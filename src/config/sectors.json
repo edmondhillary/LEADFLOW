@@ -1,0 +1,51 @@
+{
+  "fontanero": {
+    "ES": { "term": "fontanero", "plural": "fontaneros", "searchQuery": "fontanero {city}" },
+    "AR": { "term": "plomero", "plural": "plomeros", "searchQuery": "plomero {city}" },
+    "UY": { "term": "plomero", "plural": "plomeros", "searchQuery": "plomero {city}" },
+    "icon": "🔧",
+    "defaultServices": ["Reparación de tuberías", "Desatascos", "Instalación de grifería", "Detección de fugas", "Calentadores y calderas"]
+  },
+  "electricista": {
+    "ES": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
+    "AR": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
+    "UY": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
+    "icon": "⚡",
+    "defaultServices": ["Instalaciones eléctricas", "Averías eléctricas", "Cuadros eléctricos", "Iluminación LED", "Certificados eléctricos"]
+  },
+  "peluqueria": {
+    "ES": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
+    "AR": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
+    "UY": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
+    "icon": "✂️",
+    "defaultServices": ["Corte de pelo", "Coloración", "Peinados", "Tratamientos capilares", "Barba y afeitado"]
+  },
+  "dentista": {
+    "ES": { "term": "dentista", "plural": "dentistas", "searchQuery": "clínica dental {city}" },
+    "AR": { "term": "dentista", "plural": "dentistas", "searchQuery": "dentista {city}" },
+    "UY": { "term": "dentista", "plural": "dentistas", "searchQuery": "dentista {city}" },
+    "icon": "🦷",
+    "defaultServices": ["Limpieza dental", "Empastes", "Ortodoncia", "Implantes", "Blanqueamiento"]
+  },
+  "restaurante": {
+    "ES": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
+    "AR": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
+    "UY": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
+    "icon": "🍽️",
+    "defaultServices": ["Menú del día", "Carta", "Eventos privados", "Comida para llevar", "Reservas"]
+  },
+  "gimnasio": {
+    "ES": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
+    "AR": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
+    "UY": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
+    "icon": "🏋️",
+    "defaultServices": ["Sala de musculación", "Clases dirigidas", "Entrenamiento personal", "Cardio", "Crossfit"]
+  },
+  "taller": {
+    "ES": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
+    "AR": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
+    "UY": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
+    "icon": "🔩",
+    "defaultServices": ["Revisión general", "Cambio de aceite", "Frenos", "Neumáticos", "Diagnosis electrónica"]
+  }
+}

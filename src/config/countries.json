@@ -1,0 +1,50 @@
+{
+  "ES": {
+    "name": "España",
+    "flag": "🇪🇸",
+    "locale": "es-ES",
+    "currency": "EUR",
+    "currencySymbol": "€",
+    "price": 25,
+    "originalPrice": 60,
+    "domainExtension": ".es",
+    "domainCost": 15,
+    "phonePrefix": "+34",
+    "searchDomain": "google.es",
+    "searchParams": { "gl": "es", "hl": "es" },
+    "voseo": false,
+    "timezone": "Europe/Madrid"
+  },
+  "AR": {
+    "name": "Argentina",
+    "flag": "🇦🇷",
+    "locale": "es-AR",
+    "currency": "USD",
+    "currencySymbol": "$",
+    "price": 25,
+    "originalPrice": 60,
+    "domainExtension": ".com.ar",
+    "domainCost": 15,
+    "phonePrefix": "+54",
+    "searchDomain": "google.com.ar",
+    "searchParams": { "gl": "ar", "hl": "es" },
+    "voseo": true,
+    "timezone": "America/Argentina/Buenos_Aires"
+  },
+  "UY": {
+    "name": "Uruguay",
+    "flag": "🇺🇾",
+    "locale": "es-AR",
+    "currency": "USD",
+    "currencySymbol": "$",
+    "price": 25,
+    "originalPrice": 60,
+    "domainExtension": ".com.uy",
+    "domainCost": 15,
+    "phonePrefix": "+598",
+    "searchDomain": "google.com.uy",
+    "searchParams": { "gl": "uy", "hl": "es" },
+    "voseo": true,
+    "timezone": "America/Montevideo"
+  }
+}
