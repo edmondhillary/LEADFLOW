@@ -124,8 +124,8 @@ const EXCLUDED_DOMAINS = [
 async function findTopCompetitorUrls(
   sector: string, city: string, country: string, limit = 3
 ): Promise<string[]> {
-  const apiKey = process.env.SERPAPI_API_KEY;
-  if (!apiKey) throw new Error('Falta SERPAPI_API_KEY');
+  const apiKey = process.env.SERPAPI_KEY || process.env.SERPAPI_API_KEY;
+  if (!apiKey) throw new Error('Falta SERPAPI_KEY');
 
   const SECTOR_TERMS: Record<string, Record<string, string>> = {
     fontanero:    { ES: 'fontanero', AR: 'plomero', UY: 'plomero' },
