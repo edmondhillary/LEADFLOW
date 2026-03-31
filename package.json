@@ -12,11 +12,17 @@
     "generate": "tsx skills/generate.ts",
     "cleanup": "tsx skills/cleanup/index.ts",
     "pipeline": "tsx skills/generate.ts",
-    "bot": "tsx src/bot/telegram.ts"
+    "bot": "tsx src/bot/telegram.ts",
+    "list-leads": "tsx scripts/list-leads.ts",
+    "send-test-wa": "tsx scripts/send-test-whatsapp.ts",
+    "preview": "tsx scripts/preview-leads.ts",
+    "lint-ui": "tsx scripts/lint-ui.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@getbrevo/brevo": "^5.0.3",
+    "dotenv": "^16.6.1",
+    "lucide-react": "^0.468.0",
     "mongoose": "^8.10.0",
     "next": "^15.2.0",
     "node-telegram-bot-api": "^0.67.0",

@@ -11,7 +11,11 @@
 import Stripe from 'stripe';
 import { connectDB, Lead } from '../../src/lib/mongodb';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy init — evita que falle al importar antes de cargar .env.local
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('Falta STRIPE_SECRET_KEY en .env.local');
+  return new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 
 export async function createPaymentLink(options: {
   leadId: string;
@@ -38,6 +42,8 @@ export async function createPaymentLink(options: {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
+
+  const stripe = getStripe();
 
   // Crear el payment link con Stripe SDK
   const paymentLink = await stripe.paymentLinks.create({
@@ -92,6 +98,7 @@ export async function createDomainPaymentLink(options: {
 
   if (!priceId) return null;
 
+  const stripe = getStripe();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
 
   const paymentLink = await stripe.paymentLinks.create({

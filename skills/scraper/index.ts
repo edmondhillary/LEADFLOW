@@ -36,6 +36,52 @@ const SECTORS: Record<string, SectorConfig> = {
   taller:       { terms: { ES: 'taller mecánico', AR: 'taller mecánico', UY: 'taller mecánico' }, services: ['Cambio de aceite', 'Frenos', 'Diagnóstico'] },
 };
 
+// Valida si un número es móvil (muy probable que tenga WhatsApp)
+function isMobileNumber(phone: string | undefined, country: string): boolean {
+  if (!phone) return false;
+
+  // Quitamos todo excepto dígitos
+  const digits = phone.replace(/\D/g, '');
+
+  if (country === 'ES') {
+    // Extraemos los 9 dígitos nacionales (quitando prefijo +34 o 34 si viene)
+    let national = digits;
+    if (national.startsWith('34') && national.length === 11) national = national.slice(2);
+    // España: móviles empiezan SOLO por 6 o 7 — nunca 9 (fijo), 8, 5...
+    return national.length === 9 && /^[67]/.test(national);
+  }
+  if (country === 'AR') {
+    // Argentina: quitamos prefijo 54 si existe
+    let national = digits;
+    if (national.startsWith('54')) national = national.slice(2);
+    // Móviles: empiezan por 9, 11, 15
+    return /^(9|11|15)/.test(national) && national.length >= 10;
+  }
+  if (country === 'UY') {
+    let national = digits;
+    if (national.startsWith('598')) national = national.slice(3);
+    // Uruguay móviles: empiezan por 09
+    return /^09/.test(national) && national.length === 9;
+  }
+  return false; // Si no reconocemos el país, descartamos
+}
+
+// Normaliza teléfono a formato internacional para Twilio/WhatsApp
+function normalizePhone(phone: string, country: string): string {
+  const clean = phone.replace(/[\s\-().]/g, '');
+  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598' };
+  const prefix = prefixes[country] || '';
+
+  if (clean.startsWith('+')) return clean;
+  if (country === 'ES' && clean.startsWith('34')) return '+' + clean;
+  if (country === 'ES') return prefix + clean;
+  if (country === 'AR' && clean.startsWith('54')) return '+' + clean;
+  if (country === 'AR') return prefix + clean;
+  if (country === 'UY' && clean.startsWith('598')) return '+' + clean;
+  if (country === 'UY') return prefix + clean;
+  return clean.startsWith('+') ? clean : '+' + clean;
+}
+
 function generateSlug(businessName: string, city: string, sector: string): string {
   const clean = (str: string) => str
     .toLowerCase()
@@ -159,6 +205,13 @@ export async function runScraper(options: {
         continue;
       }
 
+      // Validar que tiene número de móvil (posible WhatsApp)
+      const isMobile = isMobileNumber(phone, country);
+      if (!phone || !isMobile) {
+        console.log(`⏭️  Sin móvil WhatsApp: ${result.title} (${phone || 'sin teléfono'})`);
+        continue;
+      }
+
       // Guardar lead
       try {
         await Lead.create({
@@ -167,7 +220,7 @@ export async function runScraper(options: {
           sector,
           city,
           country,
-          phone: phone || null,
+          phone: normalizePhone(phone, country),
           address: result.address || null,
           locale,
           currency,

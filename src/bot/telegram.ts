@@ -1,9 +1,9 @@
 /**
- * BOT DE TELEGRAM — Centro de Control LeadFlow
+ * BOT DE TELEGRAM — Centro de Control LeadFlow v2
  *
- * Controla todo el sistema desde el móvil:
- * - Lanzar pipeline (sector + ciudad + país + cantidad)
- * - Ver estadísticas del pipeline
+ * Controla todo el sistema desde el movil:
+ * - Lanzar pipeline v2 (sector + ciudad + pais + cantidad + modo)
+ * - Ver estadisticas del pipeline
  * - Ver leads activos y su estado
  * - Enviar payment link a un lead
  * - Marcar como contactado
@@ -26,28 +26,35 @@ const TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
 
 if (!TOKEN || !CHAT_ID) {
-  console.error('❌ Faltan TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID en .env.local');
+  console.error('TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID son obligatorios en .env.local');
   process.exit(1);
 }
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// ========================
-// ESTADO DE SESIÓN
-// ========================
+// ─── Estado de sesion ────────────────────────────────────────────────────────
+
 interface Session {
-  step: string;
+  step:
+    | 'idle'
+    | 'sector'
+    | 'country'
+    | 'city'
+    | 'limit'
+    | 'mode'
+    | 'confirm'
+    | 'running';
   sector?: string;
   city?: string;
   country?: string;
   limit?: number;
+  skipDesign?: boolean;
+  prodWhatsApp?: boolean;
 }
 
 const session: Session = { step: 'idle' };
 
-// ========================
-// HELPERS
-// ========================
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isAuthorized(chatId: number): boolean {
   return chatId.toString() === CHAT_ID;
@@ -57,6 +64,12 @@ async function sendMsg(text: string, opts?: TelegramBot.SendMessageOptions) {
   return bot.sendMessage(CHAT_ID, text, { parse_mode: 'Markdown', ...opts });
 }
 
+function buildBaseUrl(): string {
+  return process.env.NGROK_URL
+    || process.env.NEXT_PUBLIC_BASE_URL
+    || 'https://leadflow.vercel.app';
+}
+
 async function getStats() {
   await connectDB();
   const stats = await Lead.aggregate([
@@ -64,143 +77,141 @@ async function getStats() {
     { $sort: { _id: 1 } },
   ]);
 
-  const emojis: Record<string, string> = {
-    scraped: '📋', analyzing: '🔍', generating: '🤖',
-    web_live: '🌐', email_sent: '📧', visited: '👀',
-    contacted: '📞', client: '🎉', expired: '⏰',
+  const labels: Record<string, string> = {
+    scraped:    'Scrapeados',
+    analyzing:  'Analizando',
+    generating: 'Generando',
+    web_live:   'Web en vivo',
+    email_sent: 'Email enviado',
+    visited:    'Han visitado',
+    contacted:  'Contactados',
+    client:     'Clientes',
+    expired:    'Expirados',
   };
 
   let total = 0;
-  let text = '📊 *Pipeline LeadFlow*\n\n';
+  let text = '*Pipeline LeadFlow v2*\n\n';
   for (const s of stats) {
-    const emoji = emojis[s._id] || '❓';
-    text += `${emoji} ${s._id}: *${s.count}*\n`;
+    const label = labels[s._id] || s._id;
+    text += `${label}: *${s.count}*\n`;
     total += s.count;
   }
-  text += `\n📈 Total: *${total}* leads`;
+  text += `\nTotal: *${total}* leads`;
 
-  // Clientes activos (los que pagan)
-  const clients = stats.find(s => s._id === 'client')?.count || 0;
+  const clients = stats.find((s: any) => s._id === 'client')?.count || 0;
   const mrr = clients * 25;
-  text += `\n💰 MRR estimado: *${mrr}€/mes*`;
+  text += `\nMRR estimado: *${mrr}€/mes*`;
 
   return text;
 }
 
-// ========================
-// MENÚ PRINCIPAL
-// ========================
+// ─── Teclados ─────────────────────────────────────────────────────────────────
 
-const MAIN_KEYBOARD = {
+const MAIN_KEYBOARD: TelegramBot.SendMessageOptions = {
   reply_markup: {
     keyboard: [
-      [{ text: '🚀 Generar webs' }, { text: '📊 Estadísticas' }],
-      [{ text: '👀 Leads activos' }, { text: '🎉 Clientes' }],
-      [{ text: '🧹 Cleanup' }, { text: '❓ Ayuda' }],
+      [{ text: 'Generar webs' }, { text: 'Estadisticas' }],
+      [{ text: 'Leads activos' }, { text: 'Clientes' }],
+      [{ text: 'Cleanup' }, { text: 'Ayuda' }],
     ],
     resize_keyboard: true,
-    persistent: true,
   },
 };
 
-// ========================
-// COMANDOS
-// ========================
+const CANCEL_KB: TelegramBot.SendMessageOptions = {
+  reply_markup: {
+    keyboard: [[{ text: 'Cancelar' }]],
+    resize_keyboard: true,
+  },
+};
+
+// ─── /start ───────────────────────────────────────────────────────────────────
 
 bot.onText(/\/start/, async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
   session.step = 'idle';
   await sendMsg(
-    `🚀 *LeadFlow Bot* activo\n\n` +
-    `Soy tu centro de control. Desde aquí puedes:\n` +
-    `• Lanzar el pipeline de generación de webs\n` +
-    `• Ver estadísticas en tiempo real\n` +
-    `• Gestionar tus leads y clientes\n\n` +
-    `¿Qué hacemos?`,
+    `*LeadFlow Bot v2* activo\n\n` +
+    `Centro de control desde el movil.\n` +
+    `Genera webs para negocios sin presencia online,\n` +
+    `recibe alertas cuando visitan y cobra 25/mes.\n\n` +
+    `Que hacemos?`,
     MAIN_KEYBOARD
   );
 });
 
-// ========================
-// HANDLER DE MENSAJES
-// ========================
+// ─── Handler principal ────────────────────────────────────────────────────────
 
 bot.on('message', async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
   const text = msg.text?.trim() || '';
 
-  // ── MENÚ PRINCIPAL ──────────────────────────────
+  // ── Menu principal ───────────────────────────────────────────────────────
 
-  if (text === '📊 Estadísticas') {
+  if (text === 'Estadisticas') {
     const stats = await getStats();
     await sendMsg(stats, {
       reply_markup: {
-        inline_keyboard: [[
-          { text: '🔄 Actualizar', callback_data: 'stats' },
-        ]],
+        inline_keyboard: [[{ text: 'Actualizar', callback_data: 'stats' }]],
       },
     });
     return;
   }
 
-  if (text === '🧹 Cleanup') {
-    await sendMsg('🧹 Ejecutando cleanup...');
+  if (text === 'Cleanup') {
+    await sendMsg('Ejecutando cleanup...');
     const { expired, cleaned } = await runCleanup();
     await sendMsg(
-      `✅ *Cleanup completado*\n\n` +
-      `⏰ Leads expirados: *${expired}*\n` +
-      `🗑️ Leads limpiados: *${cleaned}*`
-    );
-    return;
-  }
-
-  if (text === '❓ Ayuda') {
-    await sendMsg(
-      `*LeadFlow — Comandos*\n\n` +
-      `🚀 *Generar webs* — Lanza el pipeline completo\n` +
-      `📊 *Estadísticas* — Ver estado del pipeline\n` +
-      `👀 *Leads activos* — Ver leads visitados sin convertir\n` +
-      `🎉 *Clientes* — Ver clientes que pagan\n` +
-      `🧹 *Cleanup* — Expirar leads de +48h\n\n` +
-      `*Comandos adicionales:*\n` +
-      `/stats — Estadísticas rápidas\n` +
-      `/leads — Lista de leads activos\n` +
-      `/cleanup — Limpieza manual`,
+      `*Cleanup completado*\n\nExpirados: *${expired}*\nLimpiados: *${cleaned}*`,
       MAIN_KEYBOARD
     );
     return;
   }
 
-  if (text === '👀 Leads activos') {
+  if (text === 'Ayuda') {
+    await sendMsg(
+      `*LeadFlow v2 - Comandos*\n\n` +
+      `*Generar webs* - Pipeline completo (6 pasos)\n` +
+      `*Estadisticas* - Estado de todos los leads\n` +
+      `*Leads activos* - Leads que visitaron su web\n` +
+      `*Clientes* - Clientes que pagan\n` +
+      `*Cleanup* - Expirar leads de +48h\n\n` +
+      `*Comandos rapidos:*\n` +
+      `/stats - Estadisticas rapidas\n` +
+      `/leads - Lista leads activos\n` +
+      `/cleanup - Limpieza manual\n` +
+      `/pipeline - Estado del pipeline`,
+      MAIN_KEYBOARD
+    );
+    return;
+  }
+
+  if (text === 'Leads activos') {
     await connectDB();
     const leads = await Lead.find({
-      status: { $in: ['visited', 'email_sent'] },
+      status: { $in: ['visited', 'email_sent', 'web_live'] },
     }).sort({ lastVisit: -1 }).limit(10);
 
     if (leads.length === 0) {
-      await sendMsg('No hay leads activos en este momento.');
+      await sendMsg('No hay leads activos ahora mismo.', MAIN_KEYBOARD);
       return;
     }
 
+    const baseUrl = buildBaseUrl();
     for (const lead of leads) {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
-      const visits = lead.visitCount > 0 ? `👁 ${lead.visitCount} visita${lead.visitCount > 1 ? 's' : ''}` : '📧 email enviado';
-      const phone = lead.phone ? `📞 ${lead.phone}` : 'Sin teléfono';
-
+      const visits = lead.visitCount > 0 ? `Visitas: ${lead.visitCount}` : 'Sin visitas';
       await sendMsg(
-        `🏢 *${lead.businessName}*\n` +
-        `📍 ${lead.city} (${lead.country}) — ${lead.sector}\n` +
-        `${visits}\n${phone}`,
+        `*${lead.businessName}*\n${lead.city} - ${lead.sector}\nTel: ${lead.phone || 'N/A'}\n${visits}`,
         {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '🌐 Ver web', url: `${baseUrl}/${lead.slug}` },
-                { text: '💳 Enviar cobro', callback_data: `pay_${lead._id}` },
+                { text: 'Ver web', url: `${baseUrl}/${lead.slug}` },
+                { text: 'Enviar cobro', callback_data: `pay_${lead._id}` },
               ],
               [
-                { text: '✅ Marcar contactado', callback_data: `contact_${lead._id}` },
-                { text: '📋 Info completa', callback_data: `info_${lead._id}` },
+                { text: 'Contactado', callback_data: `contact_${lead._id}` },
+                { text: 'Info completa', callback_data: `info_${lead._id}` },
               ],
             ],
           },
@@ -210,126 +221,132 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  if (text === '🎉 Clientes') {
+  if (text === 'Clientes') {
     await connectDB();
-    const clients = await Lead.find({ status: 'client' }).sort({ paidAt: -1 }).limit(10);
+    const clients = await Lead.find({ status: 'client' }).sort({ paidAt: -1 }).limit(15);
 
     if (clients.length === 0) {
-      await sendMsg('Aún no tienes clientes. ¡Sigue generando webs! 💪');
+      await sendMsg('Aun no hay clientes. Sigue generando webs!', MAIN_KEYBOARD);
       return;
     }
 
-    let msg_text = `🎉 *Tus clientes (${clients.length})*\n\n`;
+    let msgText = `*Clientes activos (${clients.length})*\n\n`;
     for (const c of clients) {
       const price = c.currency === 'EUR' ? `${c.price}€` : `$${c.price}`;
-      msg_text += `• *${c.businessName}* — ${price}/mes (${c.city})\n`;
+      msgText += `- *${c.businessName}* - ${price}/mes (${c.city})\n`;
     }
-    const total = clients.reduce((sum, c) => sum + c.price, 0);
-    msg_text += `\n💰 MRR: *${total}€/mes*`;
-    await sendMsg(msg_text);
+    const total = clients.reduce((sum: number, c: any) => sum + (c.price || 25), 0);
+    msgText += `\nMRR: *${total} euros/mes*`;
+    await sendMsg(msgText, MAIN_KEYBOARD);
     return;
   }
 
-  // ── FLUJO: GENERAR WEBS ──────────────────────────
+  // ── Flujo: Generar webs ────────────────────────────────────────────────────
 
-  if (text === '🚀 Generar webs') {
+  if (text === 'Generar webs') {
     session.step = 'sector';
-    await sendMsg(
-      '¿Qué sector quieres atacar?',
-      {
-        reply_markup: {
-          keyboard: [
-            [{ text: '🔧 Fontanero' }, { text: '⚡ Electricista' }],
-            [{ text: '✂️ Peluquería' }, { text: '🦷 Dentista' }],
-            [{ text: '🍽️ Restaurante' }, { text: '💪 Gimnasio' }],
-            [{ text: '🚗 Taller' }, { text: '❌ Cancelar' }],
-          ],
-          resize_keyboard: true,
-        },
-      }
-    );
+    await sendMsg('Que sector quieres atacar?', {
+      reply_markup: {
+        keyboard: [
+          [{ text: 'Fontanero' }, { text: 'Electricista' }],
+          [{ text: 'Peluqueria' }, { text: 'Dentista' }],
+          [{ text: 'Restaurante' }, { text: 'Gimnasio' }],
+          [{ text: 'Taller' }, { text: 'Cancelar' }],
+        ],
+        resize_keyboard: true,
+      },
+    });
     return;
   }
 
-  if (text === '❌ Cancelar') {
+  if (text === 'Cancelar') {
     session.step = 'idle';
     await sendMsg('Cancelado.', MAIN_KEYBOARD);
     return;
   }
 
-  // Paso 1: Sector
+  // ── Paso 1: Sector ────────────────────────────────────────────────────────
+
   if (session.step === 'sector') {
     const sectorMap: Record<string, string> = {
-      '🔧 Fontanero': 'fontanero',
-      '⚡ Electricista': 'electricista',
-      '✂️ Peluquería': 'peluqueria',
-      '🦷 Dentista': 'dentista',
-      '🍽️ Restaurante': 'restaurante',
-      '💪 Gimnasio': 'gimnasio',
-      '🚗 Taller': 'taller',
+      'Fontanero': 'fontanero',
+      'Electricista': 'electricista',
+      'Peluqueria': 'peluqueria',
+      'Dentista': 'dentista',
+      'Restaurante': 'restaurante',
+      'Gimnasio': 'gimnasio',
+      'Taller': 'taller',
     };
     const sector = sectorMap[text];
-    if (!sector) {
-      await sendMsg('Elige un sector del menú 👆');
-      return;
-    }
+    if (!sector) { await sendMsg('Elige un sector del menu'); return; }
     session.sector = sector;
     session.step = 'country';
-    await sendMsg(
-      `Sector: *${sector}* ✅\n\n¿En qué país?`,
-      {
-        reply_markup: {
-          keyboard: [
-            [{ text: '🇪🇸 España' }, { text: '🇦🇷 Argentina' }],
-            [{ text: '🇺🇾 Uruguay' }, { text: '❌ Cancelar' }],
-          ],
-          resize_keyboard: true,
-        },
-      }
-    );
+    await sendMsg(`Sector: *${sector}*\n\nEn que pais?`, {
+      reply_markup: {
+        keyboard: [
+          [{ text: 'Espana' }, { text: 'Argentina' }],
+          [{ text: 'Uruguay' }, { text: 'Cancelar' }],
+        ],
+        resize_keyboard: true,
+      },
+    });
     return;
   }
 
-  // Paso 2: País
+  // ── Paso 2: Pais ──────────────────────────────────────────────────────────
+
   if (session.step === 'country') {
     const countryMap: Record<string, string> = {
-      '🇪🇸 España': 'ES',
-      '🇦🇷 Argentina': 'AR',
-      '🇺🇾 Uruguay': 'UY',
+      'Espana': 'ES', 'Argentina': 'AR', 'Uruguay': 'UY',
     };
     const country = countryMap[text];
-    if (!country) {
-      await sendMsg('Elige un país del menú 👆');
-      return;
-    }
+    if (!country) { await sendMsg('Elige un pais del menu'); return; }
     session.country = country;
     session.step = 'city';
-    await sendMsg(
-      `País: *${text}* ✅\n\n¿En qué ciudad? (escribe el nombre)`,
-      {
-        reply_markup: {
-          keyboard: [
-            [{ text: '❌ Cancelar' }],
-          ],
-          resize_keyboard: true,
-        },
-      }
-    );
+    await sendMsg(`Pais: *${text}*\n\nEn que ciudad? (escribe el nombre)`, CANCEL_KB);
     return;
   }
 
-  // Paso 3: Ciudad
+  // ── Paso 3: Ciudad ────────────────────────────────────────────────────────
+
   if (session.step === 'city') {
+    if (text.length < 2) { await sendMsg('Escribe el nombre de la ciudad'); return; }
     session.city = text;
     session.step = 'limit';
+    await sendMsg(`Ciudad: *${text}*\n\nCuantas webs generar?`, {
+      reply_markup: {
+        keyboard: [
+          [{ text: '3' }, { text: '5' }, { text: '10' }],
+          [{ text: '20' }, { text: '50' }],
+          [{ text: 'Cancelar' }],
+        ],
+        resize_keyboard: true,
+      },
+    });
+    return;
+  }
+
+  // ── Paso 4: Cantidad ──────────────────────────────────────────────────────
+
+  if (session.step === 'limit') {
+    const limit = parseInt(text);
+    if (isNaN(limit) || limit < 1 || limit > 100) {
+      await sendMsg('Elige un numero entre 1 y 100'); return;
+    }
+    session.limit = limit;
+    session.step = 'mode';
     await sendMsg(
-      `Ciudad: *${text}* ✅\n\n¿Cuántas webs generar? (1-50)`,
+      `Cantidad: *${limit} webs*\n\n` +
+      `Que modo quieres?\n\n` +
+      `*Completo* - Scraping de competidores + brand guidelines por IA.\n` +
+      `Mejor resultado, tarda 3-5 min extra.\n\n` +
+      `*Rapido* - Sin scraping de diseno, usa defaults del sector.\n` +
+      `Tarda ~1 min.`,
       {
         reply_markup: {
           keyboard: [
-            [{ text: '5' }, { text: '10' }, { text: '20' }],
-            [{ text: '30' }, { text: '50' }],
-            [{ text: '❌ Cancelar' }],
+            [{ text: 'Completo (recomendado)' }, { text: 'Rapido' }],
+            [{ text: 'Cancelar' }],
           ],
           resize_keyboard: true,
         },
@@ -338,95 +355,166 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // Paso 4: Cantidad → LANZAR PIPELINE
-  if (session.step === 'limit') {
-    const limit = parseInt(text);
-    if (isNaN(limit) || limit < 1 || limit > 50) {
-      await sendMsg('Elige un número entre 1 y 50 👆');
-      return;
+  // ── Paso 5: Modo ──────────────────────────────────────────────────────────
+
+  if (session.step === 'mode') {
+    if (text === 'Completo (recomendado)') {
+      session.skipDesign = false;
+    } else if (text === 'Rapido') {
+      session.skipDesign = true;
+    } else {
+      await sendMsg('Elige un modo del menu'); return;
     }
-    session.limit = limit;
+    session.step = 'confirm';
+    await sendMsg(
+      `A quien envias el WhatsApp de preview?\n\n` +
+      `*A mi (test)* - Lo ves tu primero antes de mandar a los leads.\n\n` +
+      `*A los leads (prod)* - Se envia directo al telefono del negocio.\n` +
+      `Usa solo con Vercel + Twilio configurados.`,
+      {
+        reply_markup: {
+          keyboard: [
+            [{ text: 'Enviar a mi (test)' }, { text: 'Enviar a leads (prod)' }],
+            [{ text: 'Cancelar' }],
+          ],
+          resize_keyboard: true,
+        },
+      }
+    );
+    return;
+  }
+
+  // ── Paso 6: Confirmacion + LANZAR ─────────────────────────────────────────
+
+  if (session.step === 'confirm') {
+    if (text === 'Enviar a mi (test)') {
+      session.prodWhatsApp = false;
+    } else if (text === 'Enviar a leads (prod)') {
+      session.prodWhatsApp = true;
+    } else {
+      await sendMsg('Elige una opcion del menu'); return;
+    }
+
     session.step = 'running';
+    const modeLabel = session.skipDesign ? 'Rapido' : 'Completo con brand AI';
+    const waLabel   = session.prodWhatsApp ? 'PROD - a los leads' : 'TEST - a ti';
 
     await sendMsg(
-      `🚀 *Lanzando pipeline...*\n\n` +
+      `*Lanzando pipeline v2...*\n\n` +
       `Sector: *${session.sector}*\n` +
-      `País: *${session.country}*\n` +
+      `Pais: *${session.country}*\n` +
       `Ciudad: *${session.city}*\n` +
-      `Webs: *${limit}*\n\n` +
-      `⏳ Esto puede tardar varios minutos...`,
+      `Webs: *${session.limit}*\n` +
+      `Modo: *${modeLabel}*\n` +
+      `WhatsApp: *${waLabel}*\n\n` +
+      `Te aviso cuando termine. Puede tardar varios minutos.`,
       MAIN_KEYBOARD
     );
 
-    // Ejecutar pipeline en background
+    // Ping de progreso cada 60s
+    const pingMessages = [
+      'Buscando negocios sin web en Google Maps...',
+      'Scrapeando disenos de competidores con Playwright...',
+      'Generando brand guidelines con IA...',
+      'Generando contenido web con Claude Haiku...',
+      'Creando payment links en Stripe...',
+      'Enviando WhatsApp de preview...',
+      'Ultimando detalles...',
+    ];
+    let pingCount = 0;
+    const pingInterval = setInterval(async () => {
+      if (session.step !== 'running') { clearInterval(pingInterval); return; }
+      const pingMsg = pingMessages[pingCount % pingMessages.length];
+      await sendMsg(`_${pingMsg}_`).catch(() => {});
+      pingCount++;
+    }, 60_000);
+
     runPipeline({
-      sector: session.sector!,
-      city: session.city!,
-      country: session.country! as 'ES' | 'AR' | 'UY',
-      limit,
-      skipEmail: false,
+      sector:            session.sector!,
+      city:              session.city!,
+      country:           session.country! as 'ES' | 'AR' | 'UY',
+      limit:             session.limit!,
+      testWhatsApp:      !session.prodWhatsApp,
+      skipDesignScraper: session.skipDesign ?? false,
     })
       .then(async (results) => {
-        const ok = results.filter(r => !r.error);
-        const errors = results.filter(r => r.error);
-        const withEmail = results.filter(r => r.emailSent);
+        clearInterval(pingInterval);
+        session.step = 'idle';
+
+        const ok     = results.filter((r: any) => !r.error);
+        const errors = results.filter((r: any) => r.error);
+        const withWA = results.filter((r: any) => r.whatsappSent);
 
         await sendMsg(
-          `✅ *Pipeline completado*\n\n` +
-          `🌐 Webs generadas: *${ok.length}/${results.length}*\n` +
-          `📧 Emails enviados: *${withEmail.length}*\n` +
-          `❌ Errores: *${errors.length}*\n\n` +
-          (ok.length > 0 ? `*Webs creadas:*\n${ok.slice(0, 5).map(r => `• ${r.businessName}`).join('\n')}` : '')
+          `*Pipeline completado*\n\n` +
+          `Webs generadas: *${ok.length}/${results.length}*\n` +
+          `WhatsApp enviados: *${withWA.length}*\n` +
+          `Errores: *${errors.length}*`
         );
 
-        session.step = 'idle';
+        // Una card por web con boton de abrir + enviar cobro
+        if (ok.length > 0) {
+          await sendMsg(`*Webs creadas:*`);
+          for (const r of ok.slice(0, 10) as any[]) {
+            await sendMsg(`*${r.businessName}*\n${r.webUrl}`, {
+              reply_markup: {
+                inline_keyboard: [[
+                  { text: 'Abrir web', url: r.webUrl },
+                  { text: 'Enviar cobro', callback_data: `pay_${r.leadId}` },
+                ]],
+              },
+            });
+          }
+          if (ok.length > 10) {
+            await sendMsg(`_...y ${ok.length - 10} webs mas. Usa "Leads activos" para verlas todas._`);
+          }
+        }
+
+        if (errors.length > 0) {
+          const errList = (errors as any[]).slice(0, 5).map((r) => `- ${r.businessName}: ${r.error}`).join('\n');
+          await sendMsg(`*Errores:*\n\n${errList}`);
+        }
       })
-      .catch(async (err) => {
-        await sendMsg(`❌ *Error en el pipeline:* ${err.message}`);
+      .catch(async (err: any) => {
+        clearInterval(pingInterval);
         session.step = 'idle';
+        await sendMsg(`*Error en el pipeline:* ${err.message}`);
       });
 
     return;
   }
 });
 
-// ========================
-// CALLBACK BUTTONS
-// ========================
+// ─── Callback buttons ─────────────────────────────────────────────────────────
 
 bot.on('callback_query', async (query) => {
   if (!isAuthorized(query.message!.chat.id)) return;
   const data = query.data || '';
-
   await bot.answerCallbackQuery(query.id);
 
-  // Estadísticas
   if (data === 'stats') {
     const stats = await getStats();
     await sendMsg(stats);
     return;
   }
 
-  // Enviar payment link
   if (data.startsWith('pay_')) {
     const leadId = data.replace('pay_', '');
-    await sendMsg('⏳ Creando payment link...');
-    const url = await createPaymentLink({ leadId });
-    if (url) {
-      const lead = await Lead.findById(leadId);
-      await sendMsg(
-        `💳 *Payment link generado*\n\n` +
-        `🏢 ${lead?.businessName}\n\n` +
-        `👉 ${url}\n\n` +
-        `_Envíaselo por WhatsApp o email_`
-      );
-    } else {
-      await sendMsg('❌ Error creando payment link');
+    await sendMsg('Creando payment link...');
+    try {
+      const url = await createPaymentLink({ leadId });
+      if (url) {
+        const lead = await Lead.findById(leadId);
+        await sendMsg(`*Payment link generado*\n\n${lead?.businessName}\n\n${url}\n\n_Enviaselo por WhatsApp o email_`);
+      } else {
+        await sendMsg('Error: URL de pago vacia');
+      }
+    } catch (e: any) {
+      await sendMsg(`Error: ${e.message}`);
     }
     return;
   }
 
-  // Marcar como contactado
   if (data.startsWith('contact_')) {
     const leadId = data.replace('contact_', '');
     await connectDB();
@@ -435,61 +523,44 @@ bot.on('callback_query', async (query) => {
       contacted: true,
       contactedAt: new Date(),
     }, { new: true });
-    await sendMsg(`✅ *${lead?.businessName}* marcado como contactado`);
+    await sendMsg(`*${lead?.businessName}* marcado como contactado`);
     return;
   }
 
-  // Info completa del lead
   if (data.startsWith('info_')) {
     const leadId = data.replace('info_', '');
     await connectDB();
     const lead = await Lead.findById(leadId);
     if (!lead) return;
-
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
-    const price = lead.currency === 'EUR' ? `${lead.price}€` : `$${lead.price}`;
-
+    const baseUrl = buildBaseUrl();
+    const price = lead.currency === 'EUR' ? `${lead.price || 25} euros` : `${lead.price || 25} USD`;
     await sendMsg(
-      `📋 *${lead.businessName}*\n\n` +
-      `📍 ${lead.city}, ${lead.country}\n` +
-      `🏭 Sector: ${lead.sector}\n` +
-      `📞 Tel: ${lead.phone || 'N/A'}\n` +
-      `📧 Email: ${lead.email || 'N/A'}\n` +
-      `🌐 Web: ${baseUrl}/${lead.slug}\n` +
-      `💰 Precio: ${price}/mes\n` +
-      `📊 Estado: ${lead.status}\n` +
-      `👁 Visitas: ${lead.visitCount}\n` +
-      `📅 Primera visita: ${lead.firstVisit ? lead.firstVisit.toLocaleDateString('es-ES') : 'N/A'}`
+      `*${lead.businessName}*\n\n` +
+      `Ciudad: ${lead.city}, ${lead.country}\n` +
+      `Sector: ${lead.sector}\n` +
+      `Tel: ${lead.phone || 'N/A'}\n` +
+      `Email: ${lead.email || 'N/A'}\n` +
+      `Web: ${baseUrl}/${lead.slug}\n` +
+      `Precio: ${price}/mes\n` +
+      `Estado: ${lead.status}\n` +
+      `Visitas: ${lead.visitCount || 0}`
     );
     return;
   }
-
-  // Botones del tracking (visita detectada)
-  if (data.startsWith('web_')) {
-    const leadId = data.replace('web_', '');
-    const lead = await Lead.findById(leadId);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
-    if (lead) {
-      await bot.sendMessage(CHAT_ID, `Abriendo: ${baseUrl}/${lead.slug}`);
-    }
-  }
 });
 
-// ========================
-// COMANDOS RÁPIDOS
-// ========================
+// ─── Comandos rapidos ─────────────────────────────────────────────────────────
 
 bot.onText(/\/stats/, async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
-  const stats = await getStats();
-  await sendMsg(stats);
+  await sendMsg(await getStats());
 });
 
 bot.onText(/\/cleanup/, async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
-  await sendMsg('🧹 Ejecutando cleanup...');
+  await sendMsg('Ejecutando cleanup...');
   const { expired, cleaned } = await runCleanup();
-  await sendMsg(`✅ Expirados: *${expired}* | Limpiados: *${cleaned}*`);
+  await sendMsg(`Expirados: *${expired}* | Limpiados: *${cleaned}*`);
 });
 
 bot.onText(/\/leads/, async (msg) => {
@@ -499,31 +570,32 @@ bot.onText(/\/leads/, async (msg) => {
     status: { $in: ['visited', 'email_sent', 'web_live'] },
   }).sort({ createdAt: -1 }).limit(5);
 
-  if (leads.length === 0) {
-    await sendMsg('No hay leads activos.');
-    return;
-  }
+  if (leads.length === 0) { await sendMsg('No hay leads activos.'); return; }
 
-  let text = `👀 *Leads activos (${leads.length})*\n\n`;
+  const baseUrl = buildBaseUrl();
+  let txt = `*Leads activos (${leads.length})*\n\n`;
   for (const l of leads) {
-    text += `• *${l.businessName}* — ${l.status} (${l.city})\n`;
+    txt += `- *${l.businessName}* - ${l.status} - ${baseUrl}/${l.slug}\n`;
   }
-  await sendMsg(text);
+  await sendMsg(txt);
 });
 
-// ========================
-// ARRANQUE
-// ========================
+bot.onText(/\/pipeline/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await sendMsg(await getStats());
+});
 
-console.log('🤖 LeadFlow Bot iniciado...');
-connectDB().then(() => {
-  console.log('✅ MongoDB conectado');
-  sendMsg(
-    `🤖 *LeadFlow Bot online*\n\nListo para generar clientes. Usa el menú 👇`,
+// ─── Arranque ─────────────────────────────────────────────────────────────────
+
+console.log('LeadFlow Bot v2 iniciando...');
+connectDB().then(async () => {
+  console.log('MongoDB conectado');
+  await sendMsg(
+    `*LeadFlow Bot v2 online*\n\nPipeline completo activo: scraper + design AI + brand builder + content gen.`,
     MAIN_KEYBOARD
   );
 });
 
 bot.on('polling_error', (err) => {
-  console.error('❌ Polling error:', err.message);
+  console.error('Polling error:', err.message);
 });

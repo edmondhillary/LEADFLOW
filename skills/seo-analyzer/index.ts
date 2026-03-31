@@ -62,11 +62,13 @@ async function findTopCompetitor(
 
   // Filtramos: solo resultados orgánicos locales, excluimos directorios y grandes marcas
   const EXCLUDED_DOMAINS = [
+    'youtube.com', 'youtu.be',
     'yelp.com', 'tripadvisor', 'pages.google', 'facebook.com', 'instagram.com',
     'twitter.com', 'linkedin.com', 'wikipedia.org', 'amazon.com', 'infobae.com',
     'idealista', 'milanuncios', 'habitaclia', 'fotocasa', 'segundamano',
     'booking.com', 'expedia', 'airbnb', 'mercadolibre', 'olx.com',
     'paginas-amarillas', 'paginasamarillas', '11870', 'hotfrog',
+    'google.com', 'maps.google', 'goo.gl',
   ];
 
   const organicResults = data.organic_results || [];
