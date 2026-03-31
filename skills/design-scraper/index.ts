@@ -186,9 +186,17 @@ async function scrapeDesign(url: string, position: number) {
     const loadTime = Date.now() - startTime;
 
     // Extraer todo el diseño de una vez con evaluate
+    // NOTE: var __name polyfill needed because esbuild injects __name() calls
+    // inside page.evaluate when keepNames=true, but browser context lacks it.
     const design = await page.evaluate(() => {
-      const getCS = (el: Element, prop: string) =>
-        window.getComputedStyle(el).getPropertyValue(prop);
+      /* eslint-disable no-var */
+      // @ts-ignore — polyfill for esbuild __name helper (not available in browser)
+      var __name = (fn: any) => fn; // eslint-disable-line @typescript-eslint/no-unused-vars
+      /* eslint-enable no-var */
+
+      function getCS(el: Element, prop: string) {
+        return window.getComputedStyle(el).getPropertyValue(prop);
+      }
 
       // ── Colores ──────────────────────────────────────────────────────
       const body = document.body;
@@ -198,9 +206,9 @@ async function scrapeDesign(url: string, position: number) {
       const links = Array.from(document.querySelectorAll('a')).slice(0, 10);
 
       // Encontrar colores más usados
-      const colorMap: Record<string, number> = {};
+      const colorMap: { [k: string]: number } = {};
       const allEls = document.querySelectorAll('section, div, header, footer, main');
-      allEls.forEach(el => {
+      allEls.forEach(function(el) {
         const bg = getCS(el, 'background-color');
         if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
           colorMap[bg] = (colorMap[bg] || 0) + 1;
@@ -237,9 +245,9 @@ async function scrapeDesign(url: string, position: number) {
       // ── Secciones y layout ───────────────────────────────────────────
       const sectionEls = document.querySelectorAll('section, [class*="section"], [class*="block"]');
       const sections: string[] = [];
-      const sectionPatterns: any[] = [];
+      const sectionPatterns: { name: string; hasBackground: boolean; layout: string; itemCount: number }[] = [];
 
-      const SECTION_KEYWORDS: Record<string, string[]> = {
+      const SECTION_KEYWORDS = {
         hero: ['hero', 'banner', 'jumbotron', 'masthead', 'portada', 'header-main'],
         services: ['servicio', 'service', 'feature', 'what-we', 'caracteristica'],
         about: ['about', 'nosotros', 'quienes', 'quien', 'historia'],
@@ -250,13 +258,16 @@ async function scrapeDesign(url: string, position: number) {
         cta: ['cta', 'call-to-action', 'action', 'empezar', 'presupuesto'],
         faq: ['faq', 'pregunta', 'question'],
         footer: ['footer', 'pie'],
-      };
+      } as { [k: string]: string[] };
 
-      sectionEls.forEach(sec => {
+      sectionEls.forEach(function(sec) {
         const text = (sec.className + ' ' + sec.id + ' ' + (sec.textContent || '').slice(0, 200)).toLowerCase();
         let sectionName = 'unknown';
-        for (const [name, keywords] of Object.entries(SECTION_KEYWORDS)) {
-          if (keywords.some(kw => text.includes(kw))) {
+        const keys = Object.keys(SECTION_KEYWORDS);
+        for (let ki = 0; ki < keys.length; ki++) {
+          const name = keys[ki];
+          const keywords = SECTION_KEYWORDS[name];
+          if (keywords.some(function(kw) { return text.includes(kw); })) {
             sectionName = name;
             break;
           }
@@ -305,7 +316,7 @@ async function scrapeDesign(url: string, position: number) {
       }
 
       // ── CTAs ─────────────────────────────────────────────────────────
-      const ctaData = allButtons.slice(0, 5).map(btn => {
+      const ctaData = allButtons.slice(0, 5).map(function(btn) {
         const bg = getCS(btn, 'background-color');
         const border = getCS(btn, 'border');
         let style = 'solid';
@@ -313,7 +324,6 @@ async function scrapeDesign(url: string, position: number) {
           style = border && border !== 'none' ? 'outline' : 'ghost';
         }
 
-        // Determinar posición del CTA
         let pos = 'section-end';
         const parent = btn.closest('header, nav, [class*="hero"], [class*="banner"], footer, section');
         if (parent) {
@@ -325,7 +335,7 @@ async function scrapeDesign(url: string, position: number) {
         }
 
         return {
-          text: (btn.textContent?.trim() || '').slice(0, 40),
+          text: ((btn.textContent || '').trim()).slice(0, 40),
           style,
           position: pos,
         };

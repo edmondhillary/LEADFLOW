@@ -16,6 +16,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { connectDB, Lead, Competitor, WebsiteContent } from '../../src/lib/mongodb';
 import { BrandGuidelines } from '../brand-builder/index';
+import { getSectorConfig } from '../../src/lib/sectors';
 
 function getAnthropic() {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('Falta ANTHROPIC_API_KEY en .env.local');
@@ -141,7 +142,8 @@ export async function runContentGen(options: {
 
   const bg = brandGuidelines;
   const currency = lead.currency === 'EUR' ? '€' : '$';
-  const icons = SECTOR_ICONS[lead.sector] || ['star', 'wrench', 'check-circle', 'briefcase', 'award', 'clock', 'phone'];
+  const sectorCfg = getSectorConfig(lead.sector);
+  const icons = sectorCfg?.lucideIcons || SECTOR_ICONS[lead.sector] || ['star', 'wrench', 'check-circle', 'briefcase', 'award', 'clock', 'phone'];
   const isLatam = lead.country === 'AR' || lead.country === 'UY';
 
   // Locale voice
@@ -154,7 +156,10 @@ export async function runContentGen(options: {
     ? `Reseñas reales de negocios similares (inspírate, no copies):\n${competitor.reviews.slice(0, 4).map((r: string, i: number) => `${i + 1}. "${r}"`).join('\n')}`
     : 'Crea testimonios realistas con nombres locales.';
 
-  // SEO context from brand guidelines
+  // SEO context from brand guidelines or sector config
+  const sectorKeywords = isLatam
+    ? (sectorCfg?.seoKeywords?.LATAM || [])
+    : (sectorCfg?.seoKeywords?.ES || []);
   const seoCtx = bg ? `
 SEO TEMPLATES (Programmatic SEO):
 - Title: ${bg.seo.titleTemplate}
@@ -162,7 +167,7 @@ SEO TEMPLATES (Programmatic SEO):
 - H1: ${bg.seo.h1Template}
 - Schema: ${bg.seo.schemaType}
 - Keywords: ${bg.seo.keywordPattern.join(', ')}
-` : `Keywords principales: "${lead.sector} ${lead.city}", "${lead.sector} urgente ${lead.city}"`;
+` : `Keywords principales: "${lead.sector} ${lead.city}", "${lead.sector} urgente ${lead.city}"${sectorKeywords.length ? `, "${sectorKeywords.slice(0, 3).join(`", "`)}"` : ''}`;
 
   // Design context from brand guidelines
   const designCtx = bg ? `
@@ -175,8 +180,36 @@ DESIGN TOKENS (del análisis de competidores top):
 - CTA text hero: "${bg.cta.heroCTAtext}"
 ` : '';
 
+  // Sector-specific services reference
+  const sectorServices = sectorCfg?.services
+    ? (isLatam ? sectorCfg.services.LATAM : sectorCfg.services.ES)
+    : [];
+  const sectorServicesCtx = sectorServices.length ? `
+SERVICIOS TÍPICOS DEL SECTOR (usa como referencia de precios y nombres, adapta al negocio):
+${sectorServices.map(s => `- ${s.name}: ${s.priceRange}`).join('\n')}
+` : '';
+
+  // Sector-specific trust signals
+  const sectorTrust = sectorCfg?.trustSignals
+    ? (isLatam ? sectorCfg.trustSignals.LATAM : sectorCfg.trustSignals.ES)
+    : [];
+  const sectorTrustCtx = sectorTrust.length ? `
+SEÑALES DE CONFIANZA ESPECÍFICAS DEL SECTOR (usa en trustBadges y copy):
+${sectorTrust.map(t => `- "${t}"`).join('\n')}
+` : '';
+
+  // Sector-specific content guidance
+  const sectorPromptExtra = sectorCfg?.contentPrompt || '';
+
+  // Blog topics from sector config
+  const sectorBlogTopics = sectorCfg?.blogTopics || [];
+  const blogCtx = sectorBlogTopics.length ? `
+TEMAS DE BLOG CON POTENCIAL SEO PARA ESTE SECTOR (úsalos como inspiración para los títulos):
+${sectorBlogTopics.slice(0, 4).map((t, i) => `${i + 1}. ${t}`).join('\n')}
+` : '';
+
   // ════════════════════════════════════════════════════════════════════════
-  // PROMPT v2
+  // PROMPT v2 (sector-aware)
   // ════════════════════════════════════════════════════════════════════════
   const prompt = `Eres un experto en marketing local y programmatic SEO para negocios en España/Latinoamérica.
 
@@ -192,6 +225,11 @@ ${voiceInstructions}
 ${seoCtx}
 
 ${designCtx}
+
+${sectorServicesCtx}
+${sectorTrustCtx}
+${blogCtx}
+${sectorPromptExtra}
 
 ${reviewsCtx}
 
