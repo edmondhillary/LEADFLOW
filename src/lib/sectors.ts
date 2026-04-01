@@ -757,6 +757,111 @@ SECTOR: Empresa de Limpieza del Hogar y Oficinas
     certifications: ['Empresa inscrita en REA', 'Seguro de responsabilidad civil', 'Personal con contrato laboral', 'Certificado de manipulación de productos químicos'],
   },
 
+  // ── 14. MECÁNICO (motos / vehículos a domicilio) ────────────────────────
+  mecanico: {
+    id: 'mecanico',
+    names: { ES: 'Mecánico', AR: 'Mecánico', UY: 'Mecánico' },
+    schemaType: 'AutoRepair',
+    isEmergency: true,
+    availableIn: ['ES', 'AR', 'UY'],
+    defaultColors: { primary: '#292524', primaryDark: '#1c1917', accent: '#f97316' },
+    lucideIcons: ['wrench', 'bike', 'settings', 'shield-check', 'clock', 'phone', 'tool'],
+    services: {
+      ES: [
+        { name: 'Reparación de motocicletas', priceRange: '40–200€' },
+        { name: 'Mecánico a domicilio', priceRange: '60–150€' },
+        { name: 'Cambio de aceite y filtros (moto)', priceRange: '30–70€' },
+        { name: 'Revisión general de vehículo', priceRange: '40–80€' },
+        { name: 'Reparación de scooters eléctricos', priceRange: '50–180€' },
+        { name: 'Diagnóstico de averías', priceRange: '30–60€' },
+      ],
+      LATAM: [
+        { name: 'Reparación de motos', priceRange: '$4.000–$20.000' },
+        { name: 'Mecánico a domicilio', priceRange: '$5.000–$15.000' },
+        { name: 'Cambio de aceite (moto)', priceRange: '$2.500–$6.000' },
+        { name: 'Revisión general', priceRange: '$3.000–$8.000' },
+        { name: 'Diagnóstico de averías', priceRange: '$2.500–$6.000' },
+      ],
+    },
+    trustSignals: {
+      ES: ['Mecánico certificado con 10+ años', 'Servicio a domicilio disponible', 'Presupuesto gratis sin compromiso'],
+      LATAM: ['Mecánico matriculado', 'Vamos a domicilio', 'Presupuesto sin cargo'],
+    },
+    seoKeywords: {
+      ES: ['mecánico motos', 'reparación motocicleta', 'mecánico a domicilio', 'taller motos barato'],
+      LATAM: ['mecánico motos', 'reparación moto', 'mecánico a domicilio', 'taller motos'],
+    },
+    contentPrompt: `
+SECTOR: Mecánica de Motos / Vehículos a domicilio
+- Diferenciador clave: servicio A DOMICILIO — el cliente no necesita mover la moto averiada.
+- Palabras de dolor: "moto que no arranca", "scooter averiado", "no puedo ir al taller".
+- El heroTitle debe destacar el servicio móvil: "Tu mecánico llega donde estás".
+- Urgencia real: muchos clientes tienen una moto como único transporte — necesitan solución rápida.
+- Blog: tutoriales de mantenimiento preventivo de moto tienen mucho tráfico.
+- Tono: práctico, técnico, directo. El mecánico de confianza que viene a ti.`,
+    blogTopics: [
+      'Mantenimiento básico de moto que puedes hacer tú mismo',
+      'Señales de que tu moto necesita revisión urgente',
+      'Cómo elegir el aceite correcto para tu motocicleta',
+      'Mecánico a domicilio vs taller: ¿cuándo conviene cada uno?',
+      'Los problemas más frecuentes en scooters eléctricos',
+    ],
+    certifications: ['Certificado de mecánico de vehículos', 'Carnet de conducir A2/A', 'Seguro de RC profesional'],
+  },
+
+  // ── 15. AIRE ACONDICIONADO / CLIMATIZACIÓN ──────────────────────────────
+  'aire-acondicionado': {
+    id: 'aire-acondicionado',
+    names: { ES: 'Aire Acondicionado', AR: 'Aire Acondicionado', UY: 'Aire Acondicionado' },
+    schemaType: 'HVACBusiness',
+    isEmergency: true,
+    availableIn: ['ES', 'AR', 'UY'],
+    defaultColors: { primary: '#0369a1', primaryDark: '#075985', accent: '#22c55e' },
+    lucideIcons: ['wind', 'thermometer', 'snowflake', 'settings', 'shield-check', 'clock', 'zap'],
+    services: {
+      ES: [
+        { name: 'Instalación de aire acondicionado', priceRange: '300–800€' },
+        { name: 'Reparación de averías urgentes', priceRange: '60–200€' },
+        { name: 'Mantenimiento y limpieza anual', priceRange: '60–120€' },
+        { name: 'Recarga de gas refrigerante', priceRange: '80–200€' },
+        { name: 'Instalación bomba de calor', priceRange: '800–2.500€' },
+        { name: 'Revisión pre-verano', priceRange: '50–90€' },
+      ],
+      LATAM: [
+        { name: 'Instalación de split', priceRange: '$15.000–$40.000' },
+        { name: 'Reparación urgente', priceRange: '$5.000–$20.000' },
+        { name: 'Mantenimiento y limpieza', priceRange: '$4.000–$10.000' },
+        { name: 'Carga de gas', priceRange: '$6.000–$18.000' },
+        { name: 'Instalación bomba de calor', priceRange: '$50.000–$150.000' },
+      ],
+    },
+    trustSignals: {
+      ES: ['Técnico certificado F-Gas', 'Servicio urgente en verano', 'Garantía de 2 años en instalaciones'],
+      LATAM: ['Técnico certificado', 'Urgencias en temporada', 'Garantía en instalaciones'],
+    },
+    seoKeywords: {
+      ES: ['aire acondicionado barato', 'instalar aire acondicionado', 'reparación aire acondicionado', 'técnico clima urgente', 'mantenimiento AC'],
+      LATAM: ['aire acondicionado barato', 'instalación split', 'reparación aire acondicionado', 'técnico clima'],
+    },
+    contentPrompt: `
+SECTOR: Aire Acondicionado / Climatización (HVAC)
+- Servicio ESTACIONAL de alta urgencia: en verano/invierno el cliente no puede esperar.
+- El copy debe crear urgencia estacional: "¿Sin frío en pleno agosto?" / "¿Sin calefacción en diciembre?"
+- Diferenciadores: técnico certificado F-Gas (obligatorio en ES), rapidez en temporada alta, garantía.
+- La instalación nueva es el producto principal (alto ticket). El mantenimiento pre-verano es el gancho de captación.
+- Las averías urgentes en julio/agosto tienen ALTÍSIMA conversión — destacar disponibilidad.
+- Blog: guías de eficiencia energética y ahorro en factura tienen mucho tráfico anual.
+- Tono: técnico, eficiente, tranquilizador. "Tu casa a la temperatura perfecta, garantizado".`,
+    blogTopics: [
+      'Cuándo limpiar el filtro del aire acondicionado (y cómo hacerlo)',
+      'Split fijo vs portátil: ¿cuál consume menos y enfría mejor?',
+      'Cómo ahorrar en la factura de luz con el aire acondicionado',
+      'Señales de que tu aire acondicionado necesita carga de gas',
+      'Bomba de calor vs caldera: ¿cuál es más eficiente en 2026?',
+    ],
+    certifications: ['Certificado F-Gas (Reglamento 517/2014)', 'Instalador RITE', 'Seguro de RC profesional'],
+  },
+
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -25,7 +25,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: content?.seo?.metaTitle || lead.businessName,
       description: content?.seo?.metaDesc,
       type: 'website',
-      images: [{ url: imgs.og, width: 1200, height: 630 }],
+      images: [{ url: imgs.og, width: 1200, height: 630, alt: `${lead.businessName} - ${lead.sector} en ${lead.city}` }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content?.seo?.metaTitle || lead.businessName,
+      description: content?.seo?.metaDesc,
+      images: [imgs.og],
     },
   };
 }
@@ -77,10 +83,61 @@ export default async function BusinessLayout({ params, children }: Props) {
         Saltar al contenido
       </a>
 
-      {/* Urgency Banner */}
-      <div className="text-white text-center py-2.5 px-4 text-sm font-medium" style={{ backgroundColor: primaryDk }}>
-        Oferta especial — Demo gratuita disponible solo{' '}
-        <strong><span id="countdown" className="font-mono tabular-nums">48:00:00</span></strong>
+      {/* ─── Urgency Banner ─────────────────────────────────────────────────── */}
+      <div
+        style={{
+          backgroundColor: '#dc2626',
+          color: '#fff',
+          textAlign: 'center',
+          padding: '10px 16px',
+          fontSize: '14px',
+          fontWeight: 500,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '8px',
+          position: 'relative',
+          zIndex: 100,
+        }}
+      >
+        <span>
+          ¿Quieres esta web para{' '}
+          <strong style={{ fontWeight: 700 }}>{lead.businessName}</strong>?
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <span style={{ textDecoration: 'line-through', opacity: 0.7, fontSize: '13px' }}>2.500€</span>
+          <span style={{ fontWeight: 700, fontSize: '15px' }}>desde 25€/mes</span>
+          <span style={{ opacity: 0.8, fontSize: '12px' }}>
+            · Oferta válida{' '}
+            <span id="countdown" style={{ fontFamily: 'monospace', fontWeight: 700 }}>48:00:00</span>
+          </span>
+        </span>
+        {waNumber && (
+          <a
+            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola, he visto la web que han creado para ${lead.businessName} y me interesa. ¿Pueden darme más información?`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: '#fff',
+              color: '#dc2626',
+              fontWeight: 700,
+              fontSize: '13px',
+              padding: '5px 14px',
+              borderRadius: '20px',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.857L.059 23.57a.5.5 0 00.611.611l5.713-1.473A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 01-5.068-1.38l-.362-.215-3.748.965.985-3.607-.235-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+            Me interesa
+          </a>
+        )}
       </div>
 
       {/* Sticky Navbar */}

@@ -1,15 +1,12 @@
 /**
- * BOT DE TELEGRAM — Centro de Control LeadFlow v2
+ * BOT DE TELEGRAM — Centro de Control LeadFlow v3
  *
- * Controla todo el sistema desde el movil:
- * - Lanzar pipeline v2 (sector + ciudad + pais + cantidad + modo)
- * - Ver estadisticas del pipeline
- * - Ver leads activos y su estado
- * - Enviar payment link a un lead
- * - Marcar como contactado
- * - Recibir notificaciones en tiempo real (visitas, pagos)
- *
- * Uso: npx tsx src/bot/telegram.ts
+ * Cambios v3:
+ * - 22 sectores disponibles (todos los templates)
+ * - Sin paso "modo" ni "WhatsApp test/prod" (simplificado)
+ * - Info completa mejorada con copywriter + JSON crudo
+ * - /stripe genera link dinámico con selección de servicios
+ * - Health alerts para Vercel y MongoDB
  */
 
 import * as dotenv from 'dotenv';
@@ -22,8 +19,9 @@ import { runPipeline } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
+const TOKEN    = process.env.TELEGRAM_BOT_TOKEN!;
+const CHAT_ID  = process.env.TELEGRAM_CHAT_ID!;
+const BASE_URL = process.env.NGROK_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
 
 if (!TOKEN || !CHAT_ID) {
   console.error('TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID son obligatorios en .env.local');
@@ -32,29 +30,75 @@ if (!TOKEN || !CHAT_ID) {
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// ─── Estado de sesion ────────────────────────────────────────────────────────
+// ─── Todos los sectores disponibles (22 templates) ───────────────────────────
+
+const ALL_SECTORS: Record<string, string> = {
+  'Fontanero':         'fontanero',
+  'Electricista':      'electricista',
+  'Dentista':          'dentista',
+  'Mudanzas':          'mudanzas',
+  'Academia':          'academia',
+  'Arquitecto':        'arquitecto',
+  'Restaurante':       'restaurante',
+  'Gimnasio':          'gimnasio',
+  'Veterinario':       'veterinario',
+  'Fisioterapeuta':    'fisioterapeuta',
+  'Limpieza':          'limpieza',
+  'Pintor':            'pintor',
+  'Barbería':          'barberia',
+  'Peluquería canina': 'peluqueria-canina',
+  'Estética clínica':  'estetica-clinica',
+  'Inmobiliaria':      'inmobiliaria',
+  'Jardinería':        'jardineria',
+  'Pilates':           'pilates',
+  'Psicólogo':         'psicologo',
+  'Yoga':              'yoga',
+  'Aire acondicionado':'aire-acondicionado',
+  'Cerrajero':         'cerrajero',
+};
+
+// Precios de servicios (en céntimos para Stripe)
+const SERVICE_PRICES: Record<string, number> = {
+  webBasic:         2500,   // 25€
+  seoMonthly:       1500,   // 15€
+  blogContent:       500,   // 5€
+  reviewManagement: 5000,   // 50€
+  socialMedia:     10000,   // 100€
+  webMaintenance:   1000,   // 10€
+  emailMarketing:   2000,   // 20€
+  adsManagement:   15000,   // 150€
+  whatsappBot:      3000,   // 30€
+};
+
+const SERVICE_LABELS: Record<string, string> = {
+  webBasic:         '🌐 Web básica — 25€/mes',
+  seoMonthly:       '🔍 SEO mensual — +15€/mes',
+  blogContent:      '📝 Blog/contenido — +5€/mes',
+  reviewManagement: '⭐ Reseñas + Google Maps — +50€/mes',
+  socialMedia:      '📱 Redes sociales — +100€/mes',
+  webMaintenance:   '🔧 Mantenimiento web — +10€/mes',
+  emailMarketing:   '📧 Email marketing — +20€/mes',
+  adsManagement:    '📣 Gestión Ads — +150€/mes',
+  whatsappBot:      '💬 Bot WhatsApp — +30€/mes',
+};
+
+// ─── Estado de sesión ────────────────────────────────────────────────────────
 
 interface Session {
-  step:
-    | 'idle'
-    | 'sector'
-    | 'country'
-    | 'city'
-    | 'limit'
-    | 'mode'
-    | 'confirm'
-    | 'running';
+  step: 'idle' | 'sector' | 'country' | 'city' | 'limit' | 'confirm' | 'running'
+      | 'stripe_lead' | 'stripe_services';
   sector?: string;
   city?: string;
   country?: string;
   limit?: number;
-  skipDesign?: boolean;
-  prodWhatsApp?: boolean;
+  // stripe flow
+  stripeLead?: any;
+  stripeServices?: string[];
 }
 
 const session: Session = { step: 'idle' };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function isAuthorized(chatId: number): boolean {
   return chatId.toString() === CHAT_ID;
@@ -62,12 +106,6 @@ function isAuthorized(chatId: number): boolean {
 
 async function sendMsg(text: string, opts?: TelegramBot.SendMessageOptions) {
   return bot.sendMessage(CHAT_ID, text, { parse_mode: 'Markdown', ...opts });
-}
-
-function buildBaseUrl(): string {
-  return process.env.NGROK_URL
-    || process.env.NEXT_PUBLIC_BASE_URL
-    || 'https://leadflow.vercel.app';
 }
 
 async function getStats() {
@@ -78,19 +116,19 @@ async function getStats() {
   ]);
 
   const labels: Record<string, string> = {
-    scraped:    'Scrapeados',
-    analyzing:  'Analizando',
-    generating: 'Generando',
-    web_live:   'Web en vivo',
-    email_sent: 'Email enviado',
-    visited:    'Han visitado',
-    contacted:  'Contactados',
-    client:     'Clientes',
-    expired:    'Expirados',
+    scraped:    '🔍 Scrapeados',
+    analyzing:  '🔬 Analizando',
+    generating: '⚙️ Generando',
+    web_live:   '🌐 Web en vivo',
+    email_sent: '📧 Email enviado',
+    visited:    '👁️ Han visitado',
+    contacted:  '💬 Contactados',
+    client:     '✅ Clientes',
+    expired:    '❌ Expirados',
   };
 
   let total = 0;
-  let text = '*Pipeline LeadFlow v2*\n\n';
+  let text = '*📊 Pipeline LeadFlow v3*\n\n';
   for (const s of stats) {
     const label = labels[s._id] || s._id;
     text += `${label}: *${s.count}*\n`;
@@ -100,9 +138,38 @@ async function getStats() {
 
   const clients = stats.find((s: any) => s._id === 'client')?.count || 0;
   const mrr = clients * 25;
-  text += `\nMRR estimado: *${mrr}€/mes*`;
+  text += `\n💰 MRR estimado: *${mrr}€/mes*`;
 
   return text;
+}
+
+// ─── Health check para Vercel y MongoDB ──────────────────────────────────────
+
+async function checkHealth(): Promise<string> {
+  let report = '*🏥 Health Check*\n\n';
+
+  // MongoDB
+  try {
+    await connectDB();
+    const count = await Lead.countDocuments();
+    report += `✅ MongoDB — OK (${count} leads)\n`;
+  } catch (e: any) {
+    report += `❌ MongoDB — CAÍDO: ${e.message}\n`;
+  }
+
+  // Vercel (ping a la propia URL)
+  try {
+    const res = await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      report += `✅ Vercel — OK (${res.status})\n`;
+    } else {
+      report += `⚠️ Vercel — Status ${res.status}\n`;
+    }
+  } catch (e: any) {
+    report += `❌ Vercel — CAÍDO o sin respuesta\n`;
+  }
+
+  return report;
 }
 
 // ─── Teclados ─────────────────────────────────────────────────────────────────
@@ -110,9 +177,10 @@ async function getStats() {
 const MAIN_KEYBOARD: TelegramBot.SendMessageOptions = {
   reply_markup: {
     keyboard: [
-      [{ text: 'Generar webs' }, { text: 'Estadisticas' }],
-      [{ text: 'Leads activos' }, { text: 'Clientes' }],
-      [{ text: 'Cleanup' }, { text: 'Ayuda' }],
+      [{ text: '🚀 Generar webs' }, { text: '📊 Estadísticas' }],
+      [{ text: '👁️ Leads activos' }, { text: '✅ Clientes' }],
+      [{ text: '🏥 Health check' }, { text: '🧹 Cleanup' }],
+      [{ text: '💳 /stripe' }, { text: '❓ Ayuda' }],
     ],
     resize_keyboard: true,
   },
@@ -125,19 +193,42 @@ const CANCEL_KB: TelegramBot.SendMessageOptions = {
   },
 };
 
+// Teclado de sectores 22 — 2 por fila + cancelar
+function sectorKeyboard(): TelegramBot.SendMessageOptions {
+  const keys = Object.keys(ALL_SECTORS);
+  const rows: { text: string }[][] = [];
+  for (let i = 0; i < keys.length; i += 2) {
+    const row: { text: string }[] = [{ text: keys[i] }];
+    if (keys[i + 1]) row.push({ text: keys[i + 1] });
+    rows.push(row);
+  }
+  rows.push([{ text: 'Cancelar' }]);
+  return { reply_markup: { keyboard: rows, resize_keyboard: true } };
+}
+
 // ─── /start ───────────────────────────────────────────────────────────────────
 
 bot.onText(/\/start/, async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
   session.step = 'idle';
   await sendMsg(
-    `*LeadFlow Bot v2* activo\n\n` +
-    `Centro de control desde el movil.\n` +
-    `Genera webs para negocios sin presencia online,\n` +
-    `recibe alertas cuando visitan y cobra 25/mes.\n\n` +
-    `Que hacemos?`,
+    `*LeadFlow Bot v3* 🚀\n\n` +
+    `Centro de control desde el móvil.\n` +
+    `22 sectores · España · Argentina · Uruguay\n\n` +
+    `¿Qué hacemos?`,
     MAIN_KEYBOARD
   );
+});
+
+bot.onText(/\/stripe/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await startStripeFlow();
+});
+
+bot.onText(/\/health/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const report = await checkHealth();
+  await sendMsg(report, MAIN_KEYBOARD);
 });
 
 // ─── Handler principal ────────────────────────────────────────────────────────
@@ -146,19 +237,26 @@ bot.on('message', async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
   const text = msg.text?.trim() || '';
 
-  // ── Menu principal ───────────────────────────────────────────────────────
+  // ── Menú principal ───────────────────────────────────────────────────────
 
-  if (text === 'Estadisticas') {
+  if (text === '📊 Estadísticas' || text === 'Estadisticas') {
     const stats = await getStats();
     await sendMsg(stats, {
       reply_markup: {
-        inline_keyboard: [[{ text: 'Actualizar', callback_data: 'stats' }]],
+        inline_keyboard: [[{ text: '🔄 Actualizar', callback_data: 'stats' }]],
       },
     });
     return;
   }
 
-  if (text === 'Cleanup') {
+  if (text === '🏥 Health check' || text === 'Health check') {
+    await sendMsg('_Verificando servicios..._');
+    const report = await checkHealth();
+    await sendMsg(report, MAIN_KEYBOARD);
+    return;
+  }
+
+  if (text === '🧹 Cleanup' || text === 'Cleanup') {
     await sendMsg('Ejecutando cleanup...');
     const { expired, cleaned } = await runCleanup();
     await sendMsg(
@@ -168,28 +266,26 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  if (text === 'Ayuda') {
+  if (text === '❓ Ayuda' || text === 'Ayuda') {
     await sendMsg(
-      `*LeadFlow v2 - Comandos*\n\n` +
-      `*Generar webs* - Pipeline completo (6 pasos)\n` +
-      `*Estadisticas* - Estado de todos los leads\n` +
-      `*Leads activos* - Leads que visitaron su web\n` +
-      `*Clientes* - Clientes que pagan\n` +
-      `*Cleanup* - Expirar leads de +48h\n\n` +
-      `*Comandos rapidos:*\n` +
-      `/stats - Estadisticas rapidas\n` +
-      `/leads - Lista leads activos\n` +
-      `/cleanup - Limpieza manual\n` +
-      `/pipeline - Estado del pipeline`,
+      `*LeadFlow v3 — Comandos*\n\n` +
+      `*🚀 Generar webs* — Pipeline completo (scraping → web → notificación)\n` +
+      `*📊 Estadísticas* — Estado de todos los leads\n` +
+      `*👁️ Leads activos* — Leads que visitaron su web\n` +
+      `*✅ Clientes* — Clientes que pagan\n` +
+      `*🏥 Health check* — Estado de Vercel y MongoDB\n` +
+      `*🧹 Cleanup* — Expirar leads de +48h\n` +
+      `*💳 /stripe* — Generar link de pago personalizado\n\n` +
+      `*Nota:* El WhatsApp lo envías tú manualmente desde los botones de cada lead.`,
       MAIN_KEYBOARD
     );
     return;
   }
 
-  if (text === 'Leads activos') {
+  if (text === '👁️ Leads activos' || text === 'Leads activos') {
     await connectDB();
     const leads = await Lead.find({
-      status: { $in: ['visited', 'email_sent', 'web_live'] },
+      status: { $in: ['visited', 'email_sent', 'web_live', 'contacted'] },
     }).sort({ lastVisit: -1 }).limit(10);
 
     if (leads.length === 0) {
@@ -197,65 +293,34 @@ bot.on('message', async (msg) => {
       return;
     }
 
-    const baseUrl = buildBaseUrl();
     for (const lead of leads) {
-      const visits = lead.visitCount > 0 ? `Visitas: ${lead.visitCount}` : 'Sin visitas';
-      await sendMsg(
-        `*${lead.businessName}*\n${lead.city} - ${lead.sector}\nTel: ${lead.phone || 'N/A'}\n${visits}`,
-        {
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: 'Ver web', url: `${baseUrl}/${lead.slug}` },
-                { text: 'Enviar cobro', callback_data: `pay_${lead._id}` },
-              ],
-              [
-                { text: 'Contactado', callback_data: `contact_${lead._id}` },
-                { text: 'Info completa', callback_data: `info_${lead._id}` },
-              ],
-            ],
-          },
-        }
-      );
+      await sendLeadCard(lead);
     }
     return;
   }
 
-  if (text === 'Clientes') {
+  if (text === '✅ Clientes' || text === 'Clientes') {
     await connectDB();
     const clients = await Lead.find({ status: 'client' }).sort({ paidAt: -1 }).limit(15);
 
     if (clients.length === 0) {
-      await sendMsg('Aun no hay clientes. Sigue generando webs!', MAIN_KEYBOARD);
+      await sendMsg('Aún no hay clientes. ¡Sigue generando webs!', MAIN_KEYBOARD);
       return;
     }
 
-    let msgText = `*Clientes activos (${clients.length})*\n\n`;
+    let msgText = `*✅ Clientes activos (${clients.length})*\n\n`;
     for (const c of clients) {
-      const price = c.currency === 'EUR' ? `${c.price}€` : `$${c.price}`;
-      msgText += `- *${c.businessName}* - ${price}/mes (${c.city})\n`;
+      const price = c.currency === 'EUR' ? `${c.monthlyTotal || 25}€` : `$${c.monthlyTotal || 25}`;
+      msgText += `· *${c.businessName}* — ${price}/mes (${c.city})\n`;
     }
-    const total = clients.reduce((sum: number, c: any) => sum + (c.price || 25), 0);
-    msgText += `\nMRR: *${total} euros/mes*`;
+    const total = clients.reduce((sum: number, c: any) => sum + (c.monthlyTotal || 25), 0);
+    msgText += `\n💰 MRR total: *${total}€/mes*`;
     await sendMsg(msgText, MAIN_KEYBOARD);
     return;
   }
 
-  // ── Flujo: Generar webs ────────────────────────────────────────────────────
-
-  if (text === 'Generar webs') {
-    session.step = 'sector';
-    await sendMsg('Que sector quieres atacar?', {
-      reply_markup: {
-        keyboard: [
-          [{ text: 'Fontanero' }, { text: 'Electricista' }],
-          [{ text: 'Peluqueria' }, { text: 'Dentista' }],
-          [{ text: 'Restaurante' }, { text: 'Gimnasio' }],
-          [{ text: 'Taller' }, { text: 'Cancelar' }],
-        ],
-        resize_keyboard: true,
-      },
-    });
+  if (text === '💳 /stripe' || text === '/stripe') {
+    await startStripeFlow();
     return;
   }
 
@@ -265,27 +330,24 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // ── Paso 1: Sector ────────────────────────────────────────────────────────
+  // ── Flujo Generar webs ────────────────────────────────────────────────────
+
+  if (text === '🚀 Generar webs' || text === 'Generar webs') {
+    session.step = 'sector';
+    await sendMsg('¿Qué sector quieres atacar?\n\n_22 sectores disponibles:_', sectorKeyboard());
+    return;
+  }
 
   if (session.step === 'sector') {
-    const sectorMap: Record<string, string> = {
-      'Fontanero': 'fontanero',
-      'Electricista': 'electricista',
-      'Peluqueria': 'peluqueria',
-      'Dentista': 'dentista',
-      'Restaurante': 'restaurante',
-      'Gimnasio': 'gimnasio',
-      'Taller': 'taller',
-    };
-    const sector = sectorMap[text];
-    if (!sector) { await sendMsg('Elige un sector del menu'); return; }
+    const sector = ALL_SECTORS[text];
+    if (!sector) { await sendMsg('Elige un sector del menú.'); return; }
     session.sector = sector;
     session.step = 'country';
-    await sendMsg(`Sector: *${sector}*\n\nEn que pais?`, {
+    await sendMsg(`Sector: *${text}*\n\n¿En qué país?`, {
       reply_markup: {
         keyboard: [
-          [{ text: 'Espana' }, { text: 'Argentina' }],
-          [{ text: 'Uruguay' }, { text: 'Cancelar' }],
+          [{ text: '🇪🇸 España' }, { text: '🇦🇷 Argentina' }],
+          [{ text: '🇺🇾 Uruguay' }, { text: 'Cancelar' }],
         ],
         resize_keyboard: true,
       },
@@ -293,27 +355,25 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // ── Paso 2: Pais ──────────────────────────────────────────────────────────
-
   if (session.step === 'country') {
     const countryMap: Record<string, string> = {
-      'Espana': 'ES', 'Argentina': 'AR', 'Uruguay': 'UY',
+      '🇪🇸 España': 'ES', 'España': 'ES',
+      '🇦🇷 Argentina': 'AR', 'Argentina': 'AR',
+      '🇺🇾 Uruguay': 'UY', 'Uruguay': 'UY',
     };
     const country = countryMap[text];
-    if (!country) { await sendMsg('Elige un pais del menu'); return; }
+    if (!country) { await sendMsg('Elige un país del menú.'); return; }
     session.country = country;
     session.step = 'city';
-    await sendMsg(`Pais: *${text}*\n\nEn que ciudad? (escribe el nombre)`, CANCEL_KB);
+    await sendMsg(`País: *${text}*\n\n¿En qué ciudad? (escribe el nombre)`, CANCEL_KB);
     return;
   }
 
-  // ── Paso 3: Ciudad ────────────────────────────────────────────────────────
-
   if (session.step === 'city') {
-    if (text.length < 2) { await sendMsg('Escribe el nombre de la ciudad'); return; }
+    if (text.length < 2) { await sendMsg('Escribe el nombre de la ciudad.'); return; }
     session.city = text;
     session.step = 'limit';
-    await sendMsg(`Ciudad: *${text}*\n\nCuantas webs generar?`, {
+    await sendMsg(`Ciudad: *${text}*\n\n¿Cuántas webs generar?`, {
       reply_markup: {
         keyboard: [
           [{ text: '3' }, { text: '5' }, { text: '10' }],
@@ -326,55 +386,25 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // ── Paso 4: Cantidad ──────────────────────────────────────────────────────
-
   if (session.step === 'limit') {
     const limit = parseInt(text);
     if (isNaN(limit) || limit < 1 || limit > 100) {
-      await sendMsg('Elige un numero entre 1 y 100'); return;
+      await sendMsg('Elige un número entre 1 y 100.'); return;
     }
     session.limit = limit;
-    session.step = 'mode';
-    await sendMsg(
-      `Cantidad: *${limit} webs*\n\n` +
-      `Que modo quieres?\n\n` +
-      `*Completo* - Scraping de competidores + brand guidelines por IA.\n` +
-      `Mejor resultado, tarda 3-5 min extra.\n\n` +
-      `*Rapido* - Sin scraping de diseno, usa defaults del sector.\n` +
-      `Tarda ~1 min.`,
-      {
-        reply_markup: {
-          keyboard: [
-            [{ text: 'Completo (recomendado)' }, { text: 'Rapido' }],
-            [{ text: 'Cancelar' }],
-          ],
-          resize_keyboard: true,
-        },
-      }
-    );
-    return;
-  }
-
-  // ── Paso 5: Modo ──────────────────────────────────────────────────────────
-
-  if (session.step === 'mode') {
-    if (text === 'Completo (recomendado)') {
-      session.skipDesign = false;
-    } else if (text === 'Rapido') {
-      session.skipDesign = true;
-    } else {
-      await sendMsg('Elige un modo del menu'); return;
-    }
     session.step = 'confirm';
     await sendMsg(
-      `A quien envias el WhatsApp de preview?\n\n` +
-      `*A mi (test)* - Lo ves tu primero antes de mandar a los leads.\n\n` +
-      `*A los leads (prod)* - Se envia directo al telefono del negocio.\n` +
-      `Usa solo con Vercel + Twilio configurados.`,
+      `*Resumen del pipeline:*\n\n` +
+      `🏷️ Sector: *${session.sector}*\n` +
+      `🌍 País: *${session.country}*\n` +
+      `📍 Ciudad: *${session.city}*\n` +
+      `📊 Webs a generar: *${limit}*\n\n` +
+      `*Proceso:* Scraping → Filtrar sin web + WhatsApp → Template → Publicar → Notificar\n\n` +
+      `¿Lanzamos?`,
       {
         reply_markup: {
           keyboard: [
-            [{ text: 'Enviar a mi (test)' }, { text: 'Enviar a leads (prod)' }],
+            [{ text: '✅ Confirmar y lanzar' }],
             [{ text: 'Cancelar' }],
           ],
           resize_keyboard: true,
@@ -384,48 +414,32 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // ── Paso 6: Confirmacion + LANZAR ─────────────────────────────────────────
-
   if (session.step === 'confirm') {
-    if (text === 'Enviar a mi (test)') {
-      session.prodWhatsApp = false;
-    } else if (text === 'Enviar a leads (prod)') {
-      session.prodWhatsApp = true;
-    } else {
-      await sendMsg('Elige una opcion del menu'); return;
+    if (text !== '✅ Confirmar y lanzar') {
+      await sendMsg('Elige una opción del menú.'); return;
     }
 
     session.step = 'running';
-    const modeLabel = session.skipDesign ? 'Rapido' : 'Completo con brand AI';
-    const waLabel   = session.prodWhatsApp ? 'PROD - a los leads' : 'TEST - a ti';
-
     await sendMsg(
-      `*Lanzando pipeline v2...*\n\n` +
-      `Sector: *${session.sector}*\n` +
-      `Pais: *${session.country}*\n` +
-      `Ciudad: *${session.city}*\n` +
-      `Webs: *${session.limit}*\n` +
-      `Modo: *${modeLabel}*\n` +
-      `WhatsApp: *${waLabel}*\n\n` +
-      `Te aviso cuando termine. Puede tardar varios minutos.`,
+      `*🚀 Pipeline lanzado*\n\n` +
+      `Sector: *${session.sector}* · País: *${session.country}* · Ciudad: *${session.city}*\n` +
+      `Webs: *${session.limit}*\n\n` +
+      `Te aviso cuando cada web esté lista. Puede tardar varios minutos.`,
       MAIN_KEYBOARD
     );
 
     // Ping de progreso cada 60s
-    const pingMessages = [
-      'Buscando negocios sin web en Google Maps...',
-      'Scrapeando disenos de competidores con Playwright...',
-      'Generando brand guidelines con IA...',
-      'Generando contenido web con Claude Haiku...',
-      'Creando payment links en Stripe...',
-      'Enviando WhatsApp de preview...',
-      'Ultimando detalles...',
+    const pingMsgs = [
+      '🔍 Buscando negocios sin web en Google Maps...',
+      '📱 Validando números WhatsApp...',
+      '🎨 Inyectando datos en templates sectoriales...',
+      '🚀 Publicando webs en Vercel...',
+      '📤 Preparando notificaciones...',
     ];
     let pingCount = 0;
     const pingInterval = setInterval(async () => {
       if (session.step !== 'running') { clearInterval(pingInterval); return; }
-      const pingMsg = pingMessages[pingCount % pingMessages.length];
-      await sendMsg(`_${pingMsg}_`).catch(() => {});
+      await sendMsg(`_${pingMsgs[pingCount % pingMsgs.length]}_`).catch(() => {});
       pingCount++;
     }, 60_000);
 
@@ -434,8 +448,8 @@ bot.on('message', async (msg) => {
       city:              session.city!,
       country:           session.country! as 'ES' | 'AR' | 'UY',
       limit:             session.limit!,
-      testWhatsApp:      !session.prodWhatsApp,
-      skipDesignScraper: session.skipDesign ?? false,
+      skipDesignScraper: true,   // v3: usamos templates directos
+      skipWhatsApp:      true,   // v3: WhatsApp manual desde el bot
     })
       .then(async (results) => {
         clearInterval(pingInterval);
@@ -443,47 +457,177 @@ bot.on('message', async (msg) => {
 
         const ok     = results.filter((r: any) => !r.error);
         const errors = results.filter((r: any) => r.error);
-        const withWA = results.filter((r: any) => r.whatsappSent);
 
         await sendMsg(
-          `*Pipeline completado*\n\n` +
+          `*Pipeline completado ✅*\n\n` +
           `Webs generadas: *${ok.length}/${results.length}*\n` +
-          `WhatsApp enviados: *${withWA.length}*\n` +
           `Errores: *${errors.length}*`
         );
 
-        // Una card por web con boton de abrir + enviar cobro
-        if (ok.length > 0) {
-          await sendMsg(`*Webs creadas:*`);
-          for (const r of ok.slice(0, 10) as any[]) {
-            await sendMsg(`*${r.businessName}*\n${r.webUrl}`, {
-              reply_markup: {
-                inline_keyboard: [[
-                  { text: 'Abrir web', url: r.webUrl },
-                  { text: 'Enviar cobro', callback_data: `pay_${r.leadId}` },
-                ]],
-              },
-            });
-          }
-          if (ok.length > 10) {
-            await sendMsg(`_...y ${ok.length - 10} webs mas. Usa "Leads activos" para verlas todas._`);
-          }
+        // Card por cada web
+        for (const r of ok.slice(0, 15) as any[]) {
+          await connectDB();
+          const lead = await Lead.findById(r.leadId);
+          if (lead) await sendLeadCard(lead);
+        }
+        if (ok.length > 15) {
+          await sendMsg(`_...y ${ok.length - 15} webs más. Usa "Leads activos" para verlas todas._`);
         }
 
         if (errors.length > 0) {
-          const errList = (errors as any[]).slice(0, 5).map((r) => `- ${r.businessName}: ${r.error}`).join('\n');
+          const errList = (errors as any[]).slice(0, 5).map((r) => `• ${r.businessName}: ${r.error}`).join('\n');
           await sendMsg(`*Errores:*\n\n${errList}`);
         }
       })
       .catch(async (err: any) => {
         clearInterval(pingInterval);
         session.step = 'idle';
-        await sendMsg(`*Error en el pipeline:* ${err.message}`);
+        await sendMsg(`❌ *Error en el pipeline:* ${err.message}`, MAIN_KEYBOARD);
       });
 
     return;
   }
+
+  // ── Flujo /stripe ──────────────────────────────────────────────────────────
+
+  if (session.step === 'stripe_lead') {
+    // User typed lead name or part of it
+    await connectDB();
+    const leads = await Lead.find({
+      businessName: { $regex: text, $options: 'i' },
+      status: { $nin: ['expired'] },
+    }).limit(5);
+
+    if (leads.length === 0) {
+      await sendMsg(`No encontré ningún lead con "${text}". Prueba con otro nombre.`);
+      return;
+    }
+    if (leads.length === 1) {
+      session.stripeLead = leads[0];
+      await askStripeServices();
+      return;
+    }
+
+    // Multiple results — show inline keyboard to pick
+    await sendMsg(
+      `Encontré ${leads.length} leads. ¿Cuál es?`,
+      {
+        reply_markup: {
+          inline_keyboard: leads.map((l: any) => [{
+            text: `${l.businessName} — ${l.city}`,
+            callback_data: `stripe_pick_${l._id}`,
+          }]),
+        },
+      }
+    );
+    return;
+  }
+
+  if (session.step === 'stripe_services') {
+    // User typing custom amount override
+    const amount = parseInt(text);
+    if (!isNaN(amount) && amount > 0) {
+      const url = await createPaymentLink({
+        leadId: session.stripeLead._id.toString(),
+        amountCents: amount * 100,
+        services: session.stripeServices,
+      });
+      if (url) {
+        await sendMsg(
+          `*💳 Payment link generado*\n\n` +
+          `*${session.stripeLead.businessName}*\n` +
+          `Importe: *${amount}€/mes*\n\n` +
+          `${url}\n\n` +
+          `_Envíalo por WhatsApp al cliente._`,
+          MAIN_KEYBOARD
+        );
+      }
+      session.step = 'idle';
+    }
+    return;
+  }
 });
+
+// ─── Lead card helper ─────────────────────────────────────────────────────────
+
+async function sendLeadCard(lead: any) {
+  const waNumber = lead.phone?.replace(/\D/g, '');
+  const waMsg    = encodeURIComponent(
+    `Hola ${lead.businessName.split(' ')[0]}, somos LeadFlow. Nos hemos tomado el atrevimiento de crear una página web profesional para ${lead.businessName}. Puede verla aquí: ${BASE_URL}/${lead.slug}\n\nEl servicio completo tiene un coste de 25€/mes (hosting aparte ~3,50€/mes). ¿Le interesa?`
+  );
+
+  const reviewInfo = lead.reviewCount > 0
+    ? `⭐ ${lead.reviewRating}/5 (${lead.reviewCount} reseñas)`
+    : `⭐ Sin reseñas en Google`;
+
+  const waLabel   = lead.hasWhatsApp ? '📱 WhatsApp ✅' : '📱 Sin WhatsApp';
+
+  const statusEmoji: Record<string, string> = {
+    web_live: '🌐', visited: '👁️', contacted: '💬', client: '✅', scraped: '🔍',
+  };
+
+  await sendMsg(
+    `${statusEmoji[lead.status] || '📋'} *${lead.businessName}*\n` +
+    `📍 ${lead.city}, ${lead.country === 'ES' ? 'España' : lead.country === 'AR' ? 'Argentina' : 'Uruguay'}\n` +
+    `🏷️ ${lead.sector} · ${reviewInfo}\n` +
+    `${waLabel} · ${lead.phone || 'Sin teléfono'}\n` +
+    `👁️ Visitas: *${lead.visitCount || 0}*`,
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🌐 Ver web', url: `${BASE_URL}/${lead.slug}` },
+            { text: '📊 Info completa', callback_data: `info_${lead._id}` },
+          ],
+          [
+            ...(waNumber ? [{ text: '📲 Abrir WhatsApp', url: `https://wa.me/${waNumber}?text=${waMsg}` }] : []),
+            { text: '💳 Cobrar', callback_data: `pay_${lead._id}` },
+          ],
+          [
+            { text: '✅ Marcar contactado', callback_data: `contact_${lead._id}` },
+          ],
+        ],
+      },
+    }
+  );
+}
+
+// ─── Flujo Stripe ─────────────────────────────────────────────────────────────
+
+async function startStripeFlow() {
+  session.step = 'stripe_lead';
+  session.stripeServices = ['webBasic'];
+  await sendMsg(
+    `*💳 Generar link de pago*\n\n` +
+    `¿Para qué negocio? Escribe el nombre (o parte de él):`,
+    CANCEL_KB
+  );
+}
+
+async function askStripeServices() {
+  session.step = 'stripe_services';
+  const lead = session.stripeLead;
+
+  const serviceKeys = Object.keys(SERVICE_LABELS);
+  const rows = serviceKeys.map(svc => {
+    const selected = session.stripeServices?.includes(svc);
+    const label    = `${selected ? '✅' : '⬜'} ${SERVICE_LABELS[svc]}`;
+    return [{ text: label, callback_data: `svc_${svc}` }];
+  });
+  rows.push([{ text: '💳 Generar link de pago', callback_data: 'stripe_confirm' }]);
+  rows.push([{ text: '❌ Cancelar', callback_data: 'stripe_cancel' }]);
+
+  const total = (session.stripeServices || ['webBasic'])
+    .reduce((sum, svc) => sum + (SERVICE_PRICES[svc] || 0), 0) / 100;
+
+  await sendMsg(
+    `*Lead:* ${lead.businessName} — ${lead.city}\n\n` +
+    `Selecciona los servicios contratados:\n` +
+    `_(toca para marcar/desmarcar)_\n\n` +
+    `💰 *Total: ${total}€/mes*`,
+    { reply_markup: { inline_keyboard: rows } }
+  );
+}
 
 // ─── Callback buttons ─────────────────────────────────────────────────────────
 
@@ -498,23 +642,94 @@ bot.on('callback_query', async (query) => {
     return;
   }
 
+  // ── pay_<leadId> ──────────────────────────────────────────────────────────
   if (data.startsWith('pay_')) {
     const leadId = data.replace('pay_', '');
-    await sendMsg('Creando payment link...');
-    try {
-      const url = await createPaymentLink({ leadId });
-      if (url) {
-        const lead = await Lead.findById(leadId);
-        await sendMsg(`*Payment link generado*\n\n${lead?.businessName}\n\n${url}\n\n_Enviaselo por WhatsApp o email_`);
-      } else {
-        await sendMsg('Error: URL de pago vacia');
-      }
-    } catch (e: any) {
-      await sendMsg(`Error: ${e.message}`);
-    }
+    await connectDB();
+    const lead = await Lead.findById(leadId);
+    if (!lead) return;
+    session.stripeLead = lead;
+    session.stripeServices = ['webBasic'];
+    await askStripeServices();
     return;
   }
 
+  // ── stripe_pick_<leadId> ──────────────────────────────────────────────────
+  if (data.startsWith('stripe_pick_')) {
+    const leadId = data.replace('stripe_pick_', '');
+    await connectDB();
+    const lead = await Lead.findById(leadId);
+    if (!lead) return;
+    session.stripeLead = lead;
+    await askStripeServices();
+    return;
+  }
+
+  // ── svc_<service> — toggle service ───────────────────────────────────────
+  if (data.startsWith('svc_')) {
+    const svc = data.replace('svc_', '');
+    if (!session.stripeServices) session.stripeServices = ['webBasic'];
+
+    if (svc === 'webBasic') {
+      // webBasic is always included, can't deselect
+      await bot.answerCallbackQuery(query.id, { text: 'La web básica siempre está incluida.' });
+      return;
+    }
+
+    const idx = session.stripeServices.indexOf(svc);
+    if (idx > -1) {
+      session.stripeServices.splice(idx, 1);
+    } else {
+      session.stripeServices.push(svc);
+    }
+    await askStripeServices();
+    return;
+  }
+
+  // ── stripe_confirm ────────────────────────────────────────────────────────
+  if (data === 'stripe_confirm') {
+    const lead = session.stripeLead;
+    if (!lead) return;
+
+    const services = session.stripeServices || ['webBasic'];
+    const totalCents = services.reduce((sum, svc) => sum + (SERVICE_PRICES[svc] || 0), 0);
+
+    await sendMsg('_Generando link de Stripe..._');
+    try {
+      const url = await createPaymentLink({
+        leadId: lead._id.toString(),
+        amountCents: totalCents,
+        services,
+      });
+      if (url) {
+        const totalEur = totalCents / 100;
+        const serviceNames = services.map(s => SERVICE_LABELS[s]?.split(' — ')[0] || s).join(', ');
+        await sendMsg(
+          `*💳 Link de pago generado*\n\n` +
+          `*${lead.businessName}*\n` +
+          `📍 ${lead.city}\n` +
+          `📦 Servicios: ${serviceNames}\n` +
+          `💰 Total: *${totalEur}€/mes*\n` +
+          `🔗 Hosting: ~3,50€/mes adicional · Dominio: ~15€/año\n\n` +
+          `${url}\n\n` +
+          `_Envíalo por WhatsApp al cliente._`,
+          MAIN_KEYBOARD
+        );
+      }
+    } catch (e: any) {
+      await sendMsg(`❌ Error al generar el link: ${e.message}`, MAIN_KEYBOARD);
+    }
+    session.step = 'idle';
+    return;
+  }
+
+  if (data === 'stripe_cancel') {
+    session.step = 'idle';
+    await sendMsg('Cancelado.', MAIN_KEYBOARD);
+    return;
+  }
+
+  // ── contact_<leadId> ──────────────────────────────────────────────────────
   if (data.startsWith('contact_')) {
     const leadId = data.replace('contact_', '');
     await connectDB();
@@ -523,79 +738,129 @@ bot.on('callback_query', async (query) => {
       contacted: true,
       contactedAt: new Date(),
     }, { new: true });
-    await sendMsg(`*${lead?.businessName}* marcado como contactado`);
+    await sendMsg(`✅ *${lead?.businessName}* marcado como contactado.`);
     return;
   }
 
+  // ── info_<leadId> ─────────────────────────────────────────────────────────
   if (data.startsWith('info_')) {
     const leadId = data.replace('info_', '');
     await connectDB();
     const lead = await Lead.findById(leadId);
     if (!lead) return;
-    const baseUrl = buildBaseUrl();
-    const price = lead.currency === 'EUR' ? `${lead.price || 25} euros` : `${lead.price || 25} USD`;
-    await sendMsg(
-      `*${lead.businessName}*\n\n` +
-      `Ciudad: ${lead.city}, ${lead.country}\n` +
-      `Sector: ${lead.sector}\n` +
-      `Tel: ${lead.phone || 'N/A'}\n` +
-      `Email: ${lead.email || 'N/A'}\n` +
-      `Web: ${baseUrl}/${lead.slug}\n` +
-      `Precio: ${price}/mes\n` +
-      `Estado: ${lead.status}\n` +
-      `Visitas: ${lead.visitCount || 0}`
-    );
+
+    const price = lead.currency === 'EUR' ? `${lead.monthlyTotal || 25}€` : `$${lead.monthlyTotal || 25}`;
+    const raw   = lead.rawScrapeData;
+
+    // Construir info completa con datos del scraping
+    let infoText =
+      `*🏢 ${lead.businessName}*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📍 ${lead.address || lead.city}, ${lead.city}, ${lead.country === 'ES' ? 'España' : lead.country === 'AR' ? 'Argentina' : 'Uruguay'}\n` +
+      `🏷️ Sector: ${lead.sector}\n` +
+      `📱 Teléfono: ${lead.phone || 'No disponible'}\n` +
+      `📧 Email: ${lead.email || 'No disponible'}\n` +
+      `💬 WhatsApp: ${lead.hasWhatsApp ? '✅ Confirmado' : '❌ No verificado'}\n` +
+      `⭐ Reseñas: ${lead.reviewCount > 0 ? `${lead.reviewRating}/5 (${lead.reviewCount} reseñas)` : 'No disponible'}\n` +
+      `\n*📊 Estado del pipeline*\n` +
+      `Estado: *${lead.status}*\n` +
+      `Visitas: *${lead.visitCount || 0}*\n` +
+      `Primera visita: ${lead.firstVisit ? new Date(lead.firstVisit).toLocaleString('es-ES') : 'Nunca'}\n` +
+      `Última visita: ${lead.lastVisit ? new Date(lead.lastVisit).toLocaleString('es-ES') : 'Nunca'}\n` +
+      `\n*💰 Comercial*\n` +
+      `Precio: *${price}/mes*\n` +
+      `Hosting: *~3,50€/mes* (aparte)\n` +
+      `Dominio: *~15€/año* (aparte)\n` +
+      `Template: ${lead.templateUsed || 'Genérico'}\n` +
+      `Web: ${BASE_URL}/${lead.slug}\n`;
+
+    if (raw) {
+      infoText += `\n*📋 Datos del scraping*\n`;
+      if (raw.categories) infoText += `Categorías: ${Array.isArray(raw.categories) ? raw.categories.join(', ') : raw.categories}\n`;
+      if (raw.hours) infoText += `Horario: ${raw.hours}\n`;
+      if (raw.website === false || raw.website === null) infoText += `🚫 Sin web: Confirmado\n`;
+      if (raw.googleMapsUrl) infoText += `Google Maps: ${raw.googleMapsUrl}\n`;
+      if (raw.description) infoText += `\n_"${raw.description.slice(0, 200)}..."_\n`;
+    }
+
+    await sendMsg(infoText, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🌐 Ver web', url: `${BASE_URL}/${lead.slug}` },
+            { text: '💳 Cobrar', callback_data: `pay_${lead._id}` },
+          ],
+          ...(lead.phone ? [[{ text: '📲 WhatsApp', url: `https://wa.me/${lead.phone.replace(/\D/g, '')}` }]] : []),
+        ],
+      },
+    });
     return;
   }
 });
 
-// ─── Comandos rapidos ─────────────────────────────────────────────────────────
+// ─── Notificaciones externas (para usar desde API routes) ────────────────────
 
-bot.onText(/\/stats/, async (msg) => {
-  if (!isAuthorized(msg.chat.id)) return;
-  await sendMsg(await getStats());
-});
-
-bot.onText(/\/cleanup/, async (msg) => {
-  if (!isAuthorized(msg.chat.id)) return;
-  await sendMsg('Ejecutando cleanup...');
-  const { expired, cleaned } = await runCleanup();
-  await sendMsg(`Expirados: *${expired}* | Limpiados: *${cleaned}*`);
-});
-
-bot.onText(/\/leads/, async (msg) => {
-  if (!isAuthorized(msg.chat.id)) return;
+export async function notifyVisit(leadId: string, visitCount: number, isHot: boolean) {
   await connectDB();
-  const leads = await Lead.find({
-    status: { $in: ['visited', 'email_sent', 'web_live'] },
-  }).sort({ createdAt: -1 }).limit(5);
+  const lead = await Lead.findById(leadId);
+  if (!lead) return;
 
-  if (leads.length === 0) { await sendMsg('No hay leads activos.'); return; }
-
-  const baseUrl = buildBaseUrl();
-  let txt = `*Leads activos (${leads.length})*\n\n`;
-  for (const l of leads) {
-    txt += `- *${l.businessName}* - ${l.status} - ${baseUrl}/${l.slug}\n`;
-  }
-  await sendMsg(txt);
-});
-
-bot.onText(/\/pipeline/, async (msg) => {
-  if (!isAuthorized(msg.chat.id)) return;
-  await sendMsg(await getStats());
-});
-
-// ─── Arranque ─────────────────────────────────────────────────────────────────
-
-console.log('LeadFlow Bot v2 iniciando...');
-connectDB().then(async () => {
-  console.log('MongoDB conectado');
-  await sendMsg(
-    `*LeadFlow Bot v2 online*\n\nPipeline completo activo: scraper + design AI + brand builder + content gen.`,
-    MAIN_KEYBOARD
+  const waNumber = lead.phone?.replace(/\D/g, '');
+  const waMsg    = encodeURIComponent(
+    `Hola ${lead.businessName.split(' ')[0]}, somos LeadFlow. Nos hemos tomado el atrevimiento de crear una página web profesional para ${lead.businessName}. Puede verla aquí: ${BASE_URL}/${lead.slug}\n\nEl servicio completo tiene un coste de 25€/mes (hosting aparte ~3,50€/mes). ¿Le interesa?`
   );
-});
 
-bot.on('polling_error', (err) => {
-  console.error('Polling error:', err.message);
-});
+  const emoji = isHot ? '🔥' : visitCount === 1 ? '👁️' : '🔄';
+  const title = isHot ? 'LEAD CALIENTE' : visitCount === 1 ? 'PRIMERA VISITA' : `Visita #${visitCount}`;
+
+  await bot.sendMessage(CHAT_ID,
+    `${emoji} *${title} — ${lead.businessName}*\n` +
+    `📍 ${lead.city} · ${lead.sector}\n` +
+    `📱 ${lead.phone || 'Sin teléfono'}\n` +
+    `👁️ Total visitas: *${visitCount}*`,
+    {
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🌐 Ver web', url: `${BASE_URL}/${lead.slug}` },
+            ...(waNumber ? [{ text: '📲 WhatsApp', url: `https://wa.me/${waNumber}?text=${waMsg}` }] : []),
+          ],
+          [
+            { text: '💳 Cobrar', callback_data: `pay_${lead._id}` },
+            { text: '📊 Info completa', callback_data: `info_${lead._id}` },
+          ],
+        ],
+      },
+    }
+  );
+}
+
+export async function notifyNewClient(leadId: string, monthlyTotal: number) {
+  await connectDB();
+  const lead = await Lead.findById(leadId);
+  if (!lead) return;
+
+  await bot.sendMessage(CHAT_ID,
+    `🎉 *NUEVO CLIENTE*\n\n` +
+    `*${lead.businessName}*\n` +
+    `📍 ${lead.city}, ${lead.country}\n` +
+    `🏷️ ${lead.sector}\n` +
+    `💰 *${monthlyTotal}€/mes*\n` +
+    `(+ hosting ~3,50€/mes · dominio ~15€/año)\n\n` +
+    `Web: ${BASE_URL}/${lead.slug}`,
+    { parse_mode: 'Markdown' }
+  );
+}
+
+export async function notifyServiceAlert(service: 'vercel' | 'mongodb', error: string) {
+  await bot.sendMessage(CHAT_ID,
+    `🚨 *ALERTA DE SERVICIO*\n\n` +
+    `Servicio: *${service === 'vercel' ? 'Vercel' : 'MongoDB'}*\n` +
+    `Error: ${error}\n\n` +
+    `_Revisar urgentemente._`,
+    { parse_mode: 'Markdown' }
+  );
+}
+
+console.log('🤖 LeadFlow Bot v3 arrancado. Esperando comandos...');

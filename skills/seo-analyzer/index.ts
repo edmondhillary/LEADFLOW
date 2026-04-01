@@ -230,8 +230,8 @@ function analyzeStructure(data: Partial<CompetitorData>): object {
     heroPattern: data.headings?.[0]?.text ? 'headline-cta' : 'full-image',
     includeTestimonials: true,
     includePricing: false,
-    ctaStyle: data.ctas?.length > 2 ? 'multiple' : 'single',
-    keywordDensity: data.keywords?.length > 5 ? 'high' : 'medium',
+    ctaStyle: (data.ctas?.length ?? 0) > 2 ? 'multiple' : 'single',
+    keywordDensity: (data.keywords?.length ?? 0) > 5 ? 'high' : 'medium',
   };
 }
 

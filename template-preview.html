@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadFlow — Template Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0f;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .logo span.dot { color: #6366f1; }
+    .badge {
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: #a5b4fc;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 14px;
+      flex: 1;
+      max-width: 420px;
+    }
+    .url-bar label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+    .url-bar input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e2e8f0;
+      font-family: 'Inter', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      flex: 1;
+      min-width: 0;
+    }
+    .url-bar input::placeholder { color: #475569; }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .stats strong { color: #e2e8f0; font-weight: 700; }
+
+    /* ── Main grid ── */
+    .main { padding: 40px 32px; max-width: 1400px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.14);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .card:active { transform: translateY(-1px); }
+
+    /* Color bar */
+    .card-bar {
+      height: 5px;
+      width: 100%;
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 20px;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon-wrap .material-symbols-outlined {
+      font-size: 22px;
+      color: #fff;
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .card-path {
+      font-size: 11px;
+      font-family: monospace;
+      color: #475569;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 4px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .card-name {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #f1f5f9;
+      margin-bottom: 3px;
+    }
+    .card-tagline {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .card-arrow {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.15s;
+    }
+    .card:hover .card-arrow { color: #94a3b8; }
+    .card-arrow .material-symbols-outlined { font-size: 16px; }
+
+    /* Extra tag */
+    .extra-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #818cf8;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* ── Open all ── */
+    .open-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #a5b4fc;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .open-all-btn:hover {
+      background: rgba(99,102,241,0.2);
+      border-color: rgba(99,102,241,0.4);
+    }
+    .open-all-btn .material-symbols-outlined { font-size: 16px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="logo">
+    LeadFlow<span class="dot">.</span>
+    <span class="badge">Templates</span>
+  </div>
+
+  <div class="url-bar">
+    <label>Base URL</label>
+    <input
+      type="text"
+      id="baseUrl"
+      value="http://localhost:3000"
+      placeholder="http://localhost:3000"
+      oninput="updateLinks()"
+    />
+  </div>
+
+  <div class="stats">
+    <span class="material-symbols-outlined" style="font-size:16px;color:#6366f1">check_circle</span>
+    <strong id="count">26</strong>&nbsp;templates listos
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="toolbar">
+    <p class="section-title" style="margin:0;border:0;padding:0">Todos los templates → haz clic para previsualizar</p>
+    <button class="open-all-btn" onclick="openAll()">
+      <span class="material-symbols-outlined">open_in_new</span>
+      Abrir todos (tab a tab)
+    </button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+  const BASE_TEMPLATES = [
+    { path: 'template-academia',          name: 'ACADEMIA ÉLITE',          tagline: 'Formación de Excelencia',    icon: 'school',                   primary: '#1e3a5f', accent: '#f59e0b' },
+    { path: 'template-aire-acondicionado',name: 'CLIMATECH PRO',           tagline: 'Climatización Avanzada',     icon: 'ac_unit',                  primary: '#0369a1', accent: '#22c55e' },
+    { path: 'template-arquitectura',      name: 'ARCHI STUDIO',            tagline: 'Arquitectura de Autor',      icon: 'architecture',             primary: '#1a1a2e', accent: '#c9a96e', extra: true },
+    { path: 'template-barberia',          name: 'THE BARBER CLUB',         tagline: 'Grooming Premium',           icon: 'content_cut',              primary: '#1c1917', accent: '#ca8a04', extra: true },
+    { path: 'template-canina-peluqueria', name: 'PETS GLAMOUR',            tagline: 'Grooming Canino',            icon: 'pets',                     primary: '#0f766e', accent: '#ec4899', extra: true },
+    { path: 'template-cerrajero',         name: 'LOCKMASTER',              tagline: 'Seguridad 24h',              icon: 'key',                      primary: '#0f172a', accent: '#f59e0b' },
+    { path: 'template-dentista',          name: 'DENTAL CLINIC PRO',       tagline: 'Salud Dental',               icon: 'medical_services',         primary: '#0891b2', accent: '#06b6d4' },
+    { path: 'template-electricista',      name: 'VOLTEX PRO',              tagline: 'Electrical Engineering',     icon: 'bolt',                     primary: '#1d4ed8', accent: '#f59e0b' },
+    { path: 'template-estetica-clinica',  name: 'CLÍNICA ESTÉTICA LUXE',   tagline: 'Medicina Estética',          icon: 'spa',                      primary: '#831843', accent: '#d4a853', extra: true },
+    { path: 'template-fisioterapia',      name: 'FISIO MOTION',            tagline: 'Rehabilitación Avanzada',    icon: 'self_improvement',         primary: '#0c4a6e', accent: '#10b981' },
+    { path: 'template-fontaneria',        name: 'FLUID ARCHITECT',         tagline: 'Precision Engineering',      icon: 'waves',                    primary: '#002045', accent: '#e88532' },
+    { path: 'template-gimnasio',          name: 'IRON CLUB',               tagline: 'High Performance Fitness',   icon: 'fitness_center',           primary: '#111827', accent: '#ef4444' },
+    { path: 'template-inmobiliaria',      name: 'INMOVISION',              tagline: 'Tu Propiedad Ideal',         icon: 'home_work',                primary: '#0f172a', accent: '#d97706', extra: true },
+    { path: 'template-jardineria',        name: 'JARDÍN ÉLITE',            tagline: 'Paisajismo Profesional',     icon: 'yard',                     primary: '#14532d', accent: '#854d0e', extra: true },
+    { path: 'template-limpieza',          name: 'CLEAN MASTER PRO',        tagline: 'Limpieza Profesional',       icon: 'cleaning_services',        primary: '#0c4a6e', accent: '#22c55e' },
+    { path: 'template-mecanico',          name: 'MOTO EXPERT',             tagline: 'Mecánica de Precisión',      icon: 'two_wheeler',              primary: '#292524', accent: '#f97316' },
+    { path: 'template-mudanzas',          name: 'MUDANZA EXPRESS',         tagline: 'Tu Mudanza Perfecta',        icon: 'local_shipping',           primary: '#1e3a5f', accent: '#f97316', extra: true },
+    { path: 'template-peluqueria',        name: 'STUDIO HAIR',             tagline: 'Belleza Profesional',        icon: 'content_cut',              primary: '#7c3aed', accent: '#ec4899' },
+    { path: 'template-pilates-studio',    name: 'PILATES CORE STUDIO',     tagline: 'Movimiento Consciente',      icon: 'sports_gymnastics',        primary: '#334155', accent: '#f43f5e', extra: true },
+    { path: 'template-pintor',            name: 'PINTURA ÉLITE',           tagline: 'Acabados Perfectos',         icon: 'format_paint',             primary: '#1e293b', accent: '#f59e0b' },
+    { path: 'template-pintor-pro',        name: 'PINTURA PRO INDUSTRIAL',  tagline: 'Recubrimientos Industriales',icon: 'format_paint',             primary: '#0f172a', accent: '#f59e0b', extra: true },
+    { path: 'template-psicologo',         name: 'PSICOLOGÍA AVANZADA',     tagline: 'Tu Bienestar Mental',        icon: 'psychology',               primary: '#312e81', accent: '#0d9488', extra: true },
+    { path: 'template-restaurante',       name: 'SABOR & ALMA',            tagline: 'Alta Cocina',                icon: 'restaurant_menu',          primary: '#7c1d1d', accent: '#d97706' },
+    { path: 'template-taller',            name: 'AUTOTECH MADRID',         tagline: 'Mecánica Avanzada',          icon: 'build',                    primary: '#374151', accent: '#f59e0b' },
+    { path: 'template-veterinario',       name: 'VETCARE CLINIC',          tagline: 'Medicina Veterinaria',       icon: 'pets',                     primary: '#14532d', accent: '#f97316' },
+    { path: 'template-yogastudio',        name: 'ZEN YOGA STUDIO',         tagline: 'Yoga & Meditación',          icon: 'self_improvement',         primary: '#4c1d95', accent: '#fbbf24', extra: true },
+  ];
+
+  function getBase() {
+    return (document.getElementById('baseUrl').value || 'http://localhost:3000').replace(/\/$/, '');
+  }
+
+  function buildUrl(path) {
+    return `${getBase()}/${path}`;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = BASE_TEMPLATES.map(t => `
+      <a class="card" href="${buildUrl(t.path)}" target="_blank" rel="noopener" data-path="${t.path}">
+        <div class="card-bar" style="background: linear-gradient(90deg, ${t.primary}, ${t.accent})"></div>
+        ${t.extra ? '<span class="extra-tag">NEW</span>' : ''}
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-icon-wrap" style="background: ${t.primary};">
+              <span class="material-symbols-outlined">${t.icon}</span>
+            </div>
+            <span class="card-path">/${t.path}</span>
+          </div>
+          <div class="card-name">${t.name}</div>
+          <div class="card-tagline">${t.tagline}</div>
+          <div class="card-meta">
+            <div class="color-swatches">
+              <div class="swatch" style="background:${t.primary}" title="${t.primary}"></div>
+              <div class="swatch" style="background:${t.accent}" title="${t.accent}"></div>
+              <span style="font-size:11px;color:#475569;margin-left:2px;font-family:monospace">${t.primary}</span>
+            </div>
+            <div class="card-arrow">
+              Ver <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  function updateLinks() {
+    document.querySelectorAll('.card[data-path]').forEach(card => {
+      const path = card.getAttribute('data-path');
+      card.href = buildUrl(path);
+    });
+  }
+
+  function openAll() {
+    BASE_TEMPLATES.forEach((t, i) => {
+      setTimeout(() => window.open(buildUrl(t.path), '_blank'), i * 200);
+    });
+  }
+
+  // Init
+  renderGrid();
+</script>
+
+</body>
+</html>

@@ -84,7 +84,7 @@ export default function TemplateLayout({ children }: { children: React.ReactNode
             <a href={`tel:${business.phoneIntl}`} className="text-2xl font-black transition-colors hover:opacity-80" style={{ color: '#e88532' }}>
               {business.phone}
             </a>
-            <p className="text-xs" style={{ color: '#94a3b8' }}>&copy; {new Date().getFullYear()} {business.legalName} | {business.tagline.toUpperCase()}</p>
+            <p className="text-xs" style={{ color: '#94a3b8' }}>&copy; {new Date().getFullYear()} {business.legalName} | {business.tagline.toUpperCase()}{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a></p>
           </div>
         </div>
       </footer>

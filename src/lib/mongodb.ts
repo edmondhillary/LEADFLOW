@@ -86,6 +86,36 @@ const LeadSchema = new mongoose.Schema({
   upsellOffered: { type: Boolean, default: false },
   upsellOfferedAt: Date,
 
+  // WhatsApp validado
+  hasWhatsApp: { type: Boolean, default: false },
+  whatsAppValidatedAt: Date,
+
+  // Template sectorial usado
+  templateUsed: String,           // e.g. 'template-fontaneria'
+
+  // Reseñas (de SerpAPI o random 40-100)
+  reviewCount:  { type: Number, default: 0 },
+  reviewRating: { type: Number, default: 0 },
+
+  // Precio mensual total contratado (suma de servicios)
+  monthlyTotal: { type: Number, default: 25 },
+
+  // Servicios contratados
+  services: {
+    webBasic:         { type: Boolean, default: false },  // 25€/mes base
+    seoMonthly:       { type: Boolean, default: false },  // +15€/mes
+    blogContent:      { type: Boolean, default: false },  // +5€/mes
+    reviewManagement: { type: Boolean, default: false },  // +50€/mes
+    socialMedia:      { type: Boolean, default: false },  // +100€/mes
+    webMaintenance:   { type: Boolean, default: false },  // +10€/mes
+    emailMarketing:   { type: Boolean, default: false },  // +20€/mes
+    adsManagement:    { type: Boolean, default: false },  // +150€/mes
+    whatsappBot:      { type: Boolean, default: false },  // +30€/mes
+  },
+
+  // Datos crudos del scraping (referencia completa)
+  rawScrapeData: { type: mongoose.Schema.Types.Mixed },
+
   // Referencias
   competitorRef: { type: mongoose.Schema.Types.ObjectId, ref: 'Competitor' },
   contentRef: { type: mongoose.Schema.Types.ObjectId, ref: 'WebsiteContent' },

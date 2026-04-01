@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { connectDB, Lead } from '@/lib/mongodb';
+import { notifyNewClient } from '@/bot/telegram';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -32,29 +33,11 @@ export async function POST(request: NextRequest) {
       }, { new: true });
 
       if (lead) {
-        // Notificar a Telegram
-        if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-          const priceStr = lead.currency === 'EUR' ? `${lead.price}€/mes` : `$${lead.price}/mes`;
-          const domainCost = lead.currency === 'EUR' ? '15€' : '$15';
-
-          await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: process.env.TELEGRAM_CHAT_ID,
-              text: `🎉 *¡NUEVO CLIENTE!*\n\n🏢 ${lead.businessName}\n💰 ${priceStr} + ${domainCost} dominio\n📍 ${lead.city}\n\n📧 Email de bienvenida enviado`,
-              parse_mode: 'Markdown',
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    { text: '🌐 Comprar dominio', callback_data: `domain_${leadId}` },
-                    { text: '📋 Ver ficha', callback_data: `info_${leadId}` },
-                  ],
-                ],
-              },
-            }),
-          });
-        }
+        // Notificar a Telegram usando el helper del bot
+        const monthlyTotal = lead.monthlyTotal ?? lead.price ?? 25;
+        notifyNewClient(leadId, monthlyTotal).catch((e) =>
+          console.error('[stripe-webhook] notifyNewClient error:', e)
+        );
 
         // TODO: Enviar email de bienvenida via Brevo (Skill: email)
         // TODO: Programar recordatorio de reseña para 3 días después

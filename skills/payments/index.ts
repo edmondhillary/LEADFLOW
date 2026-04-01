@@ -19,40 +19,64 @@ function getStripe() {
 
 export async function createPaymentLink(options: {
   leadId: string;
+  amountCents?: number;   // custom amount in cents, e.g. 2500 = 25€
+  services?: string[];    // list of service names for the description
 }): Promise<string | null> {
-  const { leadId } = options;
+  const { leadId, amountCents, services: serviceList } = options;
 
   await connectDB();
-
   const lead = await Lead.findById(leadId);
   if (!lead) {
     console.error(`❌ Lead no encontrado: ${leadId}`);
     return null;
   }
 
-  console.log(`\n💳 Creando Payment Link para: ${lead.businessName}`);
+  const stripe = getStripe();
 
-  // Seleccionar price ID según moneda
-  const priceId = lead.currency === 'EUR'
-    ? process.env.STRIPE_PRICE_EUR_MONTHLY
-    : process.env.STRIPE_PRICE_USD_MONTHLY;
-
-  if (!priceId) {
-    throw new Error(`Falta STRIPE_PRICE_${lead.currency}_MONTHLY en .env.local`);
-  }
+  // Calculate amount: custom or default 25€/2500 ARS
+  const currency = lead.currency === 'EUR' ? 'eur' : 'usd';
+  const defaultAmount = lead.currency === 'EUR' ? 2500 : 2500; // 25€ or $25
+  const finalAmount = amountCents ?? defaultAmount;
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
 
-  const stripe = getStripe();
+  // Build description from services
+  const serviceLabels: Record<string, string> = {
+    webBasic: 'Web profesional',
+    seoMonthly: 'SEO mensual',
+    blogContent: 'Blog/contenido',
+    reviewManagement: 'Gestión reseñas + Google Maps',
+    socialMedia: 'Redes sociales',
+    webMaintenance: 'Mantenimiento web',
+    emailMarketing: 'Email marketing',
+    adsManagement: 'Gestión Ads',
+    whatsappBot: 'Bot WhatsApp',
+  };
+  const servicesDesc = serviceList?.length
+    ? serviceList.map(s => serviceLabels[s] || s).join(' + ')
+    : 'Web profesional mensual';
 
-  // Crear el payment link con Stripe SDK
+  console.log(`\n💳 Creando Payment Link para: ${lead.businessName} — ${finalAmount / 100}${lead.currency}/mes`);
+
+  // Create price on the fly (no env key needed)
+  const price = await stripe.prices.create({
+    currency,
+    unit_amount: finalAmount,
+    recurring: { interval: 'month' },
+    product_data: {
+      name: `${lead.businessName} — ${servicesDesc}`,
+      metadata: {
+        leadId,
+        sector: lead.sector,
+        city: lead.city,
+      },
+    },
+  });
+
   const paymentLink = await stripe.paymentLinks.create({
-    line_items: [{
-      price: priceId,
-      quantity: 1,
-    }],
+    line_items: [{ price: price.id, quantity: 1 }],
     metadata: {
-      leadId: leadId,
+      leadId,
       businessName: lead.businessName,
       sector: lead.sector,
       city: lead.city,
@@ -60,24 +84,28 @@ export async function createPaymentLink(options: {
     },
     after_completion: {
       type: 'redirect',
-      redirect: {
-        url: `${baseUrl}/${lead.slug}?pagado=true`,
-      },
+      redirect: { url: `${baseUrl}/${lead.slug}?pagado=true` },
     },
     phone_number_collection: { enabled: false },
-    allow_promotion_codes: false,
+    allow_promotion_codes: true,
   });
 
-  // Guardar el payment link en el lead
-  await Lead.findByIdAndUpdate(leadId, {
+  // Update lead with services and total
+  const updateData: Record<string, unknown> = {
     stripePaymentLinkId: paymentLink.id,
-  });
+    monthlyTotal: finalAmount / 100,
+  };
+  if (serviceList?.length) {
+    for (const svc of serviceList) {
+      updateData[`services.${svc}`] = true;
+    }
+    if (serviceList.includes('webBasic') || finalAmount > 0) {
+      updateData['services.webBasic'] = true;
+    }
+  }
+  await Lead.findByIdAndUpdate(leadId, { $set: updateData });
 
-  console.log(`✅ Payment Link creado:`);
-  console.log(`   URL: ${paymentLink.url}`);
-  console.log(`   ID: ${paymentLink.id}`);
-  console.log(`   Precio: ${lead.price}${lead.currency === 'EUR' ? '€' : '$'}/mes`);
-
+  console.log(`✅ Payment Link creado: ${paymentLink.url}`);
   return paymentLink.url;
 }
 
