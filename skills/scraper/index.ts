@@ -8,6 +8,7 @@
  */
 
 import { connectDB, Lead } from '../../src/lib/mongodb';
+import { SECTORS, getSector, getSearchTerm } from '../../src/config/sectors';
 
 interface SerpApiMapResult {
   title: string;
@@ -20,21 +21,6 @@ interface SerpApiMapResult {
   type?: string;
   gps_coordinates?: { latitude: number; longitude: number };
 }
-
-interface SectorConfig {
-  terms: Record<string, string>;
-  services: string[];
-}
-
-const SECTORS: Record<string, SectorConfig> = {
-  fontanero:    { terms: { ES: 'fontanero', AR: 'plomero', UY: 'plomero' }, services: ['Reparación de tuberías', 'Instalación sanitaria', 'Desatascos'] },
-  electricista: { terms: { ES: 'electricista', AR: 'electricista', UY: 'electricista' }, services: ['Instalaciones eléctricas', 'Reparaciones', 'Cuadros eléctricos'] },
-  peluqueria:   { terms: { ES: 'peluquería', AR: 'peluquería', UY: 'peluquería' }, services: ['Corte de pelo', 'Tinte', 'Peinados'] },
-  dentista:     { terms: { ES: 'dentista', AR: 'odontólogo', UY: 'odontólogo' }, services: ['Limpieza dental', 'Ortodoncia', 'Implantes'] },
-  restaurante:  { terms: { ES: 'restaurante', AR: 'restaurante', UY: 'restaurante' }, services: ['Comida casera', 'Menú del día', 'A la carta'] },
-  gimnasio:     { terms: { ES: 'gimnasio', AR: 'gimnasio', UY: 'gimnasio' }, services: ['Musculación', 'Clases grupales', 'Entrenamiento personal'] },
-  taller:       { terms: { ES: 'taller mecánico', AR: 'taller mecánico', UY: 'taller mecánico' }, services: ['Cambio de aceite', 'Frenos', 'Diagnóstico'] },
-};
 
 // Valida si un número es móvil (muy probable que tenga WhatsApp)
 function isMobileNumber(phone: string | undefined, country: string): boolean {
@@ -147,12 +133,8 @@ export async function runScraper(options: {
 }) {
   const { sector, city, country, limit, apiKey } = options;
 
-  const sectorConfig = SECTORS[sector];
-  if (!sectorConfig) {
-    throw new Error(`Sector desconocido: ${sector}. Opciones: ${Object.keys(SECTORS).join(', ')}`);
-  }
-
-  const term = sectorConfig.terms[country] || sectorConfig.terms['ES'];
+  const sectorConfig = getSector(sector); // lanza error si no existe
+  const term = getSearchTerm(sector, country);
   const query = `${term} ${city}`;
   const locale = country === 'ES' ? 'es-ES' : 'es-AR';
   const currency = country === 'ES' ? 'EUR' : 'USD';

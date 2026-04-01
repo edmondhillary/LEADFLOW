@@ -1,51 +1,266 @@
 {
   "fontanero": {
-    "ES": { "term": "fontanero", "plural": "fontaneros", "searchQuery": "fontanero {city}" },
-    "AR": { "term": "plomero", "plural": "plomeros", "searchQuery": "plomero {city}" },
-    "UY": { "term": "plomero", "plural": "plomeros", "searchQuery": "plomero {city}" },
+    "display": "Fontanero",
     "icon": "🔧",
-    "defaultServices": ["Reparación de tuberías", "Desatascos", "Instalación de grifería", "Detección de fugas", "Calentadores y calderas"]
+    "template": "template-fontaneria",
+    "design": { "primary": "#1e3a5f", "accent": "#f97316", "font": "Inter" },
+    "terms": {
+      "ES": "fontanero",
+      "AR": "plomero",
+      "UY": "plomero"
+    },
+    "services": ["Reparación de tuberías", "Desatascos", "Instalación de grifería", "Detección de fugas", "Calentadores y calderas"]
   },
   "electricista": {
-    "ES": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
-    "AR": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
-    "UY": { "term": "electricista", "plural": "electricistas", "searchQuery": "electricista {city}" },
+    "display": "Electricista",
     "icon": "⚡",
-    "defaultServices": ["Instalaciones eléctricas", "Averías eléctricas", "Cuadros eléctricos", "Iluminación LED", "Certificados eléctricos"]
-  },
-  "peluqueria": {
-    "ES": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
-    "AR": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
-    "UY": { "term": "peluquería", "plural": "peluquerías", "searchQuery": "peluquería {city}" },
-    "icon": "✂️",
-    "defaultServices": ["Corte de pelo", "Coloración", "Peinados", "Tratamientos capilares", "Barba y afeitado"]
+    "template": "template-electricista",
+    "design": { "primary": "#1e3a5f", "accent": "#fbbf24", "font": "Inter" },
+    "terms": {
+      "ES": "electricista",
+      "AR": "electricista",
+      "UY": "electricista"
+    },
+    "services": ["Instalaciones eléctricas", "Averías eléctricas", "Cuadros eléctricos", "Iluminación LED", "Certificados eléctricos"]
   },
   "dentista": {
-    "ES": { "term": "dentista", "plural": "dentistas", "searchQuery": "clínica dental {city}" },
-    "AR": { "term": "dentista", "plural": "dentistas", "searchQuery": "dentista {city}" },
-    "UY": { "term": "dentista", "plural": "dentistas", "searchQuery": "dentista {city}" },
+    "display": "Dentista",
     "icon": "🦷",
-    "defaultServices": ["Limpieza dental", "Empastes", "Ortodoncia", "Implantes", "Blanqueamiento"]
+    "template": "template-dentista",
+    "design": { "primary": "#003e6f", "accent": "#06b6d4", "font": "Manrope" },
+    "terms": {
+      "ES": "dentista",
+      "AR": "odontólogo",
+      "UY": "odontólogo"
+    },
+    "services": ["Limpieza dental", "Empastes", "Ortodoncia", "Implantes", "Blanqueamiento"]
+  },
+  "mudanzas": {
+    "display": "Mudanzas",
+    "icon": "🚚",
+    "template": "template-mudanzas",
+    "design": { "primary": "#1e3a5f", "accent": "#f97316", "font": "Inter" },
+    "terms": {
+      "ES": "empresa mudanzas",
+      "AR": "empresa mudanzas",
+      "UY": "empresa mudanzas"
+    },
+    "services": ["Mudanzas locales", "Mudanzas nacionales", "Guardamuebles", "Embalaje profesional", "Mudanzas de oficina"]
+  },
+  "academia": {
+    "display": "Academia",
+    "icon": "📚",
+    "template": "template-academia",
+    "design": { "primary": "#001944", "accent": "#2a6b2c", "font": "Manrope" },
+    "terms": {
+      "ES": "academia",
+      "AR": "instituto",
+      "UY": "instituto"
+    },
+    "services": ["Clases particulares", "Preparación exámenes", "Idiomas", "Matemáticas", "Oposiciones"]
+  },
+  "arquitecto": {
+    "display": "Arquitecto",
+    "icon": "🏛️",
+    "template": "template-arquitectura",
+    "design": { "primary": "#1a1a2e", "accent": "#c9a96e", "font": "Noto Serif" },
+    "terms": {
+      "ES": "arquitecto",
+      "AR": "arquitecto",
+      "UY": "arquitecto"
+    },
+    "services": ["Proyectos de obra", "Reformas integrales", "Interiorismo", "Certificados energéticos", "Legalizaciones"]
   },
   "restaurante": {
-    "ES": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
-    "AR": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
-    "UY": { "term": "restaurante", "plural": "restaurantes", "searchQuery": "restaurante {city}" },
+    "display": "Restaurante",
     "icon": "🍽️",
-    "defaultServices": ["Menú del día", "Carta", "Eventos privados", "Comida para llevar", "Reservas"]
+    "template": "template-restaurante",
+    "design": { "primary": "#1a1a1a", "accent": "#d4a853", "font": "Playfair Display" },
+    "terms": {
+      "ES": "restaurante",
+      "AR": "restaurante",
+      "UY": "restaurante"
+    },
+    "services": ["Menú del día", "Carta", "Eventos privados", "Comida para llevar", "Reservas"]
   },
   "gimnasio": {
-    "ES": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
-    "AR": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
-    "UY": { "term": "gimnasio", "plural": "gimnasios", "searchQuery": "gimnasio {city}" },
+    "display": "Gimnasio",
     "icon": "🏋️",
-    "defaultServices": ["Sala de musculación", "Clases dirigidas", "Entrenamiento personal", "Cardio", "Crossfit"]
+    "template": "template-gimnasio",
+    "design": { "primary": "#0f0f0f", "accent": "#ef4444", "font": "Inter" },
+    "terms": {
+      "ES": "gimnasio",
+      "AR": "gimnasio",
+      "UY": "gimnasio"
+    },
+    "services": ["Sala de musculación", "Clases dirigidas", "Entrenamiento personal", "Cardio", "Crossfit"]
   },
-  "taller": {
-    "ES": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
-    "AR": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
-    "UY": { "term": "taller mecánico", "plural": "talleres", "searchQuery": "taller mecánico {city}" },
-    "icon": "🔩",
-    "defaultServices": ["Revisión general", "Cambio de aceite", "Frenos", "Neumáticos", "Diagnosis electrónica"]
+  "veterinario": {
+    "display": "Veterinario",
+    "icon": "🐾",
+    "template": "template-veterinario",
+    "design": { "primary": "#1b4332", "accent": "#52b788", "font": "Inter" },
+    "terms": {
+      "ES": "veterinario",
+      "AR": "veterinario",
+      "UY": "veterinario"
+    },
+    "services": ["Consulta general", "Vacunas", "Cirugía", "Urgencias 24h", "Peluquería canina"]
+  },
+  "fisioterapeuta": {
+    "display": "Fisioterapeuta",
+    "icon": "💆",
+    "template": "template-fisioterapia",
+    "design": { "primary": "#0c4a6e", "accent": "#38bdf8", "font": "Inter" },
+    "terms": {
+      "ES": "fisioterapeuta",
+      "AR": "kinesiólogo",
+      "UY": "kinesiólogo"
+    },
+    "services": ["Fisioterapia deportiva", "Rehabilitación", "Osteopatía", "Pilates terapéutico", "Electroterapia"]
+  },
+  "limpieza": {
+    "display": "Limpieza",
+    "icon": "🧹",
+    "template": "template-limpieza",
+    "design": { "primary": "#1e40af", "accent": "#60a5fa", "font": "Inter" },
+    "terms": {
+      "ES": "empresa limpieza",
+      "AR": "empresa limpieza",
+      "UY": "empresa limpieza"
+    },
+    "services": ["Limpieza doméstica", "Limpieza de oficinas", "Limpieza fin de obra", "Cristalería", "Desinfección"]
+  },
+  "pintor": {
+    "display": "Pintor",
+    "icon": "🎨",
+    "template": "template-pintor",
+    "design": { "primary": "#1e293b", "accent": "#f59e0b", "font": "Inter" },
+    "terms": {
+      "ES": "pintor",
+      "AR": "pintor",
+      "UY": "pintor"
+    },
+    "services": ["Pintura interior", "Pintura exterior", "Estuco decorativo", "Impermeabilización", "Tratamiento de fachadas"]
+  },
+  "barberia": {
+    "display": "Barbería",
+    "icon": "💈",
+    "template": "template-barberia",
+    "design": { "primary": "#1c1917", "accent": "#ca8a04", "font": "Inter" },
+    "terms": {
+      "ES": "barbería",
+      "AR": "barbería",
+      "UY": "barbería"
+    },
+    "services": ["Corte de cabello", "Arreglo de barba", "Afeitado clásico", "Tratamientos capilares", "Diseño de barba"]
+  },
+  "peluqueria-canina": {
+    "display": "Peluquería canina",
+    "icon": "🐶",
+    "template": "template-canina",
+    "design": { "primary": "#78350f", "accent": "#f59e0b", "font": "Inter" },
+    "terms": {
+      "ES": "peluquería canina",
+      "AR": "peluquería canina",
+      "UY": "peluquería canina"
+    },
+    "services": ["Baño y corte", "Desparasitación", "Tratamientos de pelo", "Corte de uñas", "Perfumería canina"]
+  },
+  "estetica-clinica": {
+    "display": "Estética clínica",
+    "icon": "💅",
+    "template": "template-estetica",
+    "design": { "primary": "#1e1b4b", "accent": "#a78bfa", "font": "Manrope" },
+    "terms": {
+      "ES": "estética clínica",
+      "AR": "centro estética",
+      "UY": "centro estética"
+    },
+    "services": ["Depilación láser", "Tratamientos faciales", "Mesoterapia", "Radiofrecuencia", "Microblading"]
+  },
+  "inmobiliaria": {
+    "display": "Inmobiliaria",
+    "icon": "🏠",
+    "template": "template-inmobiliaria",
+    "design": { "primary": "#1e3a5f", "accent": "#10b981", "font": "Inter" },
+    "terms": {
+      "ES": "inmobiliaria",
+      "AR": "inmobiliaria",
+      "UY": "inmobiliaria"
+    },
+    "services": ["Venta de pisos", "Alquiler", "Gestión de alquileres", "Tasaciones", "Asesoría hipotecaria"]
+  },
+  "jardineria": {
+    "display": "Jardinería",
+    "icon": "🌿",
+    "template": "template-jardineria",
+    "design": { "primary": "#14532d", "accent": "#86efac", "font": "Inter" },
+    "terms": {
+      "ES": "jardinería",
+      "AR": "jardinería",
+      "UY": "jardinería"
+    },
+    "services": ["Diseño de jardines", "Mantenimiento", "Poda y siega", "Riego automático", "Césped artificial"]
+  },
+  "pilates": {
+    "display": "Pilates",
+    "icon": "🧘",
+    "template": "template-pilates",
+    "design": { "primary": "#1e1b4b", "accent": "#a78bfa", "font": "Manrope" },
+    "terms": {
+      "ES": "estudio pilates",
+      "AR": "estudio pilates",
+      "UY": "estudio pilates"
+    },
+    "services": ["Pilates mat", "Pilates con máquinas", "Clases grupales", "Pilates terapéutico", "Pilates prenatal"]
+  },
+  "psicologo": {
+    "display": "Psicólogo",
+    "icon": "🧠",
+    "template": "template-psicologo",
+    "design": { "primary": "#1e3a5f", "accent": "#818cf8", "font": "Manrope" },
+    "terms": {
+      "ES": "psicólogo",
+      "AR": "psicólogo",
+      "UY": "psicólogo"
+    },
+    "services": ["Terapia individual", "Terapia de pareja", "Psicología infantil", "Ansiedad y estrés", "Terapia online"]
+  },
+  "yoga": {
+    "display": "Yoga",
+    "icon": "🕉️",
+    "template": "template-yoga",
+    "design": { "primary": "#1c1917", "accent": "#f59e0b", "font": "Manrope" },
+    "terms": {
+      "ES": "estudio yoga",
+      "AR": "estudio yoga",
+      "UY": "estudio yoga"
+    },
+    "services": ["Hatha yoga", "Vinyasa", "Meditación", "Yin yoga", "Yoga para embarazadas"]
+  },
+  "aire-acondicionado": {
+    "display": "Aire acondicionado",
+    "icon": "❄️",
+    "template": "template-aire-acondicionado",
+    "design": { "primary": "#05647e", "accent": "#8d4b00", "font": "Inter" },
+    "terms": {
+      "ES": "instalador aire acondicionado",
+      "AR": "instalador aire acondicionado",
+      "UY": "instalador aire acondicionado"
+    },
+    "services": ["Instalación", "Mantenimiento", "Reparación", "Carga de gas", "Certificado F-Gas"]
+  },
+  "cerrajero": {
+    "display": "Cerrajero",
+    "icon": "🔑",
+    "template": "template-cerrajero",
+    "design": { "primary": "#1e293b", "accent": "#f59e0b", "font": "Inter" },
+    "terms": {
+      "ES": "cerrajero",
+      "AR": "cerrajero",
+      "UY": "cerrajero"
+    },
+    "services": ["Apertura de puertas", "Cambio de cerraduras", "Cajas fuertes", "Urgencias 24h", "Duplicado de llaves"]
   }
 }

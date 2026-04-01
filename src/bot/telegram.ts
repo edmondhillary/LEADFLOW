@@ -18,6 +18,7 @@ import { connectDB, Lead } from '../lib/mongodb';
 import { runPipeline } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
+import { getSectorKeyboard, slugFromLabel } from '../config/sectors';
 
 const TOKEN    = process.env.TELEGRAM_BOT_TOKEN!;
 const CHAT_ID  = process.env.TELEGRAM_CHAT_ID!;
@@ -30,32 +31,8 @@ if (!TOKEN || !CHAT_ID) {
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// ─── Todos los sectores disponibles (22 templates) ───────────────────────────
-
-const ALL_SECTORS: Record<string, string> = {
-  'Fontanero':         'fontanero',
-  'Electricista':      'electricista',
-  'Dentista':          'dentista',
-  'Mudanzas':          'mudanzas',
-  'Academia':          'academia',
-  'Arquitecto':        'arquitecto',
-  'Restaurante':       'restaurante',
-  'Gimnasio':          'gimnasio',
-  'Veterinario':       'veterinario',
-  'Fisioterapeuta':    'fisioterapeuta',
-  'Limpieza':          'limpieza',
-  'Pintor':            'pintor',
-  'Barbería':          'barberia',
-  'Peluquería canina': 'peluqueria-canina',
-  'Estética clínica':  'estetica-clinica',
-  'Inmobiliaria':      'inmobiliaria',
-  'Jardinería':        'jardineria',
-  'Pilates':           'pilates',
-  'Psicólogo':         'psicologo',
-  'Yoga':              'yoga',
-  'Aire acondicionado':'aire-acondicionado',
-  'Cerrajero':         'cerrajero',
-};
+// ─── Sectores: leídos de src/config/sectors.ts (fuente única de verdad) ──────
+// Para añadir un sector nuevo: solo editar src/config/sectors.json
 
 // Precios de servicios (en céntimos para Stripe)
 const SERVICE_PRICES: Record<string, number> = {
@@ -193,15 +170,9 @@ const CANCEL_KB: TelegramBot.SendMessageOptions = {
   },
 };
 
-// Teclado de sectores 22 — 2 por fila + cancelar
+// Teclado de sectores — generado dinámicamente desde sectors.json
 function sectorKeyboard(): TelegramBot.SendMessageOptions {
-  const keys = Object.keys(ALL_SECTORS);
-  const rows: { text: string }[][] = [];
-  for (let i = 0; i < keys.length; i += 2) {
-    const row: { text: string }[] = [{ text: keys[i] }];
-    if (keys[i + 1]) row.push({ text: keys[i + 1] });
-    rows.push(row);
-  }
+  const rows = getSectorKeyboard(); // filas de 2 con icono + display name
   rows.push([{ text: 'Cancelar' }]);
   return { reply_markup: { keyboard: rows, resize_keyboard: true } };
 }
@@ -339,7 +310,7 @@ bot.on('message', async (msg) => {
   }
 
   if (session.step === 'sector') {
-    const sector = ALL_SECTORS[text];
+    const sector = slugFromLabel(text);
     if (!sector) { await sendMsg('Elige un sector del menú.'); return; }
     session.sector = sector;
     session.step = 'country';

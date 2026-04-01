@@ -19,60 +19,7 @@ dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 import Anthropic from '@anthropic-ai/sdk';
 import { connectDB, Lead, WebsiteContent } from '../src/lib/mongodb';
 import { runScraper } from './scraper/index';
-
-// ─── Mapeo sector → template ───────────────────────────────────────────────
-
-const SECTOR_TEMPLATE_MAP: Record<string, string> = {
-  fontanero:           'template-fontaneria',
-  electricista:        'template-electricista',
-  dentista:            'template-dentista',
-  mudanzas:            'template-mudanzas',
-  academia:            'template-academia',
-  arquitecto:          'template-arquitectura',
-  restaurante:         'template-restaurante',
-  gimnasio:            'template-gimnasio',
-  veterinario:         'template-veterinario',
-  fisioterapeuta:      'template-fisioterapia',
-  limpieza:            'template-limpieza',
-  pintor:              'template-pintor',
-  barberia:            'template-barberia',
-  'peluqueria-canina': 'template-canina-peluqueria',
-  'estetica-clinica':  'template-estetica-clinica',
-  inmobiliaria:        'template-inmobiliaria',
-  jardineria:          'template-jardineria',
-  pilates:             'template-pilates-studio',
-  psicologo:           'template-psicologo',
-  yoga:                'template-yogastudio',
-  'aire-acondicionado':'template-aire-acondicionado',
-  cerrajero:           'template-cerrajero',
-};
-
-// ─── Colores por template ──────────────────────────────────────────────────
-
-const TEMPLATE_DESIGN: Record<string, { primary: string; accent: string; font: string }> = {
-  'template-fontaneria':        { primary: '#1e3a5f', accent: '#f97316', font: 'Inter' },
-  'template-electricista':      { primary: '#1e3a5f', accent: '#fbbf24', font: 'Inter' },
-  'template-dentista':          { primary: '#003e6f', accent: '#06b6d4', font: 'Manrope' },
-  'template-mudanzas':          { primary: '#1e3a5f', accent: '#f97316', font: 'Manrope' },
-  'template-academia':          { primary: '#001944', accent: '#2a6b2c', font: 'Manrope' },
-  'template-arquitectura':      { primary: '#1a1a2e', accent: '#c9a96e', font: 'Noto Serif' },
-  'template-restaurante':       { primary: '#7c1d1d', accent: '#d97706', font: 'Inter' },
-  'template-gimnasio':          { primary: '#111827', accent: '#ef4444', font: 'Inter' },
-  'template-veterinario':       { primary: '#14532d', accent: '#f97316', font: 'Inter' },
-  'template-fisioterapia':      { primary: '#0c4a6e', accent: '#10b981', font: 'Inter' },
-  'template-limpieza':          { primary: '#0c4a6e', accent: '#22c55e', font: 'Inter' },
-  'template-pintor':            { primary: '#1e293b', accent: '#f59e0b', font: 'Inter' },
-  'template-barberia':          { primary: '#1c1917', accent: '#ca8a04', font: 'Inter' },
-  'template-canina-peluqueria': { primary: '#0f766e', accent: '#ec4899', font: 'Inter' },
-  'template-estetica-clinica':  { primary: '#831843', accent: '#d4a853', font: 'Inter' },
-  'template-inmobiliaria':      { primary: '#0f172a', accent: '#d97706', font: 'Inter' },
-  'template-jardineria':        { primary: '#14532d', accent: '#854d0e', font: 'Inter' },
-  'template-pilates-studio':    { primary: '#334155', accent: '#f43f5e', font: 'Inter' },
-  'template-psicologo':         { primary: '#312e81', accent: '#0d9488', font: 'Inter' },
-  'template-yogastudio':        { primary: '#4c1d95', accent: '#fbbf24', font: 'Inter' },
-  'template-aire-acondicionado':{ primary: '#8d4b00', accent: '#05647e', font: 'Manrope' },
-  'template-cerrajero':         { primary: '#1e3a5f', accent: '#f97316', font: 'Inter' },
-};
+import { SECTORS, getSector, getTemplateName, getDesign } from '../src/config/sectors';
 
 // ─── Interfaces ────────────────────────────────────────────────────────────
 
@@ -272,13 +219,9 @@ async function processSingleLead(leadId: string): Promise<PipelineResult> {
   };
 
   try {
-    // Verificar que existe template para el sector
-    const templateName = SECTOR_TEMPLATE_MAP[lead.sector];
-    if (!templateName) {
-      throw new Error(`No hay template para sector: ${lead.sector}. Elige uno de: ${Object.keys(SECTOR_TEMPLATE_MAP).join(', ')}`);
-    }
-
-    const design = TEMPLATE_DESIGN[templateName] || { primary: '#1e3a5f', accent: '#f97316', font: 'Inter' };
+    // Verificar que existe template para el sector (lanza si no existe)
+    const templateName = getTemplateName(lead.sector);
+    const design = getDesign(lead.sector);
 
     // Actualizar estado
     await Lead.findByIdAndUpdate(leadId, {
@@ -421,14 +364,8 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
 
   await connectDB();
 
-  // Verificar que existe template ANTES de hacer scraping
-  const templateName = SECTOR_TEMPLATE_MAP[sector];
-  if (!templateName) {
-    const err = `❌ No hay template para sector "${sector}". Sectores disponibles: ${Object.keys(SECTOR_TEMPLATE_MAP).join(', ')}`;
-    console.error(err);
-    throw new Error(err);
-  }
-
+  // Verificar que existe template ANTES de hacer scraping (getSector lanza si no existe)
+  const templateName = getTemplateName(sector);
   console.log(`   Template: ${templateName} ✅`);
 
   // PASO 1: Scraping
