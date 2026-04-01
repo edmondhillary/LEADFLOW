@@ -372,7 +372,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   console.log(`\n🔍 PASO 1 — Scraping Google Maps...`);
   let scrapedLeadIds: string[] = [];
   try {
-    scrapedLeadIds = await runScraper({ sector, city, country, limit });
+    scrapedLeadIds = await runScraper({ sector, city, country, limit, apiKey: process.env.SERPAPI_KEY || '' });
     console.log(`   Leads scrapeados: ${scrapedLeadIds.length}`);
   } catch (err: any) {
     console.error(`❌ Error en scraper: ${err.message}`);
