@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, classes, philosophy, testimonials, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, classes, philosophy, testimonials as defaultTestimonials, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, titleItalic: ov.city, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-pilates';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
 
@@ -50,14 +65,14 @@ export default function HomePage() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/template-pilates/contacto"
+                href={`${base}/contacto`}
                 className="inline-block text-center transition-all active:scale-[0.98]"
                 style={{ backgroundColor: '#536257', color: '#ebfced', padding: '16px 40px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
               >
                 {hero.ctaPrimary}
               </Link>
               <Link
-                href="/template-pilates/servicios"
+                href={`${base}/servicios`}
                 className="inline-block text-center transition-all active:scale-[0.98]"
                 style={{ color: '#2f3430', padding: '16px 40px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderBottom: '1px solid #2f3430' }}
               >
@@ -79,7 +94,7 @@ export default function HomePage() {
               </h2>
             </div>
             <Link
-              href="/template-pilates/servicios"
+              href={`${base}/servicios`}
               style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2f3430', textDecoration: 'none', borderBottom: '1px solid #2f3430', paddingBottom: '4px', alignSelf: 'flex-start' }}
             >
               View All Classes
@@ -290,7 +305,7 @@ export default function HomePage() {
             Introductory sessions are $25. No experience required. All equipment provided. Austin&rsquo;s most intentional pilates studio is ready for you.
           </p>
           <Link
-            href="/template-pilates/contacto"
+            href={`${base}/contacto`}
             className="inline-block transition-all active:scale-[0.98]"
             style={{ backgroundColor: '#ebfced', color: '#536257', padding: '18px 48px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
           >

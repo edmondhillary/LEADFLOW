@@ -1,7 +1,24 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, stats, services, whyUs, processSteps, testimonials, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, stats, services, whyUs, processSteps, testimonials as defaultTestimonials, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateMudanzasHome() {
+export default function TemplateMudanzasHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, titleAccent: ov.city, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length
+    ? ov.testimonials.map((t, i) => ({ ...t, image: defaultTestimonials[i % defaultTestimonials.length]?.image ?? defaultTestimonials[0]?.image }))
+    : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-mudanzas';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f8f9fa' }}>
 
@@ -84,7 +101,7 @@ export default function TemplateMudanzasHome() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href="/template-mudanzas/contacto"
+              href={`${base}/contacto`}
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '14px',
@@ -361,7 +378,7 @@ export default function TemplateMudanzasHome() {
 
         <div className="mt-8 text-center">
           <Link
-            href="/template-mudanzas/servicios"
+            href={`${base}/servicios`}
             style={{
               fontFamily: "'Manrope', sans-serif",
               fontSize: '13px',
@@ -718,7 +735,7 @@ export default function TemplateMudanzasHome() {
               No commitment required. Tell us about your move and we will give you a detailed, transparent estimate.
             </p>
             <Link
-              href="/template-mudanzas/contacto"
+              href={`${base}/contacto`}
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '15px',

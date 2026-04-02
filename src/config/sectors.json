@@ -107,17 +107,17 @@
     },
     "services": ["Consulta general", "Vacunas", "Cirugía", "Urgencias 24h", "Peluquería canina"]
   },
-  "fisioterapeuta": {
-    "display": "Fisioterapeuta",
-    "icon": "💆",
-    "template": "template-fisioterapia",
-    "design": { "primary": "#0c4a6e", "accent": "#38bdf8", "font": "Inter" },
+  "mecanico": {
+    "display": "Mecánico",
+    "icon": "🔩",
+    "template": "template-mecanico",
+    "design": { "primary": "#121416", "accent": "#ff5f00", "font": "Space Grotesk" },
     "terms": {
-      "ES": "fisioterapeuta",
-      "AR": "kinesiólogo",
-      "UY": "kinesiólogo"
+      "ES": "taller mecánico",
+      "AR": "taller mecánico",
+      "UY": "taller mecánico"
     },
-    "services": ["Fisioterapia deportiva", "Rehabilitación", "Osteopatía", "Pilates terapéutico", "Electroterapia"]
+    "services": ["Mecánica general", "Diagnóstico electrónico", "Mantenimiento preventivo", "Cambio de aceite", "Frenos y suspensión"]
   },
   "limpieza": {
     "display": "Limpieza",
@@ -179,17 +179,17 @@
     },
     "services": ["Depilación láser", "Tratamientos faciales", "Mesoterapia", "Radiofrecuencia", "Microblading"]
   },
-  "inmobiliaria": {
-    "display": "Inmobiliaria",
-    "icon": "🏠",
-    "template": "template-inmobiliaria",
-    "design": { "primary": "#1e3a5f", "accent": "#10b981", "font": "Inter" },
+  "peluqueria": {
+    "display": "Peluquería",
+    "icon": "✂️",
+    "template": "template-peluqueria",
+    "design": { "primary": "#2d3435", "accent": "#785a1a", "font": "Noto Serif" },
     "terms": {
-      "ES": "inmobiliaria",
-      "AR": "inmobiliaria",
-      "UY": "inmobiliaria"
+      "ES": "peluquería",
+      "AR": "peluquería",
+      "UY": "peluquería"
     },
-    "services": ["Venta de pisos", "Alquiler", "Gestión de alquileres", "Tasaciones", "Asesoría hipotecaria"]
+    "services": ["Corte y peinado", "Coloración", "Mechas y balayage", "Tratamientos capilares", "Peinados para eventos"]
   },
   "jardineria": {
     "display": "Jardinería",
@@ -242,7 +242,7 @@
   "aire-acondicionado": {
     "display": "Aire acondicionado",
     "icon": "❄️",
-    "template": "template-aire-acondicionado",
+    "template": "template-aire",
     "design": { "primary": "#05647e", "accent": "#8d4b00", "font": "Inter" },
     "terms": {
       "ES": "instalador aire acondicionado",

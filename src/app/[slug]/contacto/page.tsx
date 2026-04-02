@@ -1,6 +1,9 @@
 import { connectDB, Lead, WebsiteContent } from '@/lib/mongodb';
 import { notFound } from 'next/navigation';
 import { getSectorImages } from '@/lib/images';
+import { getLeadOverrides } from '@/lib/lead-template-data';
+import { hasTemplate, loadTemplateSubpage } from '@/lib/template-registry';
+import { getTemplateName } from '@/config/sectors';
 
 export const revalidate = 3600;
 
@@ -58,6 +61,15 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
 
   const lead = await Lead.findOne({ slug });
   if (!lead) notFound();
+
+  const overrides = await getLeadOverrides(slug);
+  const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
+    ? lead.templateUsed
+    : getTemplateName(lead.sector);
+  const TemplateContacto = overrides ? await loadTemplateSubpage(templateName, 'contacto') : null;
+  if (TemplateContacto) {
+    return <TemplateContacto overrides={overrides || undefined} />;
+  }
 
   const content = await WebsiteContent.findById(lead.contentRef);
   const contacto = content?.pages?.contacto;

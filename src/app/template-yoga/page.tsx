@@ -1,8 +1,45 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { business, hero, images, classes, benefits, testimonials } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function YogaHome() {
+export type YogaPageProps = { overrides?: LeadOverrides };
+
+export default function YogaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  // ── Merge: datos reales > datos demo ──────────────────────────────────────
+  const business_ = ov
+    ? {
+        ...business,
+        name:        ov.businessName,
+        fullName:    ov.businessName,
+        city:        ov.city,
+        phone:       ov.phone || business.phone,
+        address:     ov.address,
+        studioQuote: ov.testimonials[0]?.text ? `"${ov.testimonials[0].text}"` : business.studioQuote,
+      }
+    : business;
+
+  const hero_ = ov
+    ? {
+        ...hero,
+        badge:       `Yoga en ${ov.city}`,
+        title:       ov.heroTitle,
+        titleItalic: ov.city,
+        subtitle:    ov.heroSubtitle,
+        ctaPrimary:  ov.heroCTA || hero.ctaPrimary,
+      }
+    : hero;
+
+  const testimonials_ = ov?.testimonials?.length
+    ? ov.testimonials.map(t => ({ name: t.name, role: t.role || 'Alumno/a', text: t.text, rating: t.rating }))
+    : testimonials;
+
+  const baseHref = ov ? ov.baseHref : '/template-yoga';
+
   return (
     <>
       {/* Hero Section */}
@@ -10,7 +47,7 @@ export default function YogaHome() {
         <div className="absolute inset-0 z-0">
           <Image
             src={images.heroBg}
-            alt="Breath of Silence Yoga Studio"
+            alt={ov ? `${ov.businessName} - Yoga Studio` : 'Breath of Silence Yoga Studio'}
             fill
             className="object-cover"
             priority
@@ -29,24 +66,24 @@ export default function YogaHome() {
               className="inline-block mb-6 px-4 py-2 rounded-full"
               style={{ backgroundColor: '#dae8be', color: '#566342', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}
             >
-              {hero.badge}
+              {hero_.badge}
             </span>
 
             <h1
               className="mb-6 leading-[1.05]"
               style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2.8rem, 6vw, 5rem)', color: '#1b1c19', fontWeight: 700 }}
             >
-              {hero.title}{' '}
-              <em style={{ fontStyle: 'italic', color: '#566342' }}>{hero.titleItalic}</em>
+              {hero_.title}{' '}
+              <em style={{ fontStyle: 'italic', color: '#566342' }}>{hero_.titleItalic}</em>
             </h1>
 
             <p className="mb-10 leading-relaxed" style={{ fontSize: '16px', color: '#45483f', maxWidth: '440px', lineHeight: 1.7 }}>
-              {hero.subtitle}
+              {hero_.subtitle}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Link
-                href="/template-yoga/contacto"
+                href={`${baseHref}/contacto`}
                 style={{
                   display: 'inline-block',
                   background: 'linear-gradient(135deg, #566342 0%, #a3b18a 100%)',
@@ -59,10 +96,10 @@ export default function YogaHome() {
                   letterSpacing: '0.03em',
                 }}
               >
-                {hero.ctaPrimary}
+                {hero_.ctaPrimary}
               </Link>
               <Link
-                href="/template-yoga/servicios"
+                href={`${baseHref}/servicios`}
                 style={{
                   display: 'inline-block',
                   backgroundColor: '#eae8e3',
@@ -75,14 +112,14 @@ export default function YogaHome() {
                   letterSpacing: '0.03em',
                 }}
               >
-                {hero.ctaSecondary}
+                {hero_.ctaSecondary}
               </Link>
             </div>
 
             {/* Stats row */}
             <div className="flex gap-10 mt-14">
               <div>
-                <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '28px', fontWeight: 700, color: '#566342' }}>{business.membersCount}</p>
+                <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '28px', fontWeight: 700, color: '#566342' }}>{business_.membersCount}</p>
                 <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Members</p>
               </div>
               <div>
@@ -163,7 +200,7 @@ export default function YogaHome() {
                   </p>
                   <p style={{ fontSize: '11px', color: '#566342', fontWeight: 600 }}>{cls.schedule}</p>
                   <Link
-                    href="/template-yoga/servicios"
+                    href={`${baseHref}/servicios`}
                     className="inline-block mt-4"
                     style={{
                       fontSize: '12px',
@@ -191,7 +228,7 @@ export default function YogaHome() {
               style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}
             >
               Why Students Choose{' '}
-              <em style={{ fontStyle: 'italic', color: '#566342' }}>Breath of Silence</em>
+              <em style={{ fontStyle: 'italic', color: '#566342' }}>{business_.name}</em>
             </h2>
           </div>
 
@@ -227,7 +264,7 @@ export default function YogaHome() {
       <section className="w-full" style={{ aspectRatio: '21/9', position: 'relative', overflow: 'hidden' }}>
         <Image
           src={images.studioWide}
-          alt="Breath of Silence Studio Interior"
+          alt={`${business_.name} Studio Interior`}
           fill
           className="object-cover"
         />
@@ -252,10 +289,10 @@ export default function YogaHome() {
                 lineHeight: 1.4,
               }}
             >
-              {business.studioQuote}
+              {business_.studioQuote}
             </p>
             <p className="mt-4" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              — Elena R., Monthly Member
+              — {testimonials_[0]?.name || 'Elena R.'}, {testimonials_[0]?.role || 'Monthly Member'}
             </p>
           </div>
         </div>
@@ -275,7 +312,7 @@ export default function YogaHome() {
           </h2>
 
           <div className="max-w-3xl mx-auto flex flex-col gap-12">
-            {testimonials.map((t, i) => (
+            {testimonials_.map((t, i) => (
               <div key={i}>
                 <p
                   style={{
@@ -292,7 +329,7 @@ export default function YogaHome() {
                   <p style={{ fontSize: '13px', fontWeight: 700, color: '#566342' }}>{t.name}</p>
                   <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.role}</p>
                 </div>
-                {i < testimonials.length - 1 && (
+                {i < testimonials_.length - 1 && (
                   <hr className="mt-10" style={{ border: 'none', borderTop: '1px solid #c6c8bb' }} />
                 )}
               </div>
@@ -317,7 +354,7 @@ export default function YogaHome() {
           Your first class is always the hardest step. After that, the studio has a way of becoming home.
         </p>
         <Link
-          href="/template-yoga/contacto"
+          href={`${baseHref}/contacto`}
           style={{
             display: 'inline-block',
             background: 'linear-gradient(135deg, #566342 0%, #a3b18a 100%)',

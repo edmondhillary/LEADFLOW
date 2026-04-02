@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, images, services, values, testimonials, portfolio } from './data';
+import { business as defaultBusiness, hero as defaultHero, images, services, values, testimonials as defaultTestimonials, portfolio } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateJardineriaHome() {
+export default function TemplateJardineriaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-jardineria';
   return (
     <div style={{ fontFamily: "'Manrope', sans-serif", backgroundColor: '#fafaf5' }}>
 
@@ -38,7 +53,7 @@ export default function TemplateJardineriaHome() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/template-jardineria/contacto"
+                href={`${base}/contacto`}
                 className="inline-block text-center rounded-xl transition-all hover:opacity-90 active:scale-[0.98]"
                 style={{
                   background: 'linear-gradient(145deg, #283827 0%, #3e4f3c 100%)',
@@ -54,7 +69,7 @@ export default function TemplateJardineriaHome() {
                 {hero.ctaPrimary}
               </Link>
               <Link
-                href="/template-jardineria/servicios"
+                href={`${base}/servicios`}
                 className="inline-block text-center rounded-xl transition-all hover:bg-[#e8e8e3] active:scale-[0.98]"
                 style={{
                   border: '1.5px solid #283827',
@@ -228,7 +243,7 @@ export default function TemplateJardineriaHome() {
                   Bespoke Programmes for Every Estate
                 </h3>
                 <Link
-                  href="/template-jardineria/servicios"
+                  href={`${base}/servicios`}
                   style={{ fontSize: '10px', fontWeight: 600, color: '#adc0a8', textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}
                 >
                   Explore All Services &rarr;
@@ -488,7 +503,7 @@ export default function TemplateJardineriaHome() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/template-jardineria/contacto"
+                  href={`${base}/contacto`}
                   className="inline-block rounded-xl transition-all hover:opacity-90"
                   style={{
                     backgroundColor: '#ffffff',
@@ -504,7 +519,7 @@ export default function TemplateJardineriaHome() {
                   Request a Quote
                 </Link>
                 <Link
-                  href="/template-jardineria/servicios"
+                  href={`${base}/servicios`}
                   className="inline-block rounded-xl transition-all hover:bg-white/10"
                   style={{
                     border: '1.5px solid rgba(255,255,255,0.4)',

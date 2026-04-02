@@ -148,6 +148,7 @@ export async function runScraper(options: {
   let found = 0;
   let saved = 0;
   let start = 0;
+  const savedIds: string[] = [];
 
   while (saved < limit) {
     const results = await searchGoogleMaps(query, apiKey, start);
@@ -196,7 +197,7 @@ export async function runScraper(options: {
 
       // Guardar lead
       try {
-        await Lead.create({
+        const lead = await Lead.create({
           slug,
           businessName: result.title,
           sector,
@@ -211,6 +212,7 @@ export async function runScraper(options: {
         });
 
         saved++;
+        savedIds.push(lead._id.toString());
         console.log(`✅ [${saved}/${limit}] Guardado: ${result.title}`);
         if (phone) console.log(`   📞 ${phone}`);
         if (result.address) console.log(`   📍 ${result.address}`);
@@ -230,7 +232,7 @@ export async function runScraper(options: {
   console.log(`   Leads guardados: ${saved}`);
   console.log(`   Sector: ${sector} | Ciudad: ${city} | País: ${country}`);
 
-  return { found, saved };
+  return { found, saved, leadIds: savedIds };
 }
 
 // Ejecución directa desde CLI

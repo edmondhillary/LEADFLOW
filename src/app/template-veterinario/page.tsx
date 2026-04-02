@@ -1,7 +1,24 @@
+'use client';
 import Link from 'next/link';
-import { hero, images, homeServices, whyUs, testimonials, business } from './data';
+import { hero as defaultHero, images, homeServices, whyUs, testimonials as defaultTestimonials, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function VeterinarioHome() {
+export default function VeterinarioHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length
+    ? ov.testimonials.map((t, i) => ({ ...t, image: defaultTestimonials[i % defaultTestimonials.length]?.image ?? defaultTestimonials[0]?.image }))
+    : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-veterinario';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -28,7 +45,7 @@ export default function VeterinarioHome() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/template-veterinario/contacto"
+                href={`${base}/contacto`}
                 className="px-8 py-4 bg-[#166875] text-[#edfcff] rounded-full font-bold text-lg hover:bg-[#005c68] transition-all shadow-md active:scale-95 text-center"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
@@ -128,7 +145,7 @@ export default function VeterinarioHome() {
                   State-of-the-art surgical suites equipped for both routine and complex soft-tissue or orthopedic procedures.
                 </p>
                 <Link
-                  href="/template-veterinario/servicios"
+                  href={`${base}/servicios`}
                   className="text-[#edfcff] font-bold flex items-center gap-2 group text-sm"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
@@ -323,14 +340,14 @@ export default function VeterinarioHome() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
-              href="/template-veterinario/contacto"
+              href={`${base}/contacto`}
               className="px-10 py-5 bg-[#edfcff] text-[#166875] rounded-full font-bold text-xl hover:bg-[#a4ebf9] transition-all active:scale-95 shadow-xl"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               Book Your First Appointment
             </Link>
             <Link
-              href="/template-veterinario/nosotros"
+              href={`${base}/nosotros`}
               className="px-10 py-5 border border-[#edfcff]/20 text-[#edfcff] rounded-full font-bold text-xl hover:bg-[#edfcff]/10 transition-all active:scale-95"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >

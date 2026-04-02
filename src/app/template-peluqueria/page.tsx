@@ -1,7 +1,16 @@
+'use client';
 import Link from 'next/link';
-import { business, images, servicesCorte, instagramGallery } from './data';
+import { business as defaultBusiness, images, servicesCorte, instagramGallery } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function PeluqueriaHome() {
+export default function PeluqueriaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address, whatsapp: ov.phoneIntl.replace('+', '') }
+    : defaultBusiness;
+
+  const base = ov?.baseHref ?? '/template-peluqueria';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -40,7 +49,7 @@ export default function PeluqueriaHome() {
               RESERVAR TURNO
             </a>
             <Link
-              href="/template-peluqueria/servicios"
+              href={`${base}/servicios`}
               className="border border-white/40 text-white uppercase tracking-widest text-xs font-semibold px-10 py-4 hover:border-[#ffdea5] hover:text-[#ffdea5] transition-colors duration-200"
             >
               VER SERVICIOS
@@ -112,7 +121,7 @@ export default function PeluqueriaHome() {
                 </p>
               </div>
               <Link
-                href="/template-peluqueria/color"
+                href={`${base}/color`}
                 className="text-[#ffdea5] text-xs tracking-widest uppercase border-b border-[#785a1a] pb-1 hover:text-white transition-colors self-start"
               >
                 Explorar Color
@@ -152,7 +161,7 @@ export default function PeluqueriaHome() {
                   &ldquo;Cada visita al atelier es el comienzo de una transformación silenciosa.&rdquo;
                 </p>
                 <Link
-                  href="/template-peluqueria/nosotros"
+                  href={`${base}/nosotros`}
                   className="text-[#785a1a] text-xs tracking-widest uppercase border-b border-[#785a1a] pb-1 mt-6 self-start hover:text-[#6b4e0e] transition-colors"
                 >
                   Conocer el Atelier

@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, services, stats, testimonials, credentials, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, stats, testimonials as defaultTestimonials, credentials, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function CerrajeroHome() {
+export default function CerrajeroHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, titleHighlight: ov.city, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-cerrajero';
   return (
     <>
       {/* ── HERO ── */}
@@ -167,7 +182,7 @@ export default function CerrajeroHome() {
                 <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '20px', fontWeight: 700, color: '#e5e2e1', letterSpacing: '-0.02em' }}>{services[1].name}</h3>
                 <p className="mt-2" style={{ fontSize: '13px', color: '#d0c6ab', lineHeight: 1.6 }}>{services[1].desc}</p>
               </div>
-              <Link href="/template-cerrajero/servicios" className="mt-6 text-xs font-semibold uppercase tracking-widest transition-colors hover:text-[#ffd700]" style={{ color: '#ffd700', textDecoration: 'none' }}>
+              <Link href="{`${base}/servicios`}" className="mt-6 text-xs font-semibold uppercase tracking-widest transition-colors hover:text-[#ffd700]" style={{ color: '#ffd700', textDecoration: 'none' }}>
                 Ver detalles
               </Link>
             </div>
@@ -176,7 +191,7 @@ export default function CerrajeroHome() {
             <div className="rounded-[1.5rem] bg-[#1c1b1b] p-8 border-l-4 border-[#ffd700]">
               <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '20px', fontWeight: 700, color: '#e5e2e1', letterSpacing: '-0.02em' }}>{services[2].name}</h3>
               <p className="mt-3" style={{ fontSize: '13px', color: '#d0c6ab', lineHeight: 1.6 }}>{services[2].desc}</p>
-              <Link href="/template-cerrajero/servicios" className="mt-4 inline-block text-xs font-semibold uppercase tracking-widest transition-colors hover:text-[#ffd700]" style={{ color: '#ffd700', textDecoration: 'none' }}>
+              <Link href="{`${base}/servicios`}" className="mt-4 inline-block text-xs font-semibold uppercase tracking-widest transition-colors hover:text-[#ffd700]" style={{ color: '#ffd700', textDecoration: 'none' }}>
                 Saber más
               </Link>
             </div>

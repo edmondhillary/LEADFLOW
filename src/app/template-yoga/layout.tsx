@@ -2,10 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { business, nav } from './data';
+import { business as defaultBusiness, nav as defaultNav } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateYogaLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateYogaLayout({ children, overrides }: { children: React.ReactNode; overrides?: LeadOverrides }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const ov = overrides;
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const base = ov?.baseHref ?? '/template-yoga';
+  const nav = defaultNav.map(n => ({ ...n, href: n.href.replace('/template-yoga', base) }));
 
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Manrope', sans-serif", backgroundColor: '#fbf9f4', color: '#1b1c19' }}>
@@ -34,7 +43,7 @@ export default function TemplateYogaLayout({ children }: { children: React.React
       >
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-5 max-w-[1920px] mx-auto">
           <Link
-            href="/template-yoga"
+            href={base}
             style={{
               fontFamily: "'Noto Serif', serif",
               fontSize: '20px',
@@ -69,7 +78,7 @@ export default function TemplateYogaLayout({ children }: { children: React.React
           </nav>
 
           <Link
-            href="/template-yoga/contacto"
+            href={`${base}/contacto`}
             className="hidden md:inline-block transition-all active:scale-[0.98]"
             style={{
               fontSize: '12px',
@@ -131,7 +140,7 @@ export default function TemplateYogaLayout({ children }: { children: React.React
         </nav>
         <div className="mt-auto px-8 pb-8">
           <Link
-            href="/template-yoga/contacto"
+            href={`${base}/contacto`}
             onClick={() => setMenuOpen(false)}
             className="block w-full text-center py-4"
             style={{

@@ -1,7 +1,23 @@
+'use client';
 import Link from 'next/link';
-import { hero, images, menuItems, trust, founder, testimonials } from './data';
+import { hero as defaultHero, images, menuItems, trust, founder, testimonials as defaultTestimonials, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function RestauranteHome() {
+export default function RestauranteHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-restaurante';
+
   const featuredDishes = menuItems.slice(0, 3);
   const dishImages = [images.dish1, images.dish2, images.dish3];
 
@@ -34,13 +50,13 @@ export default function RestauranteHome() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/template-restaurante/contacto"
+              href={`${base}/contacto`}
               className="bg-[#FED65B] text-[#745C00] uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#f5cb4a] transition-colors duration-200"
             >
               {hero.ctaPrimary}
             </Link>
             <Link
-              href="/template-restaurante/servicios"
+              href={`${base}/servicios`}
               className="border border-white/40 text-white uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:border-[#FED65B] hover:text-[#FED65B] transition-colors duration-200"
             >
               {hero.ctaSecondary}
@@ -109,7 +125,7 @@ export default function RestauranteHome() {
 
           <div className="mt-16 text-center">
             <Link
-              href="/template-restaurante/servicios"
+              href={`${base}/servicios`}
               className="inline-block border border-[#1B1D0E] text-[#1B1D0E] uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#1B1D0E] hover:text-[#FBFBE2] transition-colors duration-200"
             >
               VER CARTA COMPLETA
@@ -157,7 +173,7 @@ export default function RestauranteHome() {
                 Julian Vance lidera una propuesta de autor donde la temporalidad es dogma y el producto, protagonista absoluto de cada plato.
               </p>
               <Link
-                href="/template-restaurante/nosotros"
+                href={`${base}/nosotros`}
                 className="inline-flex items-center gap-2 text-[#735C00] text-sm tracking-[0.1em] uppercase font-bold hover:gap-4 transition-all duration-200"
               >
                 Conocer nuestra historia
@@ -310,7 +326,7 @@ export default function RestauranteHome() {
             Cada servicio es una edicion limitada. Asegure su lugar en la proxima.
           </p>
           <Link
-            href="/template-restaurante/contacto"
+            href={`${base}/contacto`}
             className="inline-block bg-[#3C0610] text-white uppercase tracking-[0.15em] text-sm font-bold px-12 py-5 hover:bg-[#2d0409] transition-colors duration-200"
           >
             RESERVAR AHORA

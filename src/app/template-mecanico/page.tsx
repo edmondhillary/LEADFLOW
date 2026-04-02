@@ -2,9 +2,18 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { business, images, stats, homeServices, techSpecs } from './data';
+import { business as defaultBusiness, images, stats, homeServices, techSpecs } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function MecanicoHome() {
+export default function MecanicoHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const base = ov?.baseHref ?? '/template-mecanico';
+
   const [formData, setFormData] = useState({
     nombre: '',
     telefono: '',
@@ -81,7 +90,7 @@ export default function MecanicoHome() {
                   LLAMAR AHORA
                 </a>
                 <Link
-                  href="/template-mecanico/servicios"
+                  href={`${base}/servicios`}
                   className="border border-[#ffb599]/40 text-[#ffb599] uppercase tracking-[0.15em] text-sm font-bold px-8 py-4 hover:border-[#ff5f00] hover:text-[#ff5f00] transition-colors duration-200"
                 >
                   VER SERVICIOS
@@ -199,7 +208,7 @@ export default function MecanicoHome() {
 
           <div className="mt-16 text-center">
             <Link
-              href="/template-mecanico/servicios"
+              href={`${base}/servicios`}
               className="inline-block border border-[#ffb599]/40 text-[#ffb599] uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#ffb599]/10 transition-colors duration-200"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
@@ -337,7 +346,7 @@ export default function MecanicoHome() {
                 Más de 15 años de experiencia en reparación mecánica de alta precisión. Software de diagnóstico AUTOLOGIC 2.0, compatible con más de 150 marcas y modelos europeos y asiáticos.
               </p>
               <Link
-                href="/template-mecanico/nosotros"
+                href={`${base}/nosotros`}
                 className="inline-flex items-center gap-2 text-[#ffb599] text-sm tracking-[0.1em] uppercase font-bold hover:gap-4 transition-all duration-200"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >

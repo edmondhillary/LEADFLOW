@@ -1,6 +1,19 @@
-import { hero, services, trust, testimonials, coverage, images, business } from './data';
+'use client';
+import { hero as defaultHero, services, trust, testimonials as defaultTestimonials, coverage, images, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
   return (
     <main className="w-full">
       {/* ========== HERO SECTION ========== */}

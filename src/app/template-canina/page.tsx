@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, images, services, philosophy, gallery, testimonials } from './data';
+import { business as defaultBusiness, hero as defaultHero, images, services, philosophy, gallery, testimonials as defaultTestimonials } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateCaninaHome() {
+export default function TemplateCaninaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-canina';
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif", backgroundColor: '#fafaf5', color: '#2f342e' }}>
 
@@ -27,11 +42,11 @@ export default function TemplateCaninaHome() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/template-canina/contacto" className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#4c6456', color: '#e6ffed', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
+              <Link href={`${base}/contacto`} className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#4c6456', color: '#e6ffed', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
                 {hero.ctaPrimary}
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
               </Link>
-              <Link href="/template-canina/servicios" className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e7e9e2', color: '#2f342e', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
+              <Link href={`${base}/servicios`} className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e7e9e2', color: '#2f342e', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
                 {hero.ctaSecondary}
               </Link>
             </div>
@@ -79,7 +94,7 @@ export default function TemplateCaninaHome() {
                   {services[0].desc}
                 </p>
               </div>
-              <Link href="/template-canina/servicios" className="inline-flex items-center gap-1 mt-6" style={{ fontSize: '12px', fontWeight: 600, color: '#4c6456', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <Link href={`${base}/servicios`} className="inline-flex items-center gap-1 mt-6" style={{ fontSize: '12px', fontWeight: 600, color: '#4c6456', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Learn More
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
               </Link>
@@ -97,7 +112,7 @@ export default function TemplateCaninaHome() {
               </div>
               <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 700, color: '#e6ffed', letterSpacing: '-0.02em' }}>Full Grooming</h3>
               <p style={{ fontSize: '13px', color: 'rgba(230,255,237,0.75)', lineHeight: 1.7 }}>{services[1].desc}</p>
-              <Link href="/template-canina/servicios" className="inline-flex items-center gap-1 mt-2" style={{ fontSize: '12px', fontWeight: 600, color: '#cee9d6', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <Link href={`${base}/servicios`} className="inline-flex items-center gap-1 mt-2" style={{ fontSize: '12px', fontWeight: 600, color: '#cee9d6', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Book Now
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
               </Link>
@@ -169,7 +184,7 @@ export default function TemplateCaninaHome() {
               ))}
             </div>
 
-            <Link href="/template-canina/nosotros" className="inline-flex items-center gap-2 rounded-full self-start transition-all hover:opacity-90" style={{ backgroundColor: '#4c6456', color: '#e6ffed', padding: '13px 28px', fontSize: '12px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <Link href={`${base}/nosotros`} className="inline-flex items-center gap-2 rounded-full self-start transition-all hover:opacity-90" style={{ backgroundColor: '#4c6456', color: '#e6ffed', padding: '13px 28px', fontSize: '12px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               Our Story
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
             </Link>
@@ -253,11 +268,11 @@ export default function TemplateCaninaHome() {
             {business.tagline} — First appointments include a complimentary coat consultation.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/template-canina/contacto" className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none', letterSpacing: '0.05em' }}>
+            <Link href={`${base}/contacto`} className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none', letterSpacing: '0.05em' }}>
               Book Appointment
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
             </Link>
-            <Link href="/template-canina/servicios" className="inline-flex items-center gap-2 rounded-full transition-all hover:bg-[#40584a]" style={{ border: '1.5px solid rgba(230,255,237,0.4)', color: '#e6ffed', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
+            <Link href={`${base}/servicios`} className="inline-flex items-center gap-2 rounded-full transition-all hover:bg-[#40584a]" style={{ border: '1.5px solid rgba(230,255,237,0.4)', color: '#e6ffed', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em' }}>
               View Services
             </Link>
           </div>

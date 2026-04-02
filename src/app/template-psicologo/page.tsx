@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, specializations, benefits, process, testimonials, images, credentials } from './data';
+import { business as defaultBusiness, hero as defaultHero, specializations, benefits, process, testimonials as defaultTestimonials, images, credentials } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, titleItalic: ov.city, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-psicologo';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
 
@@ -24,10 +39,10 @@ export default function HomePage() {
               {hero.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link href="/template-psicologo/contacto" className="inline-block text-center transition-all active:scale-[0.98] rounded-lg" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 36px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+              <Link href={`${base}/contacto`} className="inline-block text-center transition-all active:scale-[0.98] rounded-lg" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 36px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
                 {hero.ctaPrimary}
               </Link>
-              <Link href="/template-psicologo/servicios" className="inline-block text-center transition-all active:scale-[0.98] rounded-lg" style={{ border: '1.5px solid #a7b19f', color: '#586152', padding: '16px 36px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+              <Link href={`${base}/servicios`} className="inline-block text-center transition-all active:scale-[0.98] rounded-lg" style={{ border: '1.5px solid #a7b19f', color: '#586152', padding: '16px 36px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
                 {hero.ctaSecondary}
               </Link>
             </div>
@@ -161,7 +176,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <Link href="/template-psicologo/nosotros" style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#586152', textDecoration: 'none', borderBottom: '1.5px solid #a7b19f', paddingBottom: '4px', alignSelf: 'flex-start' }}>
+              <Link href={`${base}/nosotros`} style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#586152', textDecoration: 'none', borderBottom: '1.5px solid #a7b19f', paddingBottom: '4px', alignSelf: 'flex-start' }}>
                 Conocer Más
               </Link>
             </div>
@@ -227,7 +242,7 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="text-center mt-12">
-                <Link href="/template-psicologo/contacto" className="inline-block rounded-lg transition-all active:scale-[0.98]" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+                <Link href={`${base}/contacto`} className="inline-block rounded-lg transition-all active:scale-[0.98]" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
                   Reservar Primera Sesión
                 </Link>
               </div>

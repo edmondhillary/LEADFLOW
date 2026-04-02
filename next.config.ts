@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Avoid monorepo/workspace root inference when multiple lockfiles exist.
+  outputFileTracingRoot: process.cwd(),
   // ISR: regenera páginas cada hora
   experimental: {
     // Permite rutas dinámicas con fallback

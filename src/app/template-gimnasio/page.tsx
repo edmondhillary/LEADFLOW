@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, services, plans, classes, testimonials, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, plans, classes, testimonials as defaultTestimonials, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-gimnasio';
   return (
     <main>
       {/* ===== HERO — matches ZIP exactly ===== */}
@@ -32,7 +47,7 @@ export default function HomePage() {
                 {hero.ctaPrimary}
               </a>
               <Link
-                href="/template-gimnasio/servicios"
+                href={`${base}/servicios`}
                 className="bg-[#262626] text-white px-10 py-5 font-black uppercase tracking-widest text-base md:text-lg hover:bg-[#2c2c2c] transition-all duration-300 text-center active:scale-95"
                 style={{ fontFamily: "'Epilogue', sans-serif", textDecoration: 'none' }}
               >
@@ -251,7 +266,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Link
-              href="/template-gimnasio/contacto"
+              href={`${base}/contacto`}
               className="bg-[#eb0000] text-black px-10 py-5 font-black italic uppercase tracking-widest text-lg hover:scale-105 transition-transform duration-300 text-center active:scale-95"
               style={{ fontFamily: "'Epilogue', sans-serif", textDecoration: 'none' }}
             >

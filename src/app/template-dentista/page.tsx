@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, services, trustStats, benefits, testimonials, images, credentials } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, trustStats, benefits, testimonials as defaultTestimonials, images, credentials } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateDentistaHome() {
+export default function TemplateDentistaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-dentista';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f7f9fb' }}>
 
@@ -41,7 +56,7 @@ export default function TemplateDentistaHome() {
               {/* CTAs */}
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/template-dentista/contacto"
+                  href={`${base}/contacto`}
                   className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg, #003e6f 0%, #005696 100%)', color: '#ffffff', padding: '14px 28px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,62,111,0.25)' }}
                 >
@@ -49,7 +64,7 @@ export default function TemplateDentistaHome() {
                   {hero.ctaPrimary}
                 </Link>
                 <Link
-                  href="/template-dentista/servicios"
+                  href={`${base}/servicios`}
                   className="inline-flex items-center gap-2 rounded-xl transition-all hover:bg-[#eceef0]"
                   style={{ border: '1.5px solid #c1c7d2', color: '#003e6f', padding: '14px 28px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', backgroundColor: 'transparent' }}
                 >
@@ -131,7 +146,7 @@ export default function TemplateDentistaHome() {
                 <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 700, marginBottom: '12px' }}>{s.name}</h3>
                 <p style={{ fontSize: '14px', lineHeight: 1.7, opacity: s.urgent ? 0.85 : undefined, color: s.urgent ? undefined : '#414750' }}>{s.desc}</p>
                 <Link
-                  href="/template-dentista/servicios"
+                  href={`${base}/servicios`}
                   className="inline-flex items-center gap-2 mt-6 transition-opacity hover:opacity-70"
                   style={{ fontSize: '13px', fontWeight: 600, color: s.urgent ? '#ffffff' : '#003e6f', textDecoration: 'none' }}
                 >
@@ -299,7 +314,7 @@ export default function TemplateDentistaHome() {
                 Llamar Ahora
               </a>
               <Link
-                href="/template-dentista/contacto"
+                href={`${base}/contacto`}
                 className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90"
                 style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#ffffff', padding: '14px 28px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.3)' }}
               >

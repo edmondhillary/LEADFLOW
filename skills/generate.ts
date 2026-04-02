@@ -14,6 +14,7 @@
 
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
+import { existsSync } from 'fs';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -63,30 +64,14 @@ function getCurrency(country: string): 'EUR' | 'USD' {
 // Por ahora marcamos hasWhatsApp=true si el número es móvil validado por el scraper
 // (scraper ya filtra solo móviles). Implementar validación real aquí cuando se tenga API.
 
-async function validateWhatsApp(phone: string, country: string): Promise<boolean> {
-  // Los móviles ya están pre-filtrados por el scraper
-  // Si hay TWILIO configurado, hacer lookup real
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    try {
-      const lookupUrl = `https://lookups.twilio.com/v2/PhoneNumbers/${encodeURIComponent(phone)}?Fields=line_type_intelligence`;
-      const resp = await fetch(lookupUrl, {
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from(
-            `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
-          ).toString('base64'),
-        },
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        const lineType = data?.line_type_intelligence?.type;
-        return lineType === 'mobile' || lineType === 'nonFixedVoip';
-      }
-    } catch {
-      // fallback: asumir que sí tiene WhatsApp si es móvil
-    }
-  }
-  // Sin Twilio: asumir que móviles válidos tienen WhatsApp (España >95%, AR/UY >90%)
-  return phone.length > 8;
+function validateWhatsApp(phone: string, _country: string): boolean {
+  // El scraper ya filtra SOLO números móviles (regex por país).
+  // Twilio Lookup "line_type_intelligence" es un add-on de pago — no usamos.
+  // Penetración WhatsApp en móviles: España >95%, Argentina >92%, Uruguay >88%.
+  // Si tiene número → asumimos WhatsApp. ✅
+  if (!phone) return false;
+  const digits = phone.replace(/\D/g, '');
+  return digits.length >= 8;
 }
 
 // ─── Inyectar datos reales en el contenido del template via Claude Haiku ───
@@ -165,16 +150,13 @@ Genera un objeto JSON con el contenido personalizado para la web. El JSON debe t
     },
     "blog": [
       {
-        "title": "título SEO local con keyword ${lead.sector} ${lead.city}",
+        "title": "título SEO local con keyword ${lead.sector} ${lead.city} (max 70 chars)",
         "slug": "slug-url-amigable",
         "excerpt": "extracto 120 chars",
-        "content": "contenido mínimo 300 palabras, bien estructurado con H2, listas. Menciona ${lead.city} varias veces.",
         "keywords": ["${lead.sector}", "${lead.city}", "keyword3"]
       },
-      {"title": "2º artículo", "slug": "slug-2", "excerpt": "...", "content": "300 palabras...", "keywords": []},
-      {"title": "3º artículo", "slug": "slug-3", "excerpt": "...", "content": "300 palabras...", "keywords": []},
-      {"title": "4º artículo", "slug": "slug-4", "excerpt": "...", "content": "300 palabras...", "keywords": []},
-      {"title": "5º artículo", "slug": "slug-5", "excerpt": "...", "content": "300 palabras...", "keywords": []}
+      {"title": "2º artículo título SEO", "slug": "slug-2", "excerpt": "extracto 120 chars", "keywords": []},
+      {"title": "3º artículo título SEO", "slug": "slug-3", "excerpt": "extracto 120 chars", "keywords": []}
     ]
   },
   "seo": {
@@ -190,7 +172,7 @@ Devuelve ÚNICAMENTE el JSON válido, sin markdown ni explicaciones.`;
 
   const response = await anthropic.messages.create({
     model: 'claude-haiku-4-5',
-    max_tokens: 4000,
+    max_tokens: 8192,
     messages: [{ role: 'user', content: prompt }],
   });
 
@@ -221,6 +203,10 @@ async function processSingleLead(leadId: string): Promise<PipelineResult> {
   try {
     // Verificar que existe template para el sector (lanza si no existe)
     const templateName = getTemplateName(lead.sector);
+    const templateHomePath = resolve(process.cwd(), 'src', 'app', templateName, 'page.tsx');
+    if (!existsSync(templateHomePath)) {
+      throw new Error(`Template no disponible para sector "${lead.sector}": ${templateName}`);
+    }
     const design = getDesign(lead.sector);
 
     // Actualizar estado
@@ -371,49 +357,75 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   // PASO 1: Scraping
   console.log(`\n🔍 PASO 1 — Scraping Google Maps...`);
   let scrapedLeadIds: string[] = [];
-  try {
-    scrapedLeadIds = await runScraper({ sector, city, country, limit, apiKey: process.env.SERPAPI_KEY || '' });
-    console.log(`   Leads scrapeados: ${scrapedLeadIds.length}`);
-  } catch (err: any) {
-    console.error(`❌ Error en scraper: ${err.message}`);
-    throw new Error(`Scraping falló: ${err.message}`);
-  }
-
-  if (scrapedLeadIds.length === 0) {
-    console.log('⚠️  No se encontraron negocios sin web. Prueba con otra ciudad o sector.');
-    return [];
-  }
-
-  // PASO 2: Validar WhatsApp
-  console.log(`\n📱 PASO 2 — Validando WhatsApp...`);
+  // PASOS 1+2 COMBINADOS: scraping + validación WhatsApp en loop
+  // Sigue buscando hasta tener `limit` leads con WhatsApp, o hasta MAX_SCRAPE_ROUNDS intentos.
+  console.log(`\n📱 PASOS 1+2 — Scraping + validación WhatsApp (objetivo: ${limit} leads)...`);
   const validLeadIds: string[] = [];
-  for (const leadId of scrapedLeadIds) {
-    const lead = await Lead.findById(leadId);
-    if (!lead?.phone) continue;
+  const MAX_ROUNDS = 5;        // máximo 5 rondas de scraping (evita bucle infinito)
+  const BATCH_SIZE = limit * 3; // pedimos 3× más de lo necesario para compensar los que tienen web
+  let round = 0;
+  let totalScraped = 0;
 
-    const hasWA = await validateWhatsApp(lead.phone, country);
-    await Lead.findByIdAndUpdate(leadId, {
-      hasWhatsApp: hasWA,
-      whatsAppValidatedAt: new Date(),
-      // Guardar reviewCount de SerpAPI si existe en rawScrapeData
-      reviewCount: (lead.rawScrapeData as any)?.reviews ?? randomBetween(40, 100),
-      reviewRating: (lead.rawScrapeData as any)?.rating ?? parseFloat((4 + Math.random()).toFixed(1)),
-    });
+  while (validLeadIds.length < limit && round < MAX_ROUNDS) {
+    round++;
+    const needed = limit - validLeadIds.length;
+    console.log(`\n   🔄 Ronda ${round}: buscando ${BATCH_SIZE} negocios (necesitamos ${needed} más)...`);
 
-    if (hasWA) {
-      validLeadIds.push(leadId);
-      console.log(`   ✅ ${lead.businessName} — WhatsApp OK`);
-    } else {
-      console.log(`   ⚠️  ${lead.businessName} — Sin WhatsApp (descartado)`);
+    let batchIds: string[] = [];
+    try {
+      const scraperResult = await runScraper({
+        sector, city, country,
+        limit: BATCH_SIZE,
+        apiKey: process.env.SERPAPI_KEY || '',
+      });
+      batchIds = scraperResult.leadIds;
+      totalScraped += batchIds.length;
+      console.log(`   Negocios sin web encontrados en esta ronda: ${batchIds.length}`);
+    } catch (err: any) {
+      console.error(`❌ Error en scraper (ronda ${round}): ${err.message}`);
+      if (round === 1) throw new Error(`Scraping falló: ${err.message}`);
+      break; // Si falla en rondas posteriores, usamos lo que tenemos
+    }
+
+    if (batchIds.length === 0) {
+      console.log('   ℹ️  No hay más negocios sin web en esta ciudad/sector.');
+      break;
+    }
+
+    // Validar WhatsApp para cada lead de esta ronda
+    for (const leadId of batchIds) {
+      if (validLeadIds.length >= limit) break;
+      const lead = await Lead.findById(leadId);
+      if (!lead?.phone) continue;
+
+      const hasWA = validateWhatsApp(lead.phone, country);
+      await Lead.findByIdAndUpdate(leadId, {
+        hasWhatsApp: hasWA,
+        whatsAppValidatedAt: new Date(),
+        reviewCount: (lead.rawScrapeData as any)?.reviews ?? randomBetween(40, 100),
+        reviewRating: (lead.rawScrapeData as any)?.rating ?? parseFloat((4 + Math.random()).toFixed(1)),
+      });
+
+      if (hasWA) {
+        validLeadIds.push(leadId);
+        console.log(`   ✅ ${lead.businessName} — WhatsApp OK (${validLeadIds.length}/${limit})`);
+      } else {
+        console.log(`   ⚠️  ${lead.businessName} — Sin móvil válido, descartado`);
+      }
     }
   }
 
-  console.log(`   Leads válidos (con WhatsApp): ${validLeadIds.length}/${scrapedLeadIds.length}`);
-
   if (validLeadIds.length === 0) {
-    console.log('⚠️  Ningún lead tiene WhatsApp verificado. Procesando todos de todos modos...');
-    validLeadIds.push(...scrapedLeadIds);
+    console.log('⚠️  No se encontraron negocios sin web con número móvil. Prueba otra ciudad.');
+    return [];
   }
+
+  if (validLeadIds.length < limit) {
+    console.log(`⚠️  Solo se encontraron ${validLeadIds.length}/${limit} leads válidos tras ${round} rondas.`);
+  }
+
+  scrapedLeadIds = validLeadIds;
+  console.log(`\n   ✅ ${validLeadIds.length} leads con WhatsApp listos para generar webs.`);
 
   // PASO 3-5: Generar web para cada lead
   console.log(`\n⚙️  PASO 3 — Generando webs (${validLeadIds.length} leads)...`);

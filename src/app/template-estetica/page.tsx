@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { hero, images, treatments, trust, founder, testimonials } from './data';
+import { hero as defaultHero, images, treatments, trust, founder, testimonials as defaultTestimonials, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function EsteticaHome() {
+export default function EsteticaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-estetica';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -25,13 +40,13 @@ export default function EsteticaHome() {
               </p>
               <div className="flex flex-wrap gap-4 mt-4">
                 <Link
-                  href="/template-estetica/contacto"
+                  href={`${base}/contacto`}
                   className="bg-[#6c5c4a] text-[#fff6f0] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#5f503f] transition-colors duration-200"
                 >
                   {hero.ctaPrimary}
                 </Link>
                 <Link
-                  href="/template-estetica/servicios"
+                  href={`${base}/servicios`}
                   className="border border-[#6c5c4a] text-[#6c5c4a] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#6c5c4a] hover:text-[#fff6f0] transition-colors duration-200"
                 >
                   {hero.ctaSecondary}
@@ -146,7 +161,7 @@ export default function EsteticaHome() {
                   <p className="text-[#fff6f0]/70 text-sm leading-relaxed">{treatments[3].desc}</p>
                 </div>
                 <Link
-                  href="/template-estetica/servicios"
+                  href={`${base}/servicios`}
                   className="text-[#eeda7b] text-xs tracking-widest uppercase mt-4 hover:text-white transition-colors"
                 >
                   Ver protocolo &rarr;
@@ -165,7 +180,7 @@ export default function EsteticaHome() {
                 </h3>
                 <p className="text-[#5d605a] text-sm">{treatments[2].desc}</p>
                 <Link
-                  href="/template-estetica/servicios"
+                  href={`${base}/servicios`}
                   className="text-[#6c5c4a] text-xs tracking-widest uppercase mt-4 hover:text-[#5f503f] transition-colors"
                 >
                   Explorar &rarr;
@@ -273,7 +288,7 @@ export default function EsteticaHome() {
                 ))}
               </div>
               <Link
-                href="/template-estetica/nosotros"
+                href={`${base}/nosotros`}
                 className="text-[#6c5c4a] text-sm tracking-widest uppercase hover:text-[#5f503f] transition-colors mt-2"
               >
                 Conoce al equipo &rarr;
@@ -331,7 +346,7 @@ export default function EsteticaHome() {
                 </div>
               </div>
               <Link
-                href="/template-estetica/nosotros"
+                href={`${base}/nosotros`}
                 className="text-[#6c5c4a] text-sm tracking-widest uppercase hover:text-[#5f503f] transition-colors"
               >
                 Nuestra historia &rarr;
@@ -404,13 +419,13 @@ export default function EsteticaHome() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/template-estetica/contacto"
+              href={`${base}/contacto`}
               className="bg-[#fff6f0] text-[#6c5c4a] tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors duration-200"
             >
               RESERVAR CONSULTA
             </Link>
             <Link
-              href="/template-estetica/servicios"
+              href={`${base}/servicios`}
               className="border border-[#fff6f0]/40 text-[#fff6f0] tracking-widest uppercase text-sm px-8 py-4 hover:border-[#fff6f0] transition-colors duration-200"
             >
               VER TRATAMIENTOS

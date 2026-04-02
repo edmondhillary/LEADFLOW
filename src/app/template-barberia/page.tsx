@@ -1,7 +1,24 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, services, philosophy, testimonial, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, philosophy, testimonial as defaultTestimonial, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function BarberiaHomePage() {
+export default function BarberiaHomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonial = ov?.testimonials?.[0]
+    ? { ...defaultTestimonial, text: ov.testimonials[0].text, author: ov.testimonials[0].name }
+    : defaultTestimonial;
+
+  const base = ov?.baseHref ?? '/template-barberia';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#131313', color: '#e5e2e1' }}>
 
@@ -35,13 +52,13 @@ export default function BarberiaHomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/template-barberia/contacto"
+              href={`${base}/contacto`}
               style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '11px', fontWeight: 700, padding: '16px 40px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
             >
               {hero.ctaPrimary}
             </Link>
             <Link
-              href="/template-barberia/servicios"
+              href={`${base}/servicios`}
               style={{ display: 'inline-block', border: '1px solid rgba(78,70,57,0.4)', color: '#d1c5b4', fontSize: '11px', fontWeight: 600, padding: '16px 40px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
             >
               {hero.ctaSecondary}
@@ -159,7 +176,7 @@ export default function BarberiaHomePage() {
             Limited appointments each week. Reserve yours and experience {business.name}.
           </p>
           <Link
-            href="/template-barberia/contacto"
+            href={`${base}/contacto`}
             style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '11px', fontWeight: 700, padding: '18px 56px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
           >
             Book Your Session

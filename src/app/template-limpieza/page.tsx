@@ -1,7 +1,24 @@
+'use client';
 import Link from 'next/link';
-import { hero, images, services, promise, testimonials } from './data';
+import { hero as defaultHero, images, services, promise, testimonials as defaultTestimonials, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateLimpiezaHome() {
+export default function TemplateLimpiezaHome(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length
+    ? ov.testimonials.map((t, i) => ({ ...t, image: defaultTestimonials[i % defaultTestimonials.length]?.image ?? defaultTestimonials[0]?.image }))
+    : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-limpieza';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -26,10 +43,10 @@ export default function TemplateLimpiezaHome() {
               </p>
 
               <div className="flex flex-wrap gap-3 mt-2">
-                <Link href="/template-limpieza/contacto" className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ background: 'linear-gradient(to right, #0059bb, #0070ea)', color: '#ffffff', fontSize: '15px', fontWeight: 600, padding: '14px 28px', textDecoration: 'none' }}>
+                <Link href={`${base}/contacto`} className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ background: 'linear-gradient(to right, #0059bb, #0070ea)', color: '#ffffff', fontSize: '15px', fontWeight: 600, padding: '14px 28px', textDecoration: 'none' }}>
                   Request a Free Quote
                 </Link>
-                <Link href="/template-limpieza/servicios" className="inline-block rounded-lg transition-all hover:bg-[#e1e3e4] active:scale-[0.98]" style={{ backgroundColor: '#e7e8e9', color: '#191c1d', fontSize: '15px', fontWeight: 600, padding: '14px 28px', textDecoration: 'none' }}>
+                <Link href={`${base}/servicios`} className="inline-block rounded-lg transition-all hover:bg-[#e1e3e4] active:scale-[0.98]" style={{ backgroundColor: '#e7e8e9', color: '#191c1d', fontSize: '15px', fontWeight: 600, padding: '14px 28px', textDecoration: 'none' }}>
                   Our Portfolio
                 </Link>
               </div>
@@ -81,7 +98,7 @@ export default function TemplateLimpiezaHome() {
                 <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 700, color: '#191c1d', marginBottom: '10px' }}>{s.name}</h3>
                 <p style={{ fontSize: '14px', color: '#414754', lineHeight: 1.7 }}>{s.desc}</p>
                 <div className="mt-6 flex items-center gap-2 group-hover:gap-3 transition-all duration-300">
-                  <Link href="/template-limpieza/servicios" style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>Learn More</Link>
+                  <Link href={`${base}/servicios`} style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>Learn More</Link>
                   <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#0059bb' }}>arrow_forward</span>
                 </div>
               </div>
@@ -184,7 +201,7 @@ export default function TemplateLimpiezaHome() {
           <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.8)', marginBottom: '36px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
             Get your free, no-obligation quote today. Our team responds within 24 hours.
           </p>
-          <Link href="/template-limpieza/contacto" className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '16px 36px', textDecoration: 'none' }}>
+          <Link href={`${base}/contacto`} className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '16px 36px', textDecoration: 'none' }}>
             Get a Free Quote
           </Link>
         </div>

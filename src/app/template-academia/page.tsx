@@ -1,8 +1,25 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { hero, partners, courses, stats, testimonial, process, images } from './data';
+import { hero as defaultHero, partners, courses, stats, testimonial as defaultTestimonial, process, images, business as defaultBusiness } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function AcademiaHomePage() {
+export default function AcademiaHomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonial = ov?.testimonials?.[0]
+    ? { ...defaultTestimonial, text: ov.testimonials[0].text, author: ov.testimonials[0].name }
+    : defaultTestimonial;
+
+  const base = ov?.baseHref ?? '/template-academia';
   const uxuiCourse = courses.find(c => c.slug === 'uxui-mastery')!;
   const webdevCourse = courses.find(c => c.slug === 'advanced-web-dev')!;
   const marketingCourse = courses.find(c => c.slug === 'digital-marketing-strategy')!;
@@ -39,10 +56,10 @@ export default function AcademiaHomePage() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/template-academia/servicios" className="inline-flex items-center justify-center gap-2 rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '15px', fontWeight: 700, padding: '16px 32px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+                <Link href={`${base}/servicios`} className="inline-flex items-center justify-center gap-2 rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '15px', fontWeight: 700, padding: '16px 32px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
                   {hero.ctaPrimary}
                 </Link>
-                <Link href="/template-academia/servicios" className="inline-flex items-center justify-center gap-2 rounded-xl transition-all hover:bg-[#e7e8e9]" style={{ backgroundColor: '#ffffff', color: '#001944', fontSize: '15px', fontWeight: 600, padding: '16px 32px', textDecoration: 'none', border: '1.5px solid #e1e3e4', fontFamily: "'Manrope', sans-serif" }}>
+                <Link href={`${base}/servicios`} className="inline-flex items-center justify-center gap-2 rounded-xl transition-all hover:bg-[#e7e8e9]" style={{ backgroundColor: '#ffffff', color: '#001944', fontSize: '15px', fontWeight: 600, padding: '16px 32px', textDecoration: 'none', border: '1.5px solid #e1e3e4', fontFamily: "'Manrope', sans-serif" }}>
                   {hero.ctaSecondary}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </Link>
@@ -119,7 +136,7 @@ export default function AcademiaHomePage() {
                 <div className="flex items-center gap-4 mt-6">
                   <span style={{ fontSize: '13px', fontWeight: 600, color: '#454652' }}>{uxuiCourse.duration}</span>
                   <span style={{ fontSize: '18px', fontWeight: 800, color: '#001944', fontFamily: "'Manrope', sans-serif" }}>{uxuiCourse.price}</span>
-                  <Link href="/template-academia/servicios" className="ml-auto rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '10px 20px', textDecoration: 'none' }}>
+                  <Link href={`${base}/servicios`} className="ml-auto rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '10px 20px', textDecoration: 'none' }}>
                     Inscribirse
                   </Link>
                 </div>
@@ -138,7 +155,7 @@ export default function AcademiaHomePage() {
               </div>
               <div className="flex items-center justify-between mt-6">
                 <span style={{ fontSize: '20px', fontWeight: 800, color: '#6b95f3', fontFamily: "'Manrope', sans-serif" }}>{webdevCourse.price}</span>
-                <Link href="/template-academia/servicios" className="rounded-xl transition-all hover:opacity-90" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '10px 18px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)' }}>
+                <Link href={`${base}/servicios`} className="rounded-xl transition-all hover:opacity-90" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '10px 18px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)' }}>
                   Ver mas
                 </Link>
               </div>
@@ -155,7 +172,7 @@ export default function AcademiaHomePage() {
                 <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, letterSpacing: '-0.03em', color: '#191c1d', marginBottom: '6px' }}>{marketingCourse.title}</h3>
                 <div className="flex items-center justify-between mt-4">
                   <span style={{ fontSize: '18px', fontWeight: 800, color: '#001944', fontFamily: "'Manrope', sans-serif" }}>{marketingCourse.price}</span>
-                  <Link href="/template-academia/servicios" style={{ fontSize: '13px', fontWeight: 600, color: '#2a6b2c', textDecoration: 'none' }}>Ver curso &rarr;</Link>
+                  <Link href={`${base}/servicios`} style={{ fontSize: '13px', fontWeight: 600, color: '#2a6b2c', textDecoration: 'none' }}>Ver curso &rarr;</Link>
                 </div>
               </div>
             </div>
@@ -231,10 +248,10 @@ export default function AcademiaHomePage() {
               Mas de 50.000 estudiantes ya confiaron en nosotros. Cursos desde 199 euros. Primera clase gratuita.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/template-academia/servicios" className="inline-flex items-center justify-center rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '16px', fontWeight: 700, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+              <Link href={`${base}/servicios`} className="inline-flex items-center justify-center rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '16px', fontWeight: 700, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
                 Start Learning Journey
               </Link>
-              <Link href="/template-academia/contacto" className="inline-flex items-center justify-center rounded-xl transition-all hover:bg-[#e7e8e9]" style={{ backgroundColor: '#f3f4f5', color: '#001944', fontSize: '16px', fontWeight: 600, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+              <Link href={`${base}/contacto`} className="inline-flex items-center justify-center rounded-xl transition-all hover:bg-[#e7e8e9]" style={{ backgroundColor: '#f3f4f5', color: '#001944', fontSize: '16px', fontWeight: 600, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
                 Hablar con un asesor
               </Link>
             </div>

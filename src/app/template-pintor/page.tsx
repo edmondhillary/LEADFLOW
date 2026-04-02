@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, finishes, trust, testimonials, images, about } from './data';
+import { business as defaultBusiness, hero as defaultHero, finishes, trust, testimonials as defaultTestimonials, images, about } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-pintor';
   return (
     <main style={{ fontFamily: "'Work Sans', sans-serif" }}>
       {/* ===== HERO ===== */}
@@ -22,7 +37,7 @@ export default function HomePage() {
             <a href={`tel:${business.phoneIntl}`} className="text-[#d9fffe] px-8 py-4 rounded-md font-semibold text-lg shadow-xl transition-all duration-300 active:scale-95 text-center" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)', textDecoration: 'none' }}>
               {hero.ctaPrimary}
             </a>
-            <Link href="/template-pintor/servicios" className="bg-white text-[#3d6565] px-8 py-4 rounded-md font-semibold text-lg transition-all duration-300 text-center shadow-sm" style={{ border: '1px solid rgba(173,179,180,0.15)', textDecoration: 'none' }}>
+            <Link href={`${base}/servicios`} className="bg-white text-[#3d6565] px-8 py-4 rounded-md font-semibold text-lg transition-all duration-300 text-center shadow-sm" style={{ border: '1px solid rgba(173,179,180,0.15)', textDecoration: 'none' }}>
               {hero.ctaSecondary}
             </Link>
           </div>
@@ -138,7 +153,7 @@ export default function HomePage() {
           <div className="relative z-10">
             <h3 className="text-3xl md:text-5xl font-bold text-[#d9fffe] mb-6" style={{ fontFamily: "'Manrope', sans-serif" }}>{about.cta.title}</h3>
             <p className="text-[#d9fffe]/80 text-lg mb-10 max-w-2xl mx-auto font-light">{about.cta.desc}</p>
-            <Link href="/template-pintor/contacto" className="inline-block bg-white text-teal-900 px-10 py-4 rounded-md font-bold text-lg hover:bg-teal-50 transition-all duration-300 shadow-lg active:scale-95" style={{ textDecoration: 'none' }}>
+            <Link href={`${base}/contacto`} className="inline-block bg-white text-teal-900 px-10 py-4 rounded-md font-bold text-lg hover:bg-teal-50 transition-all duration-300 shadow-lg active:scale-95" style={{ textDecoration: 'none' }}>
               Solicitar Presupuesto Gratis
             </Link>
           </div>

@@ -1,8 +1,26 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { business, hero, services, trust, process, stats, testimonials, images } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, trust, process, stats, testimonials as defaultTestimonials, images } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateAirePage() {
+export default function TemplateAirePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, titleAccent: ov.city, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length
+    ? ov.testimonials.map((t, i) => ({ ...t, image: defaultTestimonials[i % defaultTestimonials.length]?.image ?? defaultTestimonials[0]?.image }))
+    : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-aire';
+
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -35,14 +53,14 @@ export default function TemplateAirePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/template-aire/contacto"
+                  href={`${base}/contacto`}
                   className="inline-flex items-center justify-center gap-2 rounded-md transition-all hover:opacity-90 active:scale-[0.98]"
                   style={{ background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', fontSize: '14px', fontWeight: 600, padding: '14px 32px', textDecoration: 'none' }}
                 >
                   {hero.ctaPrimary}
                 </Link>
                 <Link
-                  href="/template-aire/servicios"
+                  href={`${base}/servicios`}
                   className="inline-flex items-center justify-center gap-2 rounded-md transition-all hover:bg-[#eae7ea]"
                   style={{ backgroundColor: '#ffffff', color: '#3a5f94', border: '2px solid #3a5f94', fontSize: '14px', fontWeight: 600, padding: '14px 32px', textDecoration: 'none' }}
                 >
@@ -140,7 +158,7 @@ export default function TemplateAirePage() {
                   <p style={{ fontSize: '13px', color: '#414754', lineHeight: 1.6 }}>{s.desc}</p>
                 </div>
                 <Link
-                  href="/template-aire/servicios"
+                  href={`${base}/servicios`}
                   style={{ fontSize: '13px', fontWeight: 600, color: '#8d4b00', textDecoration: 'none', marginTop: 'auto' }}
                 >
                   Learn More &rarr;
@@ -294,7 +312,7 @@ export default function TemplateAirePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/template-aire/contacto"
+                href={`${base}/contacto`}
                 className="inline-flex items-center justify-center rounded-md transition-all hover:bg-white/90"
                 style={{ backgroundColor: '#ffffff', color: '#8d4b00', fontSize: '14px', fontWeight: 700, padding: '14px 36px', textDecoration: 'none' }}
               >

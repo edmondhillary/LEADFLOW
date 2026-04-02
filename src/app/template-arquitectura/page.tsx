@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
-import { business, hero, services, projects, testimonials, images, about } from './data';
+import { business as defaultBusiness, hero as defaultHero, services, projects, testimonials as defaultTestimonials, images, about } from './data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function HomePage() {
+export default function HomePage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+
+  const business = ov
+    ? { ...defaultBusiness, name: ov.businessName, city: ov.city, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    : defaultBusiness;
+
+  const hero = ov
+    ? { ...defaultHero, subtitle: ov.heroSubtitle, ctaPrimary: ov.heroCTA || defaultHero.ctaPrimary }
+    : defaultHero;
+
+  const testimonials = ov?.testimonials?.length ? ov.testimonials : defaultTestimonials;
+
+  const base = ov?.baseHref ?? '/template-arquitectura';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* ===== HERO ===== */}
@@ -21,7 +36,7 @@ export default function HomePage() {
             <a href={`tel:${business.phoneIntl}`} className="inline-block text-center transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '16px 40px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
               {hero.ctaPrimary}
             </a>
-            <Link href="/template-arquitectura/servicios" className="inline-block text-center transition-all active:scale-[0.98]" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '16px 40px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', backdropFilter: 'blur(8px)' }}>
+            <Link href={`${base}/servicios`} className="inline-block text-center transition-all active:scale-[0.98]" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '16px 40px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', backdropFilter: 'blur(8px)' }}>
               {hero.ctaSecondary}
             </Link>
           </div>
@@ -46,7 +61,7 @@ export default function HomePage() {
                 Definiendo el futuro del <br />habitar.
               </h2>
             </div>
-            <Link href="/template-arquitectura/servicios" style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2e3430', textDecoration: 'none', borderBottom: '1px solid #2e3430', paddingBottom: '4px', alignSelf: 'flex-start' }}>
+            <Link href={`${base}/servicios`} style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2e3430', textDecoration: 'none', borderBottom: '1px solid #2e3430', paddingBottom: '4px', alignSelf: 'flex-start' }}>
               Ver Todos
             </Link>
           </div>
@@ -164,10 +179,10 @@ export default function HomePage() {
             Actualmente aceptamos consultas para proyectos de 2026. Contacta con nuestro equipo para iniciar tu proyecto arquitectónico.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/template-arquitectura/contacto" className="inline-block text-center transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
+            <Link href={`${base}/contacto`} className="inline-block text-center transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
               Solicitar Consulta
             </Link>
-            <Link href="/template-arquitectura/servicios" className="inline-block text-center transition-all" style={{ border: '1px solid #767c77', color: '#2e3430', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
+            <Link href={`${base}/servicios`} className="inline-block text-center transition-all" style={{ border: '1px solid #767c77', color: '#2e3430', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
               Nuestro Proceso
             </Link>
           </div>
