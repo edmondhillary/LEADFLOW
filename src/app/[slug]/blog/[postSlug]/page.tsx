@@ -20,16 +20,15 @@ export default async function LeadBlogPostPage({ params }: Props) {
     ? lead.templateUsed
     : getTemplateName(lead.sector);
   const TemplateBlogPost = await loadTemplateBlogPost(templateName);
+  const overrides = await getLeadOverrides(slug);
 
   if (TemplateBlogPost) {
-    return <TemplateBlogPost params={Promise.resolve({ slug: postSlug })} />;
+    return <TemplateBlogPost params={Promise.resolve({ slug: postSlug })} overrides={overrides || undefined} />;
   }
 
   const content = await WebsiteContent.findById(lead.contentRef).lean() as any;
   const post = (content?.pages?.blog || []).find((p: any) => p.slug === postSlug);
   if (!post) notFound();
-
-  const overrides = await getLeadOverrides(slug);
 
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

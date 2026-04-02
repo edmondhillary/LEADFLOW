@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { business as defaultBusiness, nav as defaultNav } from './data';
 import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function TemplateYogaLayout({ children, overrides }: { children: React.ReactNode; overrides?: LeadOverrides }) {
+export default function TemplateYogaLayout(props: any) {
+  const { children, overrides } = props as { children: React.ReactNode; overrides?: LeadOverrides };
   const [menuOpen, setMenuOpen] = useState(false);
+  const isRioplatense = overrides?.country === 'AR' || overrides?.country === 'UY';
 
   const ov = overrides;
   const business = ov
@@ -14,7 +16,9 @@ export default function TemplateYogaLayout({ children, overrides }: { children: 
     : defaultBusiness;
 
   const base = ov?.baseHref ?? '/template-yoga';
-  const nav = defaultNav.map(n => ({ ...n, href: n.href.replace('/template-yoga', base) }));
+  const nav = defaultNav
+    .map(n => ({ ...n, href: n.href.replace('/template-yoga', base) }))
+    .map((n, i) => (i === 0 ? { ...n, label: 'Inicio' } : n));
 
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Manrope', sans-serif", backgroundColor: '#fbf9f4', color: '#1b1c19' }}>
@@ -208,11 +212,11 @@ export default function TemplateYogaLayout({ children, overrides }: { children: 
 
           {/* Policies */}
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#e4e2dd', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Policies</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#e4e2dd', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Políticas</h4>
             <div className="flex flex-col gap-3">
-              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Privacy Policy</span>
-              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Cancellation Policy</span>
-              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Terms of Service</span>
+              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Política de privacidad</span>
+              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Política de cancelación</span>
+              <span style={{ fontSize: '12px', color: '#c6c8bb' }}>Términos del servicio</span>
             </div>
           </div>
         </div>
@@ -222,14 +226,14 @@ export default function TemplateYogaLayout({ children, overrides }: { children: 
           style={{ borderTop: '1px solid rgba(198,200,187,0.15)' }}
         >
           <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.
             {' · '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
           </p>
           <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.15em', fontStyle: 'italic' }}>
-            Notting Hill, London
+            {ov?.city || (isRioplatense ? 'Buenos Aires' : 'Madrid')}
           </p>
         </div>
       </footer>

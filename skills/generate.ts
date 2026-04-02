@@ -81,8 +81,8 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 async function injectDataWithClaude(templateName: string, lead: any): Promise<any> {
   const locale = getLocale(lead.country);
   const toneNote = locale === 'es-AR'
-    ? 'Usa tono rioplatense argentino/uruguayo (vos, che, etc.).'
-    : 'Usa tono español de España (usted/tú, vosotros).';
+    ? 'Usa tono rioplatense argentino/uruguayo (voseo natural: vos, tenés, podés). Evita modismos de España.'
+    : 'Usa tono español de España (tú/te, puedes, tienes). Evita voseo rioplatense.';
 
   const reviewCount = lead.reviewCount > 0 ? lead.reviewCount : randomBetween(40, 100);
   const reviewRating = lead.reviewRating > 0 ? lead.reviewRating : (4 + Math.random()).toFixed(1);
@@ -102,8 +102,10 @@ ${lead.rawScrapeData?.description ? `- Descripción Google: ${lead.rawScrapeData
 ${lead.rawScrapeData?.hours ? `- Horario: ${lead.rawScrapeData.hours}` : ''}
 
 IMPORTANTE: ${toneNote}
+IMPORTANTE: TODO el contenido debe quedar en español natural. No uses inglés (excepto nombres propios/marca).
 IMPORTANTE: Reemplaza TODAS las menciones de ciudades genéricas (Austin, San Francisco, Madrid, Barcelona, Buenos Aires, Montevideo o cualquier ciudad de ejemplo) por "${lead.city}".
-IMPORTANTE: Todos los textos de hero, servicios, testimonios deben mencionar "${lead.city}" cuando sea natural.
+IMPORTANTE: Menciona "${lead.city}" cuando aporte valor, pero evita repeticiones innecesarias.
+IMPORTANTE: NO dupliques la ciudad en el hero. Si el heroTitle ya incluye ciudad, no repetir en otra parte del mismo titular.
 
 Genera un objeto JSON con el contenido personalizado para la web. El JSON debe tener exactamente esta estructura:
 

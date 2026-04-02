@@ -3,8 +3,23 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { business, contacto, images } from '../data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+  const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
+
+  const business_ = ov
+    ? {
+        ...business,
+        name: ov.businessName,
+        fullName: ov.businessName,
+        phone: ov.phone || business.phone,
+        address: ov.address,
+        city: ov.city,
+      }
+    : business;
+
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -93,36 +108,36 @@ export default function ContactoPage() {
               <h3
                 style={{ fontFamily: "'Noto Serif', serif", fontSize: '20px', fontWeight: 700, color: '#1b1c19', marginBottom: '20px' }}
               >
-                Studio Details
-              </h3>
+                  Datos del estudio
+                </h3>
               <div className="flex flex-col gap-5">
                 <div className="flex gap-4 items-start">
                   <span style={{ color: '#566342', fontSize: '20px', marginTop: '2px' }}>📍</span>
                   <div>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Address</p>
-                    <p style={{ fontSize: '13px', color: '#45483f', lineHeight: 1.6 }}>{business.address}</p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Dirección</p>
+                    <p style={{ fontSize: '13px', color: '#45483f', lineHeight: 1.6 }}>{business_.address}</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start">
                   <span style={{ color: '#566342', fontSize: '20px', marginTop: '2px' }}>📞</span>
                   <div>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Phone</p>
-                    <p style={{ fontSize: '13px', color: '#45483f' }}>{business.phone}</p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Teléfono</p>
+                    <p style={{ fontSize: '13px', color: '#45483f' }}>{business_.phone}</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start">
                   <span style={{ color: '#566342', fontSize: '20px', marginTop: '2px' }}>✉️</span>
                   <div>
                     <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Email</p>
-                    <p style={{ fontSize: '13px', color: '#45483f' }}>{business.email}</p>
+                    <p style={{ fontSize: '13px', color: '#45483f' }}>{business_.email}</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start">
                   <span style={{ color: '#566342', fontSize: '20px', marginTop: '2px' }}>🕐</span>
                   <div>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Schedule</p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Horario</p>
                     <p style={{ fontSize: '13px', color: '#45483f' }}>{contacto.schedule}</p>
-                    <p style={{ fontSize: '12px', color: '#566342', marginTop: '4px' }}>Response time: {contacto.responseTime}</p>
+                    <p style={{ fontSize: '12px', color: '#566342', marginTop: '4px' }}>Tiempo de respuesta: {contacto.responseTime}</p>
                   </div>
                 </div>
               </div>
@@ -145,7 +160,7 @@ export default function ContactoPage() {
                   padding: '10px 16px',
                 }}
               >
-                <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19' }}>Notting Hill, London</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19' }}>{business_.city}</p>
                 <p style={{ fontSize: '11px', color: '#45483f' }}>W11 2PH</p>
               </div>
             </div>
@@ -176,10 +191,12 @@ export default function ContactoPage() {
                   <h4
                     style={{ fontFamily: "'Noto Serif', serif", fontSize: '20px', fontWeight: 700, color: '#566342', marginBottom: '8px' }}
                   >
-                    Namaste, {formData.nombre}
+                    Gracias, {formData.nombre}
                   </h4>
                   <p style={{ fontSize: '14px', color: '#45483f', lineHeight: 1.6 }}>
-                    Your booking request has been received. We&apos;ll confirm your class within {contacto.responseTime}.
+                    {isRioplatense
+                      ? `Recibimos tu solicitud. Te confirmamos dentro de ${contacto.responseTime}.`
+                      : `Hemos recibido tu solicitud. Te confirmamos en ${contacto.responseTime}.`}
                   </p>
                 </div>
               ) : (
@@ -193,7 +210,7 @@ export default function ContactoPage() {
                         type="text"
                         value={formData.nombre}
                         onChange={handleChange}
-                        placeholder="Your name"
+                        placeholder="Tu nombre"
                         required
                         style={inputStyle}
                       />
@@ -206,7 +223,7 @@ export default function ContactoPage() {
                         type="tel"
                         value={formData.telefono}
                         onChange={handleChange}
-                        placeholder="+44 000 000 0000"
+                        placeholder={isRioplatense ? '+54 11 0000 0000' : '+34 600 000 000'}
                         style={inputStyle}
                       />
                     </div>
@@ -220,14 +237,14 @@ export default function ContactoPage() {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="your@email.com"
+                        placeholder="tu@email.com"
                       required
                       style={inputStyle}
                     />
                   </div>
 
                   <div>
-                    <label style={labelStyle} htmlFor="clase">Clase Preferida</label>
+                      <label style={labelStyle} htmlFor="clase">Clase preferida</label>
                     <select
                       id="clase"
                       name="clase"
@@ -236,7 +253,7 @@ export default function ContactoPage() {
                       required
                       style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
                     >
-                      <option value="">Select a class...</option>
+                      <option value="">Selecciona una clase...</option>
                       {contacto.serviceOptions.map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
@@ -250,7 +267,9 @@ export default function ContactoPage() {
                       name="mensaje"
                       value={formData.mensaje}
                       onChange={handleChange}
-                      placeholder="Any questions, preferred times, or notes for your instructor..."
+                      placeholder={isRioplatense
+                        ? 'Contanos horarios preferidos o cualquier duda que tengas...'
+                        : 'Cuéntanos horarios preferidos o cualquier duda que tengas...'}
                       rows={4}
                       style={{ ...inputStyle, resize: 'vertical' }}
                     />
@@ -273,12 +292,12 @@ export default function ContactoPage() {
                       fontFamily: "'Manrope', sans-serif",
                     }}
                   >
-                    {loading ? 'Sending...' : 'Reservar Clase'}
+                    {loading ? 'Enviando...' : 'Reservar clase'}
                   </button>
 
                   {/* Confidentiality note */}
                   <p style={{ fontSize: '11px', color: '#45483f', lineHeight: 1.6, textAlign: 'center' }}>
-                    🔒 Your information is kept private and never shared with third parties. By submitting you agree to our Privacy Policy.
+                    Tu información se mantiene privada y no se comparte con terceros. Al enviar aceptas nuestra política de privacidad.
                   </p>
                 </form>
               )}

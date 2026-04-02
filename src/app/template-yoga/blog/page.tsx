@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
 const categories = ['Todos', 'Meditación', 'Movimiento', 'Bienestar', 'Principiantes'];
 
@@ -15,12 +16,18 @@ const postImages: Record<string, string> = {
   'finding-balance': images.blog4,
 };
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+  const baseHref = ov?.baseHref || '/template-yoga';
+  const posts = ov?.blogPosts?.length
+    ? ov.blogPosts.map((p, i) => ({ ...p, category: 'Blog', readTime: `${6 + i} min`, featured: i === 0 }))
+    : blogPosts;
+
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const featuredPost = blogPosts.find(p => p.featured);
-  const regularPosts = blogPosts.filter(p => !p.featured);
+  const featuredPost = posts.find((p: any) => p.featured) as any;
+  const regularPosts = (posts as any[]).filter((p) => !p.featured);
 
   function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
@@ -47,7 +54,7 @@ export default function BlogPage() {
                   marginBottom: '12px',
                 }}
               >
-                The Journal
+                Nuestro blog
               </p>
               <h1
                 style={{
@@ -63,7 +70,7 @@ export default function BlogPage() {
               </h1>
             </div>
             <p style={{ fontSize: '14px', color: '#45483f', maxWidth: '340px', lineHeight: 1.7 }}>
-              Reflections on practice, movement, breath, and the quiet life. Insights from the mat.
+              Ideas útiles, prácticas y consejos reales para mejorar tu bienestar día a día.
             </p>
           </div>
 
@@ -128,7 +135,7 @@ export default function BlogPage() {
                   >
                     {featuredPost.category}
                   </span>
-                  <span style={{ fontSize: '11px', color: '#45483f' }}>{featuredPost.readTime} read</span>
+                  <span style={{ fontSize: '11px', color: '#45483f' }}>{featuredPost.readTime} de lectura</span>
                 </div>
                 <h2
                   style={{
@@ -146,7 +153,7 @@ export default function BlogPage() {
                   {featuredPost.excerpt}
                 </p>
                 <Link
-                  href={`/template-yoga/blog/${featuredPost.slug}`}
+                  href={`${baseHref}/blog/${featuredPost.slug}`}
                   style={{
                     display: 'inline-block',
                     background: 'linear-gradient(135deg, #566342 0%, #a3b18a 100%)',
@@ -160,7 +167,7 @@ export default function BlogPage() {
                     alignSelf: 'flex-start',
                   }}
                 >
-                  Read Article →
+                  Leer artículo →
                 </Link>
               </div>
             </div>
@@ -220,7 +227,7 @@ export default function BlogPage() {
                     {post.excerpt.substring(0, 100)}...
                   </p>
                   <Link
-                    href={`/template-yoga/blog/${post.slug}`}
+                      href={`${baseHref}/blog/${post.slug}`}
                     style={{
                       fontSize: '12px',
                       fontWeight: 600,
@@ -230,8 +237,8 @@ export default function BlogPage() {
                       paddingBottom: '2px',
                     }}
                   >
-                    Read →
-                  </Link>
+                      Leer →
+                    </Link>
                 </div>
               </article>
             ))}

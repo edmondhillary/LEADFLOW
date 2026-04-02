@@ -1,15 +1,18 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { blogPosts, images, business } from '../../data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
 // Generate static routes at build time
 export function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPage(props: any) {
+  const { params, overrides } = props as { params: Promise<{ slug: string }>; overrides?: LeadOverrides };
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = overrides?.blogPosts?.find((p) => p.slug === slug) || blogPosts.find((p) => p.slug === slug);
+  const baseHref = overrides?.baseHref || '/template-yoga';
 
   if (!post) {
     notFound();
@@ -22,9 +25,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px' }}>
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px', fontSize: '12px', fontFamily: "'Manrope', sans-serif" }}>
-            <Link href="/template-yoga" style={{ color: '#566342', textDecoration: 'none' }}>Home</Link>
+            <Link href={baseHref} style={{ color: '#566342', textDecoration: 'none' }}>Inicio</Link>
             <span style={{ color: '#9ca3af' }}>/</span>
-            <Link href="/template-yoga/blog" style={{ color: '#566342', textDecoration: 'none' }}>Blog</Link>
+            <Link href={`${baseHref}/blog`} style={{ color: '#566342', textDecoration: 'none' }}>Blog</Link>
             <span style={{ color: '#9ca3af' }}>/</span>
             <span style={{ color: '#6b7280' }}>{post.title}</span>
           </div>
@@ -32,7 +35,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Category + read time */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#566342', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: "'Manrope', sans-serif" }}>
-              {post.category}
+              {(post as any).category || 'Blog'}
             </span>
             {'readTime' in post && (
               <span style={{ fontSize: '11px', color: '#9ca3af', fontFamily: "'Manrope', sans-serif" }}>
@@ -85,23 +88,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <p style={{ fontSize: '16px', fontWeight: 600, color: '#1b1c19', fontFamily: "'Noto Serif', serif", marginBottom: '8px' }}>
               ¿Necesitas ayuda profesional?
             </p>
-            <p style={{ fontSize: '14px', color: '#6b7280', fontFamily: "'Manrope', sans-serif", marginBottom: '16px' }}>
-              Nuestro equipo de {business.name} esta disponible para resolver cualquier duda y ofrecerte una solucion personalizada.
-            </p>
-            <Link
-              href="/template-yoga/contacto"
-              style={{ display: 'inline-block', padding: '10px 24px', backgroundColor: '#566342', color: '#ffffff', fontFamily: "'Manrope', sans-serif", fontSize: '13px', fontWeight: 700, textDecoration: 'none', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-            >
-              Contactar ahora
+              <p style={{ fontSize: '14px', color: '#6b7280', fontFamily: "'Manrope', sans-serif", marginBottom: '16px' }}>
+                Nuestro equipo de {overrides?.businessName || business.name} está disponible para ayudarte con una solución a medida.
+              </p>
+              <Link
+                href={`${baseHref}/contacto`}
+                style={{ display: 'inline-block', padding: '10px 24px', backgroundColor: '#566342', color: '#ffffff', fontFamily: "'Manrope', sans-serif", fontSize: '13px', fontWeight: 700, textDecoration: 'none', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+              >
+                Contactar ahora
             </Link>
           </div>
 
           {/* Back to blog */}
           <div style={{ paddingTop: '32px', borderTop: '1px solid #f0eee9' }}>
-            <Link
-              href="/template-yoga/blog"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#566342', fontFamily: "'Manrope', sans-serif", fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
-            >
+              <Link
+                href={`${baseHref}/blog`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#566342', fontFamily: "'Manrope', sans-serif", fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
+              >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
               Volver al Blog
             </Link>

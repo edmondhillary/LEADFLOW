@@ -67,8 +67,8 @@ export default async function BusinessLayout({ params, children }: Props) {
       <div
         id="urgency-banner"
         style={{
-          backgroundColor: '#dc2626',
-          color: '#fff',
+          backgroundColor: '#c2410c',
+          color: '#fff7ed',
           textAlign: 'center',
           padding: '10px 16px',
           fontSize: '14px',
@@ -99,7 +99,7 @@ export default async function BusinessLayout({ params, children }: Props) {
             rel="noopener noreferrer"
             style={{
               backgroundColor: '#fff',
-              color: '#dc2626',
+              color: '#9a3412',
               fontWeight: 700,
               fontSize: '13px',
               padding: '5px 14px',

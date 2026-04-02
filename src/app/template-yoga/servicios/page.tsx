@@ -1,8 +1,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { allClasses, pricing, schedule, images } from '../data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+  const baseHref = ov?.baseHref || '/template-yoga';
+  const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
+
+  const classesData = ov?.services?.length
+    ? ov.services.map((s, i) => ({
+        key: `svc-${i}`,
+        name: s.name,
+        desc: s.description,
+        type: 'Servicio',
+        duration: '60 min',
+        level: 'Todos los niveles',
+        sessions: 'Consultá disponibilidad',
+      }))
+    : allClasses;
+
   const classImages: Record<string, string> = {
     hatha: images.hatha,
     vinyasa: images.vinyasa,
@@ -12,7 +29,7 @@ export default function ServiciosPage() {
     breathwork: images.blog3,
   };
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   return (
     <>
@@ -23,7 +40,7 @@ export default function ServiciosPage() {
             className="inline-block mb-5 px-4 py-2 rounded-full"
             style={{ backgroundColor: '#dae8be', color: '#566342', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}
           >
-            Curated Practices
+            Prácticas guiadas
           </span>
           <h1
             style={{
@@ -35,11 +52,13 @@ export default function ServiciosPage() {
               maxWidth: '700px',
             }}
           >
-            Six Paths to{' '}
-            <em style={{ fontStyle: 'italic', color: '#566342' }}>Stillness</em>
+            Nuestra propuesta de{' '}
+            <em style={{ fontStyle: 'italic', color: '#566342' }}>clases</em>
           </h1>
           <p className="mt-6 max-w-xl" style={{ fontSize: '16px', color: '#45483f', lineHeight: 1.7 }}>
-            Each class is a distinct practice designed with intention. Whether you seek movement, restoration, or inner quiet — your path is here.
+            {isRioplatense
+              ? 'Cada clase está pensada con intención. Si buscás movimiento, calma o recuperación, tenemos un plan para vos.'
+              : 'Cada clase está diseñada con intención. Si buscas movimiento, calma o recuperación, tenemos un plan para ti.'}
           </p>
         </div>
       </section>
@@ -50,7 +69,7 @@ export default function ServiciosPage() {
           {/* Large featured + small 2 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Large card */}
-            {allClasses.slice(0, 1).map(cls => (
+            {classesData.slice(0, 1).map(cls => (
               <div
                 key={cls.key}
                 className="md:col-span-2 group transition-all duration-500 hover:-translate-y-2"
@@ -101,7 +120,7 @@ export default function ServiciosPage() {
             ))}
 
             {/* Small card */}
-            {allClasses.slice(1, 2).map(cls => (
+            {classesData.slice(1, 2).map(cls => (
               <div
                 key={cls.key}
                 className="group transition-all duration-500 hover:-translate-y-2"
@@ -143,7 +162,7 @@ export default function ServiciosPage() {
 
           {/* 4 remaining cards in 2x2 grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {allClasses.slice(2).map(cls => (
+            {classesData.slice(2).map(cls => (
               <div
                 key={cls.key}
                 className="group transition-all duration-500 hover:-translate-y-2"
@@ -192,10 +211,10 @@ export default function ServiciosPage() {
         <div className="max-w-[1920px] mx-auto">
           <div className="text-center mb-16">
             <h2 style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}>
-              Simple, Honest <em style={{ fontStyle: 'italic', color: '#566342' }}>Pricing</em>
+              Planes y <em style={{ fontStyle: 'italic', color: '#566342' }}>precios</em>
             </h2>
             <p className="mt-4 max-w-md mx-auto" style={{ fontSize: '14px', color: '#45483f', lineHeight: 1.7 }}>
-              No hidden fees. No pressure to upgrade. Just yoga.
+              Sin costes ocultos, sin letra pequeña.
             </p>
           </div>
 
@@ -226,7 +245,7 @@ export default function ServiciosPage() {
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    Most Popular
+                    Más elegido
                   </span>
                 )}
                 <p style={{ fontSize: '13px', fontWeight: 700, color: tier.highlight ? '#becca3' : '#566342', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
@@ -252,7 +271,7 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/template-yoga/contacto"
+                  href={`${baseHref}/contacto`}
                   style={{
                     display: 'block',
                     textAlign: 'center',
@@ -279,9 +298,9 @@ export default function ServiciosPage() {
         <div className="max-w-[1920px] mx-auto">
           <div className="mb-12">
             <h2 style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#1b1c19', fontWeight: 700 }}>
-              Weekly <em style={{ fontStyle: 'italic', color: '#566342' }}>Schedule</em>
+              Horarios de <em style={{ fontStyle: 'italic', color: '#566342' }}>la semana</em>
             </h2>
-            <p className="mt-3" style={{ fontSize: '14px', color: '#45483f' }}>All classes led by Aria Morant</p>
+            <p className="mt-3" style={{ fontSize: '14px', color: '#45483f' }}>Clases impartidas por el equipo del estudio</p>
           </div>
 
           <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid #e4e2dd' }}>
@@ -289,7 +308,7 @@ export default function ServiciosPage() {
               <thead>
                 <tr style={{ backgroundColor: '#f5f3ee' }}>
                   <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid #e4e2dd' }}>
-                    Class
+                    Clase
                   </th>
                   {days.map(d => (
                     <th key={d} style={{ padding: '16px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#1b1c19', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid #e4e2dd' }}>
@@ -320,13 +339,15 @@ export default function ServiciosPage() {
       {/* CTA */}
       <section className="w-full py-20 px-6 md:px-16 text-center" style={{ backgroundColor: '#f5f3ee' }}>
         <h2 style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}>
-          Ready to begin?
+          ¿Listo para empezar?
         </h2>
         <p className="mt-4 mb-8 max-w-md mx-auto" style={{ fontSize: '15px', color: '#45483f', lineHeight: 1.7 }}>
-          Book your first class today. All levels welcome — we&apos;ll take care of the rest.
+          {isRioplatense
+            ? 'Reservá tu primera clase hoy. Nosotros te guiamos en todo el proceso.'
+            : 'Reserva tu primera clase hoy. Nosotros te guiamos en todo el proceso.'}
         </p>
         <Link
-          href="/template-yoga/contacto"
+          href={`${baseHref}/contacto`}
           style={{
             display: 'inline-block',
             background: 'linear-gradient(135deg, #566342 0%, #a3b18a 100%)',
@@ -339,7 +360,7 @@ export default function ServiciosPage() {
             letterSpacing: '0.03em',
           }}
         >
-          Reservar Clase
+          Reservar clase
         </Link>
       </section>
     </>

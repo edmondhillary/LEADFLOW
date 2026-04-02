@@ -1,8 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { about, business, images } from '../data';
+import type { LeadOverrides } from '@/lib/lead-template-data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as LeadOverrides | undefined;
+  const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
+  const baseHref = ov?.baseHref || '/template-yoga';
+  const business_ = ov
+    ? { ...business, name: ov.businessName, city: ov.city, address: ov.address }
+    : business;
   return (
     <>
       {/* Hero Section */}
@@ -10,7 +17,7 @@ export default function NosotrosPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src={images.nosotrosHero}
-            alt="Breath of Silence Studio"
+            alt={business_.name}
             fill
             className="object-cover"
             priority
@@ -56,7 +63,7 @@ export default function NosotrosPage() {
             <div className="relative rounded-2xl overflow-hidden" style={{ height: '560px' }}>
               <Image
                 src={images.instructorPortrait}
-                alt={business.headInstructor}
+                alt={business_.headInstructor}
                 fill
                 className="object-cover"
               />
@@ -66,7 +73,7 @@ export default function NosotrosPage() {
                 className="inline-block mb-4 px-3 py-1 rounded-full"
                 style={{ backgroundColor: '#dae8be', color: '#566342', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}
               >
-                Lead Instructor
+                Instructor principal
               </span>
               <h2
                 style={{
@@ -77,10 +84,10 @@ export default function NosotrosPage() {
                   lineHeight: 1.2,
                 }}
               >
-                {business.headInstructor}
+                {business_.headInstructor}
               </h2>
               <p style={{ fontSize: '13px', color: '#566342', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '8px', marginBottom: '24px' }}>
-                {business.instructorCredentials}
+                {business_.instructorCredentials}
               </p>
               {about.storyParagraphs.map((para, i) => (
                 <p key={i} className="mb-5" style={{ fontSize: '15px', color: '#45483f', lineHeight: 1.75 }}>
@@ -113,7 +120,7 @@ export default function NosotrosPage() {
             &ldquo;Natural oak floors, filtered afternoon light, and the kind of silence that allows you to actually hear your breath.&rdquo;
           </p>
           <p className="mt-4" style={{ fontSize: '12px', color: '#566342', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            — {business.headInstructor}, Founder
+              — {business_.headInstructor}, {isRioplatense ? 'Fundador/a' : 'Fundador/a'}
           </p>
         </div>
       </section>
@@ -130,7 +137,7 @@ export default function NosotrosPage() {
                 fontWeight: 700,
               }}
             >
-              Our <em style={{ fontStyle: 'italic', color: '#566342' }}>Philosophy</em>
+              Nuestra <em style={{ fontStyle: 'italic', color: '#566342' }}>filosofía</em>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -182,18 +189,18 @@ export default function NosotrosPage() {
               fontWeight: 700,
             }}
           >
-            The <em style={{ fontStyle: 'italic', color: '#566342' }}>Studio</em>
+            El <em style={{ fontStyle: 'italic', color: '#566342' }}>estudio</em>
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="relative rounded-2xl overflow-hidden col-span-2" style={{ height: '380px' }}>
-              <Image src={images.studioWide} alt="Studio wide view" fill className="object-cover" />
+              <Image src={images.studioWide} alt={`Estudio ${business_.name}`} fill className="object-cover" />
             </div>
             <div className="flex flex-col gap-4">
               <div className="relative rounded-2xl overflow-hidden flex-1">
-                <Image src={images.hatha} alt="Hatha class" fill className="object-cover" />
+                <Image src={images.hatha} alt="Clase de yoga" fill className="object-cover" />
               </div>
               <div className="relative rounded-2xl overflow-hidden flex-1">
-                <Image src={images.restorative} alt="Restorative session" fill className="object-cover" />
+                <Image src={images.restorative} alt="Sesión de yoga" fill className="object-cover" />
               </div>
             </div>
           </div>
@@ -245,13 +252,15 @@ export default function NosotrosPage() {
             lineHeight: 1.2,
           }}
         >
-          {about.ctaTitle}
+          {isRioplatense ? 'Sumate a la comunidad' : 'Únete a la comunidad'}
         </h2>
         <p className="mt-5 mb-10 max-w-lg mx-auto" style={{ fontSize: '16px', color: '#45483f', lineHeight: 1.7 }}>
-          {about.ctaSubtitle}
+          {isRioplatense
+            ? 'Te acompañamos para que encuentres una práctica sostenible, sin presión y a tu ritmo.'
+            : 'Te acompañamos para que encuentres una práctica sostenible, sin presión y a tu ritmo.'}
         </p>
         <Link
-          href="/template-yoga/contacto"
+          href={`${baseHref}/contacto`}
           style={{
             display: 'inline-block',
             background: 'linear-gradient(135deg, #566342 0%, #a3b18a 100%)',
@@ -264,7 +273,7 @@ export default function NosotrosPage() {
             letterSpacing: '0.03em',
           }}
         >
-          Reservar Clase
+          Reservar clase
         </Link>
       </section>
     </>

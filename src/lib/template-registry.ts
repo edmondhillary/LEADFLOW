@@ -4,7 +4,7 @@ import type { LeadOverrides } from './lead-template-data';
 type TemplateProps = { overrides?: LeadOverrides };
 type PageLoader = () => Promise<{ default: ComponentType<TemplateProps> }>;
 type LayoutLoader = () => Promise<{ default: ComponentType<{ children: ReactNode; overrides?: LeadOverrides }> }>;
-type BlogPostLoader = () => Promise<{ default: ComponentType<{ params: Promise<{ slug: string }> }> }>;
+type BlogPostLoader = () => Promise<{ default: ComponentType<{ params: Promise<{ slug: string }>; overrides?: LeadOverrides }> }>;
 
 const PAGES: Record<string, PageLoader> = {
   'template-academia': () => import('@/app/template-academia/page'),

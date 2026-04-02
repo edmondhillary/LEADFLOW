@@ -9,6 +9,25 @@ export type YogaPageProps = { overrides?: LeadOverrides };
 
 export default function YogaHome(props: any = {}) {
   const ov = props.overrides as LeadOverrides | undefined;
+  const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
+
+  const ui = {
+    members: 'Miembros',
+    daysWeek: 'Días / Semana',
+    founded: 'Fundado',
+    offerings: 'Nuestras Prácticas',
+    classesForBody: 'Clases para cada cuerpo',
+    viewSchedule: 'Ver horarios',
+    whyChoose: 'Por qué eligen',
+    stories: 'Historias de alumnos',
+    whatSays: 'Lo que dice nuestra comunidad',
+    firstStep: 'Da el primer paso',
+    beginJourney: isRioplatense ? 'Empezá tu' : 'Empieza tu',
+    journey: 'práctica',
+    ctaClosing: isRioplatense
+      ? 'La primera clase siempre cuesta más. Después, el estudio se vuelve parte de tu rutina.'
+      : 'La primera clase siempre cuesta más. Después, el estudio se convierte en tu rutina.',
+  };
 
   // ── Merge: datos reales > datos demo ──────────────────────────────────────
   const business_ = ov
@@ -28,11 +47,15 @@ export default function YogaHome(props: any = {}) {
         ...hero,
         badge:       `Yoga en ${ov.city}`,
         title:       ov.heroTitle,
-        titleItalic: ov.city,
+        titleItalic: ov.heroTitle.toLowerCase().includes(ov.city.toLowerCase()) ? '' : ov.city,
         subtitle:    ov.heroSubtitle,
         ctaPrimary:  ov.heroCTA || hero.ctaPrimary,
       }
     : hero;
+
+  const heroTitleClean = ov && hero_.titleItalic
+    ? hero_.title.replace(new RegExp(`\\s*en\\s+${ov.city}$`, 'i'), '').trim()
+    : hero_.title;
 
   const testimonials_ = ov?.testimonials?.length
     ? ov.testimonials.map(t => ({ name: t.name, role: t.role || 'Alumno/a', text: t.text, rating: t.rating }))
@@ -73,8 +96,8 @@ export default function YogaHome(props: any = {}) {
               className="mb-6 leading-[1.05]"
               style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2.8rem, 6vw, 5rem)', color: '#1b1c19', fontWeight: 700 }}
             >
-              {hero_.title}{' '}
-              <em style={{ fontStyle: 'italic', color: '#566342' }}>{hero_.titleItalic}</em>
+              {heroTitleClean}{' '}
+              {hero_.titleItalic ? <em style={{ fontStyle: 'italic', color: '#566342' }}>{hero_.titleItalic}</em> : null}
             </h1>
 
             <p className="mb-10 leading-relaxed" style={{ fontSize: '16px', color: '#45483f', maxWidth: '440px', lineHeight: 1.7 }}>
@@ -120,15 +143,15 @@ export default function YogaHome(props: any = {}) {
             <div className="flex gap-10 mt-14">
               <div>
                 <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '28px', fontWeight: 700, color: '#566342' }}>{business_.membersCount}</p>
-                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Members</p>
+                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{ui.members}</p>
               </div>
               <div>
                 <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '28px', fontWeight: 700, color: '#566342' }}>6</p>
-                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Days / Week</p>
+                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{ui.daysWeek}</p>
               </div>
               <div>
                 <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '28px', fontWeight: 700, color: '#566342' }}>2019</p>
-                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Founded</p>
+                <p style={{ fontSize: '11px', color: '#45483f', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{ui.founded}</p>
               </div>
             </div>
           </div>
@@ -139,13 +162,13 @@ export default function YogaHome(props: any = {}) {
       <section className="w-full py-24 px-6 md:px-16 max-w-[1920px] mx-auto">
         <div className="text-center mb-16">
           <span style={{ fontSize: '11px', fontWeight: 600, color: '#566342', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            Our Offerings
+            {ui.offerings}
           </span>
           <h2
             className="mt-3"
             style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}
           >
-            Classes for Every Body
+            {ui.classesForBody}
           </h2>
         </div>
 
@@ -211,7 +234,7 @@ export default function YogaHome(props: any = {}) {
                       paddingBottom: '2px',
                     }}
                   >
-                    View Schedule →
+                    {ui.viewSchedule} →
                   </Link>
                 </div>
               </div>
@@ -227,7 +250,7 @@ export default function YogaHome(props: any = {}) {
             <h2
               style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}
             >
-              Why Students Choose{' '}
+              {ui.whyChoose}{' '}
               <em style={{ fontStyle: 'italic', color: '#566342' }}>{business_.name}</em>
             </h2>
           </div>
@@ -302,13 +325,13 @@ export default function YogaHome(props: any = {}) {
       <section className="w-full py-24" style={{ backgroundColor: '#f0eee9' }}>
         <div className="px-6 md:px-16 max-w-[1920px] mx-auto text-center">
           <span style={{ fontSize: '11px', fontWeight: 600, color: '#566342', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            Student Stories
+            {ui.stories}
           </span>
           <h2
             className="mt-3 mb-16"
             style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1b1c19', fontWeight: 700 }}
           >
-            What Our Community Says
+            {ui.whatSays}
           </h2>
 
           <div className="max-w-3xl mx-auto flex flex-col gap-12">
@@ -341,17 +364,17 @@ export default function YogaHome(props: any = {}) {
       {/* Final CTA */}
       <section className="w-full py-28 px-6 md:px-16 text-center" style={{ backgroundColor: '#fbf9f4' }}>
         <span style={{ fontSize: '11px', fontWeight: 600, color: '#566342', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-          Take the First Step
+          {ui.firstStep}
         </span>
         <h2
           className="mt-4 mb-6"
           style={{ fontFamily: "'Noto Serif', serif", fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', color: '#1b1c19', fontWeight: 700, lineHeight: 1.1 }}
         >
-          Begin Your{' '}
-          <em style={{ fontStyle: 'italic', color: '#566342' }}>Journey</em>
+          {ui.beginJourney}{' '}
+          <em style={{ fontStyle: 'italic', color: '#566342' }}>{ui.journey}</em>
         </h2>
         <p className="mb-10 max-w-lg mx-auto" style={{ fontSize: '16px', color: '#45483f', lineHeight: 1.7 }}>
-          Your first class is always the hardest step. After that, the studio has a way of becoming home.
+          {ui.ctaClosing}
         </p>
         <Link
           href={`${baseHref}/contacto`}
