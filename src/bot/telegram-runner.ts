@@ -85,6 +85,23 @@ async function sendMsg(text: string, opts?: TelegramBot.SendMessageOptions) {
   return bot.sendMessage(CHAT_ID, text, { parse_mode: 'Markdown', ...opts });
 }
 
+async function sendMsgPlain(text: string, opts?: TelegramBot.SendMessageOptions) {
+  return bot.sendMessage(CHAT_ID, text, opts);
+}
+
+function escapeHtml(text: string = ''): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function sendMsgHtml(html: string, opts?: TelegramBot.SendMessageOptions) {
+  return bot.sendMessage(CHAT_ID, html, { parse_mode: 'HTML', ...opts });
+}
+
 async function getStats() {
   await connectDB();
   const stats = await Lead.aggregate([
@@ -541,12 +558,14 @@ bot.on('message', async (msg) => {
         services: session.stripeServices,
       });
       if (url) {
-        await sendMsg(
-          `*💳 Payment link generado*\n\n` +
-          `*${session.stripeLead.businessName}*\n` +
-          `Importe: *${amount}€/mes*\n\n` +
-          `${url}\n\n` +
-          `_Envíalo por WhatsApp al cliente._`,
+        const businessName = escapeHtml(session.stripeLead.businessName || 'Negocio');
+        const safeUrl = escapeHtml(url);
+        await sendMsgHtml(
+          `💳 <b>Payment link generado</b>\n\n` +
+          `<b>${businessName}</b>\n` +
+          `Importe: <b>${amount}€/mes</b>\n\n` +
+          `<a href="${safeUrl}">Abrir payment link</a>\n\n` +
+          `Envíalo por WhatsApp al cliente.`,
           MAIN_KEYBOARD
         );
       }
@@ -717,20 +736,25 @@ bot.on('callback_query', async (query) => {
       if (url) {
         const totalEur = totalCents / 100;
         const serviceNames = services.map(s => SERVICE_LABELS[s]?.split(' — ')[0] || s).join(', ');
-        await sendMsg(
-          `*💳 Link de pago generado*\n\n` +
-          `*${lead.businessName}*\n` +
-          `📍 ${lead.city}\n` +
-          `📦 Servicios: ${serviceNames}\n` +
-          `💰 Total: *${totalEur}€/mes*\n` +
+        const businessName = escapeHtml(lead.businessName || 'Negocio');
+        const city = escapeHtml(lead.city || '');
+        const safeServices = escapeHtml(serviceNames);
+        const safeUrl = escapeHtml(url);
+
+        await sendMsgHtml(
+          `💳 <b>Link de pago generado</b>\n\n` +
+          `<b>${businessName}</b>\n` +
+          `📍 ${city}\n` +
+          `📦 Servicios: ${safeServices}\n` +
+          `💰 Total: <b>${totalEur}€/mes</b>\n` +
           `🔗 Hosting: ~3,50€/mes adicional · Dominio: ~15€/año\n\n` +
-          `${url}\n\n` +
-          `_Envíalo por WhatsApp al cliente._`,
+          `<a href="${safeUrl}">Abrir payment link</a>\n\n` +
+          `Envíalo por WhatsApp al cliente.`,
           MAIN_KEYBOARD
         );
       }
     } catch (e: any) {
-      await sendMsg(`❌ Error al generar el link: ${e.message}`, MAIN_KEYBOARD);
+      await sendMsgPlain(`❌ Error al generar el link: ${e.message}`, MAIN_KEYBOARD);
     }
     session.step = 'idle';
     return;

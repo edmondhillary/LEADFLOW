@@ -5,6 +5,18 @@ import { business, contacto, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-jardineria';
   const [formData, setFormData] = useState({
     name: '',
@@ -61,9 +73,9 @@ export default function ContactoPage(props: any = {}) {
             {/* Contact cards */}
             <div className="flex flex-col gap-4">
               {[
-                { label: 'Estudio', value: business.address },
-                { label: 'Telephone', value: business.phone },
-                { label: 'Email', value: business.email },
+                { label: 'Estudio', value: business_.address },
+                { label: 'Telephone', value: business_.phone },
+                { label: 'Email', value: business_.email },
                 { label: 'Horario', value: contacto.schedule },
               ].map(item => (
                 <div

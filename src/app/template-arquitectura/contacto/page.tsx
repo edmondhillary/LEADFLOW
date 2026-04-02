@@ -6,6 +6,18 @@ import { contacto, images, business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-arquitectura';
   const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', tipo: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -98,17 +110,17 @@ export default function ContactoPage(props: any = {}) {
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-1" style={{ color: '#635e57' }}>location_on</span>
                   <div>
-                    <p className="text-sm" style={{ color: '#2e3430' }}>{business.address}</p>
-                    <p className="text-sm" style={{ color: '#5a615c' }}>{business.postalCode} {business.city}</p>
+                    <p className="text-sm" style={{ color: '#2e3430' }}>{business_.address}</p>
+                    <p className="text-sm" style={{ color: '#5a615c' }}>{business_.postalCode} {business_.city}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-1" style={{ color: '#635e57' }}>mail</span>
-                  <p className="text-sm" style={{ color: '#2e3430' }}>{business.email}</p>
+                  <p className="text-sm" style={{ color: '#2e3430' }}>{business_.email}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-1" style={{ color: '#635e57' }}>call</span>
-                  <p className="text-sm" style={{ color: '#2e3430' }}>{business.phone}</p>
+                  <p className="text-sm" style={{ color: '#2e3430' }}>{business_.phone}</p>
                 </div>
               </div>
             </div>
@@ -132,7 +144,7 @@ export default function ContactoPage(props: any = {}) {
                   <span style={{ color: '#2e3430', fontWeight: 500 }}>{contacto.responseTime}</span>
                 </div>
               </div>
-              <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 w-fit pb-1 transition-colors" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700, color: '#2e3430', borderBottom: '2px solid #5f5e5e', textDecoration: 'none' }}>
+              <a href={`https://wa.me/${business_.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 w-fit pb-1 transition-colors" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700, color: '#2e3430', borderBottom: '2px solid #5f5e5e', textDecoration: 'none' }}>
                 Escribir por WhatsApp
               </a>
             </div>

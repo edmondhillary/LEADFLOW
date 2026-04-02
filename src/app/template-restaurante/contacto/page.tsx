@@ -5,6 +5,18 @@ import { contacto, business, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-restaurante';
   const [formData, setFormData] = useState({
     nombre: '',
@@ -192,7 +204,7 @@ export default function ContactoPage(props: any = {}) {
                       Una experiencia para recordar
                     </p>
                     <a
-                      href={`https://wa.me/${business.whatsapp}`}
+                      href={`https://wa.me/${business_.whatsapp}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block bg-[#FED65B] text-[#745C00] uppercase tracking-[0.15em] text-sm font-bold px-8 py-4 hover:bg-[#f5cb4a] transition-colors"
@@ -213,8 +225,8 @@ export default function ContactoPage(props: any = {}) {
                   className="text-3xl font-bold text-[#1B1D0E] leading-tight"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                 >
-                  {business.address},<br />
-                  {business.postalCode} {business.city}
+                  {business_.address},<br />
+                  {business_.postalCode} {business_.city}
                 </p>
               </div>
 
@@ -242,11 +254,11 @@ export default function ContactoPage(props: any = {}) {
               <div>
                 <p className="text-xs tracking-[0.3em] uppercase text-[#735C00] mb-3">Telefono</p>
                 <a
-                  href={`tel:${business.phoneIntl}`}
+                  href={`tel:${business_.phoneIntl}`}
                   className="text-2xl font-bold text-[#1B1D0E] hover:text-[#735C00] transition-colors"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                 >
-                  {business.phone}
+                  {business_.phone}
                 </a>
               </div>
 
@@ -272,9 +284,9 @@ export default function ContactoPage(props: any = {}) {
               <span className="text-xs tracking-[0.3em] uppercase text-[#735C00] block mb-8">Siguenos</span>
               <div className="flex flex-col gap-4">
                 {[
-                  { label: 'Instagram', handle: '@culinaryeditorial', href: '#' },
-                  { label: 'TikTok', handle: '@culinaryeditorial', href: '#' },
-                  { label: 'Facebook', handle: 'The Culinary Editorial', href: '#' },
+                  { label: 'Instagram', handle: '@culinaryeditorial', href: mapLink },
+                  { label: 'TikTok', handle: '@culinaryeditorial', href: mapLink },
+                  { label: 'Facebook', handle: 'The Culinary Editorial', href: mapLink },
                 ].map((social) => (
                   <a
                     key={social.label}

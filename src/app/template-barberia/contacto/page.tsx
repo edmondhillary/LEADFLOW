@@ -5,6 +5,18 @@ import { business, contacto, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-barberia';
   const [form, setForm] = useState({
     name: '',
@@ -73,15 +85,15 @@ export default function ContactoPage(props: any = {}) {
             <div className="flex flex-col gap-6 mb-12">
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
                 <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Dirección</p>
-                <p style={{ fontSize: '15px', color: '#e5e2e1', lineHeight: 1.6 }}>{business.address}</p>
+                <p style={{ fontSize: '15px', color: '#e5e2e1', lineHeight: 1.6 }}>{business_.address}</p>
               </div>
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
                 <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Teléfono</p>
-                <a href={`tel:${business.phoneIntl}`} style={{ fontSize: '15px', color: '#e5e2e1', textDecoration: 'none' }}>{business.phone}</a>
+                <a href={`tel:${business_.phoneIntl}`} style={{ fontSize: '15px', color: '#e5e2e1', textDecoration: 'none' }}>{business_.phone}</a>
               </div>
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
                 <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Email</p>
-                <a href={`mailto:${business.email}`} style={{ fontSize: '15px', color: '#e5e2e1', textDecoration: 'none' }}>{business.email}</a>
+                <a href={`mailto:${business_.email}`} style={{ fontSize: '15px', color: '#e5e2e1', textDecoration: 'none' }}>{business_.email}</a>
               </div>
             </div>
 

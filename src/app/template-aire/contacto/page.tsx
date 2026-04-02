@@ -6,6 +6,18 @@ import { business, contacto, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-aire';
   const [form, setForm] = useState({
     nombre: '',
@@ -51,9 +63,9 @@ export default function ContactoPage(props: any = {}) {
               {/* Contact info cards */}
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: 'phone', label: 'Teléfono', value: business.phone, href: `tel:${business.phoneIntl}` },
-                  { icon: 'email', label: 'Email', value: business.email, href: `mailto:${business.email}` },
-                  { icon: 'location_on', label: 'Dirección', value: business.address, href: undefined },
+                  { icon: 'phone', label: 'Teléfono', value: business_.phone, href: `tel:${business_.phoneIntl}` },
+                  { icon: 'email', label: 'Email', value: business_.email, href: `mailto:${business_.email}` },
+                  { icon: 'location_on', label: 'Dirección', value: business_.address, href: mapLink },
                 ].map(item => (
                   <div key={item.label} className="flex items-center gap-4 p-5 rounded-xl" style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 16px rgba(27,27,29,0.04)', border: '1px solid #e4e2e4' }}>
                     <div
@@ -129,7 +141,7 @@ export default function ContactoPage(props: any = {}) {
                     Request received!
                   </h2>
                   <p style={{ fontSize: '15px', color: '#414754', lineHeight: 1.7, maxWidth: '380px' }}>
-                    A certified technician will contact you within {contacto.responseTime}. For urgent issues, call us directly at {business.phone}.
+                    A certified technician will contact you within {contacto.responseTime}. For urgent issues, call us directly at {business_.phone}.
                   </p>
                   <button
                     onClick={() => { setSubmitted(false); setForm({ nombre: '', email: '', telefono: '', servicio: '', mensaje: '' }); }}

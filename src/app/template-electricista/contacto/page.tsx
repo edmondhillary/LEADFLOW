@@ -6,6 +6,18 @@ import { business, images, blogPosts, contact } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-electricista';
   const [formData, setFormData] = useState({ nombre: '', email: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -77,18 +89,18 @@ export default function ContactoPage(props: any = {}) {
                     <span className="material-symbols-outlined text-[#705d00] text-3xl">location_on</span>
                     <div>
                       <p className="font-bold text-lg leading-tight">Volt Precision Electrical HQ</p>
-                      <p className="text-[#5f5e5e]">{business.address}</p>
-                      <p className="text-[#5f5e5e]">{business.city}, {business.country} {business.zip}</p>
+                      <p className="text-[#5f5e5e]">{business_.address}</p>
+                      <p className="text-[#5f5e5e]">{business_.city}, {business_.country} {business_.zip}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
                     <span className="material-symbols-outlined text-[#705d00] text-3xl">phone_in_talk</span>
                     <div>
                       <p className="font-bold text-lg leading-tight">Contacto Directo</p>
-                      <a href={`tel:${business.phoneIntl}`} className="text-[#5f5e5e] hover:text-[#705d00] transition-colors">
-                        {business.phone}
+                      <a href={`tel:${business_.phoneIntl}`} className="text-[#5f5e5e] hover:text-[#705d00] transition-colors">
+                        {business_.phone}
                       </a>
-                      <p className="text-[#5f5e5e]">{business.email}</p>
+                      <p className="text-[#5f5e5e]">{business_.email}</p>
                     </div>
                   </div>
                 </div>
@@ -192,7 +204,7 @@ export default function ContactoPage(props: any = {}) {
               <span className="text-[#705d00] font-bold text-xs uppercase tracking-[0.3em]">Knowledge Base</span>
               <h2 className="text-4xl font-black uppercase tracking-tighter mt-2">Technical Blog</h2>
             </div>
-            <a className="hidden md:block text-sm font-bold uppercase border-b-2 border-[#705d00] pb-1 hover:text-[#705d00] transition-colors" href="#">
+            <a className="hidden md:block text-sm font-bold uppercase border-b-2 border-[#705d00] pb-1 hover:text-[#705d00] transition-colors" href={mapLink}>
               Ver todos los artículos
             </a>
           </div>

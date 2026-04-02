@@ -13,6 +13,18 @@ type FormData = {
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-psicologo';
   const [form, setForm] = useState<FormData>({
     nombre: '',
@@ -89,17 +101,17 @@ export default function ContactoPage(props: any = {}) {
               <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(26,28,27,0.04)' }}>
                 <p style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#586152', marginBottom: '8px' }}>Dirección</p>
                 <p style={{ fontSize: '14px', color: '#454841', lineHeight: 1.7 }}>
-                  {business.address}<br />
-                  {business.postalCode} {business.city}, {business.country}
+                  {business_.address}<br />
+                  {business_.postalCode} {business_.city}, {business_.country}
                 </p>
               </div>
 
               <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(26,28,27,0.04)' }}>
                 <p style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#586152', marginBottom: '8px' }}>Teléfono & Email</p>
                 <p style={{ fontSize: '14px', color: '#454841', lineHeight: 1.7 }}>
-                  <a href={`tel:${business.phoneIntl}`} style={{ color: '#454841', textDecoration: 'none' }}>{business.phone}</a>
+                  <a href={`tel:${business_.phoneIntl}`} style={{ color: '#454841', textDecoration: 'none' }}>{business_.phone}</a>
                   <br />
-                  <a href={`mailto:${business.email}`} style={{ color: '#586152', textDecoration: 'none' }}>{business.email}</a>
+                  <a href={`mailto:${business_.email}`} style={{ color: '#586152', textDecoration: 'none' }}>{business_.email}</a>
                 </p>
               </div>
 

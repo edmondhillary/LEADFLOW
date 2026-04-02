@@ -23,6 +23,18 @@ const initialForm: FormState = {
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-mudanzas';
   const [form, setForm] = useState<FormState>(initialForm);
   const [submitted, setSubmitted] = useState(false);
@@ -140,7 +152,7 @@ export default function ContactoPage(props: any = {}) {
                     </div>
                     <div>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Dirección</p>
-                      <p style={{ fontSize: '13px', color: '#44474e', marginTop: '2px' }}>{business.address}</p>
+                      <p style={{ fontSize: '13px', color: '#44474e', marginTop: '2px' }}>{business_.address}</p>
                     </div>
                   </div>
 
@@ -156,10 +168,10 @@ export default function ContactoPage(props: any = {}) {
                     <div>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Teléfono</p>
                       <a
-                        href={`tel:${business.phoneIntl}`}
+                        href={`tel:${business_.phoneIntl}`}
                         style={{ fontSize: '13px', color: '#002046', textDecoration: 'none', marginTop: '2px', display: 'block' }}
                       >
-                        {business.phone}
+                        {business_.phone}
                       </a>
                     </div>
                   </div>
@@ -176,10 +188,10 @@ export default function ContactoPage(props: any = {}) {
                     <div>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Email</p>
                       <a
-                        href={`mailto:${business.email}`}
+                        href={`mailto:${business_.email}`}
                         style={{ fontSize: '13px', color: '#002046', textDecoration: 'none', marginTop: '2px', display: 'block' }}
                       >
-                        {business.email}
+                        {business_.email}
                       </a>
                     </div>
                   </div>

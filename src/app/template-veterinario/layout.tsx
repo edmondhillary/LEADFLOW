@@ -95,13 +95,13 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
 
       {/* Mobile Overlay */}
       <div
-        className={`fixed inset-0 z-30 transition-opacity duration-300 bg-[#38312b]/40 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-[70] transition-opacity duration-300 bg-[#38312b]/40 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setMenuOpen(false)}
       />
 
       {/* Mobile Slide-in Menu */}
       <aside
-        className={`fixed top-0 right-0 bottom-0 z-30 w-72 bg-[#fff8f4] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 bottom-0 z-[80] w-72 bg-[#fff8f4] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-2">
           {navLinks.map((item) => (

@@ -5,6 +5,18 @@ import { business, contacto, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-cerrajero';
   const [form, setForm] = useState({ nombre: '', telefono: '', email: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -62,14 +74,14 @@ export default function ContactoPage(props: any = {}) {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <a
-              href={`tel:${business.phoneIntl}`}
+              href={`tel:${business_.phoneIntl}`}
               className="inline-flex items-center gap-3 rounded-lg px-10 py-5 transition-all hover:scale-[1.02]"
               style={{ background: 'linear-gradient(to right, #fff6df, #ffd700)', color: '#3a3000', fontSize: '16px', fontWeight: 800, textDecoration: 'none', letterSpacing: '-0.01em' }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.12-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
               </svg>
-              {business.phone}
+              {business_.phone}
             </a>
           </div>
         </div>
@@ -91,8 +103,8 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 600, color: '#d0c6ab', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Teléfono 24h</p>
-                  <a href={`tel:${business.phoneIntl}`} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '24px', fontWeight: 800, color: '#ffd700', textDecoration: 'none', letterSpacing: '-0.03em' }}>
-                    {business.phone}
+                  <a href={`tel:${business_.phoneIntl}`} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '24px', fontWeight: 800, color: '#ffd700', textDecoration: 'none', letterSpacing: '-0.03em' }}>
+                    {business_.phone}
                   </a>
                   <p className="mt-1" style={{ fontSize: '12px', color: '#d0c6ab' }}>{contacto.schedule}</p>
                 </div>
@@ -107,7 +119,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 600, color: '#d0c6ab', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Email</p>
-                  <a href={`mailto:${business.email}`} style={{ fontSize: '16px', color: '#e5e2e1', textDecoration: 'none' }}>{business.email}</a>
+                  <a href={`mailto:${business_.email}`} style={{ fontSize: '16px', color: '#e5e2e1', textDecoration: 'none' }}>{business_.email}</a>
                 </div>
               </div>
 
@@ -120,7 +132,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 600, color: '#d0c6ab', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Dirección</p>
-                  <p style={{ fontSize: '15px', color: '#e5e2e1', lineHeight: 1.5 }}>{business.address}</p>
+                  <p style={{ fontSize: '15px', color: '#e5e2e1', lineHeight: 1.5 }}>{business_.address}</p>
                 </div>
               </div>
 
@@ -172,7 +184,7 @@ export default function ContactoPage(props: any = {}) {
                   </p>
                   <p className="mt-4" style={{ fontSize: '13px', color: '#d0c6ab' }}>
                     Para urgencias llama directamente:{' '}
-                    <a href={`tel:${business.phoneIntl}`} style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 700 }}>{business.phone}</a>
+                    <a href={`tel:${business_.phoneIntl}`} style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 700 }}>{business_.phone}</a>
                   </p>
                 </div>
               ) : (
@@ -258,7 +270,7 @@ export default function ContactoPage(props: any = {}) {
 
                   <p className="text-center" style={{ fontSize: '11px', color: '#d0c6ab' }}>
                     Para urgencias, llame directamente:{' '}
-                    <a href={`tel:${business.phoneIntl}`} style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 700 }}>{business.phone}</a>
+                    <a href={`tel:${business_.phoneIntl}`} style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 700 }}>{business_.phone}</a>
                   </p>
                 </form>
               )}

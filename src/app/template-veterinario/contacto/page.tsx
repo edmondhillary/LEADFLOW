@@ -5,6 +5,18 @@ import { contact, business, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-veterinario';
   const [formData, setFormData] = useState({
     name: '',
@@ -68,11 +80,11 @@ export default function ContactoPage(props: any = {}) {
                       General Inquiries
                     </h3>
                     <a
-                      href={`tel:${business.phoneIntl}`}
+                      href={`tel:${business_.phoneIntl}`}
                       className="text-2xl font-bold text-[#166875] mt-1 block hover:text-[#005c68] transition-colors"
                       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                     >
-                      {business.phone}
+                      {business_.phone}
                     </a>
                     <p className="text-[#665e56] text-sm mt-1">Mon—Fri, 8:00am — 6:00pm</p>
                   </div>
@@ -89,11 +101,11 @@ export default function ContactoPage(props: any = {}) {
                       Emergency Care
                     </h3>
                     <a
-                      href={`tel:${business.phoneIntl}`}
+                      href={`tel:${business_.phoneIntl}`}
                       className="text-2xl font-bold text-[#ac3434] mt-1 block hover:text-[#70030f] transition-colors"
                       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                     >
-                      {business.emergency}
+                      {business_.emergency}
                     </a>
                     <p className="text-[#665e56] text-sm mt-1">24/7 Veterinary Response Unit</p>
                   </div>
@@ -145,9 +157,9 @@ export default function ContactoPage(props: any = {}) {
                   className="text-2xl font-bold text-[#38312b] leading-tight"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
-                  {business.address},
+                  {business_.address},
                   <br />
-                  {business.city}, {business.state} {business.zip}
+                  {business_.city}, {business_.state} {business_.zip}
                 </p>
               </div>
             </div>
@@ -312,9 +324,9 @@ export default function ContactoPage(props: any = {}) {
                   The Sanctuary Location
                 </h3>
                 <p className="text-[#665e56] mt-1">
-                  {business.address}
+                  {business_.address}
                   <br />
-                  {business.city}, {business.state} {business.zip}
+                  {business_.city}, {business_.state} {business_.zip}
                 </p>
                 <button
                   className="mt-4 text-[#166875] font-bold flex items-center gap-2 hover:underline"

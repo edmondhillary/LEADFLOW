@@ -7,6 +7,18 @@ import { contacto, business, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-academia';
   const [form, setForm] = useState({
     nombre: '',
@@ -52,10 +64,10 @@ export default function ContactoPage(props: any = {}) {
               {/* Contact Info Cards */}
               <div className="flex flex-col gap-4 mb-8">
                 {[
-                  { label: 'Telefono', value: business.phone, icon: 'tel', href: `tel:${business.phoneIntl}` },
-                  { label: 'Email', value: business.email, icon: 'mail', href: `mailto:${business.email}` },
-                  { label: 'Direccion', value: `${business.address}, ${business.postalCode} ${business.city}`, icon: 'map', href: '#' },
-                  { label: 'Horario', value: contacto.schedule, icon: 'clock', href: '#' },
+                  { label: 'Telefono', value: business_.phone, icon: 'tel', href: `tel:${business_.phoneIntl}` },
+                  { label: 'Email', value: business_.email, icon: 'mail', href: `mailto:${business_.email}` },
+                  { label: 'Direccion', value: `${business_.address}, ${business_.postalCode} ${business_.city}`, icon: 'map', href: mapLink },
+                  { label: 'Horario', value: contacto.schedule, icon: 'clock', href: mapLink },
                 ].map(item => (
                   <a key={item.label} href={item.href} className="rounded-2xl p-5 flex items-start gap-4 transition-all hover:shadow-md" style={{ backgroundColor: '#ffffff', textDecoration: 'none', boxShadow: '0 4px 16px rgba(25,28,29,0.04)' }}>
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#d9e2ff' }}>
@@ -77,8 +89,8 @@ export default function ContactoPage(props: any = {}) {
                 <Image src={images.contactMap} alt="Ubicacion Scholarly Academy" fill className="object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="rounded-2xl px-5 py-3" style={{ backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0 8px 24px rgba(25,28,29,0.12)' }}>
-                    <p style={{ fontSize: '13px', fontWeight: 700, color: '#001944', fontFamily: "'Manrope', sans-serif" }}>{business.name}</p>
-                    <p style={{ fontSize: '11px', color: '#454652' }}>{business.address}</p>
+                    <p style={{ fontSize: '13px', fontWeight: 700, color: '#001944', fontFamily: "'Manrope', sans-serif" }}>{business_.name}</p>
+                    <p style={{ fontSize: '11px', color: '#454652' }}>{business_.address}</p>
                   </div>
                 </div>
               </div>
@@ -91,7 +103,7 @@ export default function ContactoPage(props: any = {}) {
                 <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '18px' }}>
                   Reserva una videollamada de 30 minutos con un asesor academico. Sin compromiso, sin coste.
                 </p>
-                <a href={`https://wa.me/${business.whatsapp}?text=Hola!%20Me%20gustaria%20reservar%20una%20sesion%20de%20orientacion.`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '13px', fontWeight: 700, padding: '12px 24px', textDecoration: 'none' }}>
+                <a href={`https://wa.me/${business_.whatsapp}?text=Hola!%20Me%20gustaria%20reservar%20una%20sesion%20de%20orientacion.`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '13px', fontWeight: 700, padding: '12px 24px', textDecoration: 'none' }}>
                   Reservar por WhatsApp
                 </a>
               </div>
@@ -216,7 +228,7 @@ export default function ContactoPage(props: any = {}) {
 
                     <p style={{ fontSize: '11px', color: '#454652', textAlign: 'center', lineHeight: 1.6 }}>
                       Al enviar aceptas nuestra{' '}
-                      <Link href="#" style={{ color: '#001944', textDecoration: 'underline' }}>Politica de Privacidad</Link>.
+                      <Link href={mapLink} style={{ color: '#001944', textDecoration: 'underline' }}>Politica de Privacidad</Link>.
                       Respuesta garantizada en {contacto.responseTime}.
                     </p>
                   </form>

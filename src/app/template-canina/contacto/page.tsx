@@ -5,6 +5,18 @@ import { business, contacto, images } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-canina';
   const [formData, setFormData] = useState({
     name: '',
@@ -71,7 +83,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Dirección</p>
-                  <p style={{ fontSize: '14px', color: '#5c605a', lineHeight: 1.65 }}>{business.address}</p>
+                  <p style={{ fontSize: '14px', color: '#5c605a', lineHeight: 1.65 }}>{business_.address}</p>
                 </div>
               </div>
               <div className="rounded-xl p-7 flex items-start gap-5" style={{ backgroundColor: '#f3f4ee' }}>
@@ -89,7 +101,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Teléfono</p>
-                  <a href={`tel:${business.phoneIntl}`} style={{ fontSize: '14px', color: '#4c6456', textDecoration: 'none', fontWeight: 600 }}>{business.phone}</a>
+                  <a href={`tel:${business_.phoneIntl}`} style={{ fontSize: '14px', color: '#4c6456', textDecoration: 'none', fontWeight: 600 }}>{business_.phone}</a>
                 </div>
               </div>
               <div className="rounded-xl p-7 flex items-start gap-5" style={{ backgroundColor: '#f3f4ee' }}>
@@ -98,7 +110,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Email</p>
-                  <a href={`mailto:${business.email}`} style={{ fontSize: '14px', color: '#4c6456', textDecoration: 'none', fontWeight: 600 }}>{business.email}</a>
+                  <a href={`mailto:${business_.email}`} style={{ fontSize: '14px', color: '#4c6456', textDecoration: 'none', fontWeight: 600 }}>{business_.email}</a>
                 </div>
               </div>
             </div>

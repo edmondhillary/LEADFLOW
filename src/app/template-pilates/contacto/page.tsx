@@ -6,6 +6,18 @@ import { contacto, images, business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-pilates';
   const [formData, setFormData] = useState({
     name: '',
@@ -211,17 +223,17 @@ export default function ContactoPage(props: any = {}) {
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-0.5" style={{ color: '#536257', fontSize: '20px' }}>location_on</span>
                   <div>
-                    <p style={{ fontSize: '14px', color: '#2f3430', fontWeight: 500 }}>{business.address}</p>
-                    <p style={{ fontSize: '13px', color: '#5c605c' }}>{business.city}, {business.state}</p>
+                    <p style={{ fontSize: '14px', color: '#2f3430', fontWeight: 500 }}>{business_.address}</p>
+                    <p style={{ fontSize: '13px', color: '#5c605c' }}>{business_.city}, {business_.state}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-0.5" style={{ color: '#536257', fontSize: '20px' }}>mail</span>
-                  <p style={{ fontSize: '14px', color: '#2f3430' }}>{business.email}</p>
+                  <p style={{ fontSize: '14px', color: '#2f3430' }}>{business_.email}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="material-symbols-outlined mt-0.5" style={{ color: '#536257', fontSize: '20px' }}>call</span>
-                  <p style={{ fontSize: '14px', color: '#2f3430' }}>{business.phone}</p>
+                  <p style={{ fontSize: '14px', color: '#2f3430' }}>{business_.phone}</p>
                 </div>
               </div>
             </div>
@@ -264,7 +276,7 @@ export default function ContactoPage(props: any = {}) {
                 </div>
               </div>
               <a
-                href={`https://wa.me/${business.whatsapp}`}
+                href={`https://wa.me/${business_.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 w-fit transition-colors"

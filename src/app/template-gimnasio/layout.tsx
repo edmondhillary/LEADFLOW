@@ -56,9 +56,9 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
         </div>
       </header>
 
-      {menuOpen && <div className="fixed inset-0 z-40 md:hidden" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMenuOpen(false)} />}
+      {menuOpen && <div className="fixed inset-0 z-[70] md:hidden" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMenuOpen(false)} />}
 
-      <div className="fixed top-0 right-0 z-50 h-full w-72 md:hidden flex flex-col transition-transform duration-300" style={{ backgroundColor: '#131313', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px', borderLeft: '2px solid #eb0000' }}>
+      <div className="fixed top-0 right-0 z-[80] h-full w-72 md:hidden flex flex-col transition-transform duration-300" style={{ backgroundColor: '#131313', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px', borderLeft: '2px solid #eb0000' }}>
         <nav className="flex flex-col px-8 gap-1">
           {navLinks.map(n => (
             <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-4 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', textDecoration: 'none', color: '#fff' }}>

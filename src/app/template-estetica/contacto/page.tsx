@@ -5,6 +5,18 @@ import { contacto, business, images, testimonials } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-estetica';
   const [formData, setFormData] = useState({
     nombre: '',
@@ -67,8 +79,8 @@ export default function ContactoPage(props: any = {}) {
                 <div className="flex gap-3">
                   <span className="material-symbols-outlined text-[#6c5c4a] text-xl shrink-0 mt-0.5">location_on</span>
                   <div>
-                    <p className="text-sm text-[#30332e] font-medium">{business.address}</p>
-                    <p className="text-sm text-[#5d605a]">{business.postalCode} {business.city}, {business.country}</p>
+                    <p className="text-sm text-[#30332e] font-medium">{business_.address}</p>
+                    <p className="text-sm text-[#5d605a]">{business_.postalCode} {business_.city}, {business_.country}</p>
                   </div>
                 </div>
               </div>
@@ -77,11 +89,11 @@ export default function ContactoPage(props: any = {}) {
               <div className="flex flex-col gap-3">
                 <span className="text-xs tracking-widest uppercase text-[#6c5c4a] border-b border-[#b1b3ab]/30 pb-3 mb-1">Telefono</span>
                 <a
-                  href={`tel:${business.phoneIntl}`}
+                  href={`tel:${business_.phoneIntl}`}
                   className="flex gap-3 hover:text-[#6c5c4a] transition-colors"
                 >
                   <span className="material-symbols-outlined text-[#6c5c4a] text-xl shrink-0 mt-0.5">phone</span>
-                  <span className="text-sm text-[#30332e] font-medium">{business.phone}</span>
+                  <span className="text-sm text-[#30332e] font-medium">{business_.phone}</span>
                 </a>
               </div>
 
@@ -89,7 +101,7 @@ export default function ContactoPage(props: any = {}) {
               <div className="flex flex-col gap-3">
                 <span className="text-xs tracking-widest uppercase text-[#6c5c4a] border-b border-[#b1b3ab]/30 pb-3 mb-1">WhatsApp</span>
                 <a
-                  href={`https://wa.me/${business.whatsapp}`}
+                  href={`https://wa.me/${business_.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex gap-3 items-center group"
@@ -126,7 +138,7 @@ export default function ContactoPage(props: any = {}) {
                   style={{ background: 'linear-gradient(to top, rgba(48,51,46,0.3) 0%, transparent 60%)' }}
                 />
                 <div className="absolute bottom-4 left-4">
-                  <span className="text-xs text-white bg-[#6c5c4a] px-3 py-1.5 tracking-wide">{business.city}</span>
+                  <span className="text-xs text-white bg-[#6c5c4a] px-3 py-1.5 tracking-wide">{business_.city}</span>
                 </div>
               </div>
             </div>
@@ -243,7 +255,7 @@ export default function ContactoPage(props: any = {}) {
                         />
                         <label htmlFor="privacidad" className="text-xs text-[#5d605a] leading-relaxed cursor-pointer">
                           He leido y acepto la{' '}
-                          <a href="#" className="text-[#6c5c4a] underline hover:text-[#5f503f]">Politica de Privacidad</a>
+                          <a href={mapLink} className="text-[#6c5c4a] underline hover:text-[#5f503f]">Politica de Privacidad</a>
                           {' '}y consiento el tratamiento de mis datos con fines de gestion de consultas.
                         </label>
                       </div>

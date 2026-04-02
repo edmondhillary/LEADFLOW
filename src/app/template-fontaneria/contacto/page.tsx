@@ -7,6 +7,18 @@ import { contacto, images, business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-fontaneria';
   const [formData, setFormData] = useState({
     nombre: '',
@@ -69,7 +81,7 @@ export default function ContactoPage(props: any = {}) {
 
           {/* Right side: Action buttons */}
           <div className="flex flex-col gap-4 pt-4 lg:pt-0">
-            <Link href={`tel:${business.phoneIntl}`}>
+            <Link href={`tel:${business_.phoneIntl}`}>
               <button
                 className="w-full px-8 py-4 rounded-lg font-semibold uppercase tracking-wide text-white transition-all duration-200 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
                 style={{ backgroundColor: '#e88532' }}
@@ -81,7 +93,7 @@ export default function ContactoPage(props: any = {}) {
               </button>
             </Link>
 
-            <Link href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer">
+            <Link href={`https://wa.me/${business_.whatsapp}`} target="_blank" rel="noopener noreferrer">
               <button
                 className="w-full px-8 py-4 rounded-lg font-semibold uppercase tracking-wide text-white transition-all duration-200 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
                 style={{ backgroundColor: '#25D366' }}
@@ -291,10 +303,10 @@ export default function ContactoPage(props: any = {}) {
                     className="text-sm font-medium"
                     style={{ color: '#002045' }}
                   >
-                    {business.address}
+                    {business_.address}
                   </p>
                   <p className="text-xs" style={{ color: '#43474e' }}>
-                    {business.postalCode} {business.city}, {business.country}
+                    {business_.postalCode} {business_.city}, {business_.country}
                   </p>
                 </div>
               </div>
@@ -308,11 +320,11 @@ export default function ContactoPage(props: any = {}) {
                   mail
                 </span>
                 <a
-                  href={`mailto:${business.email}`}
+                  href={`mailto:${business_.email}`}
                   className="text-sm"
                   style={{ color: '#0061a5' }}
                 >
-                  {business.email}
+                  {business_.email}
                 </a>
               </div>
             </div>

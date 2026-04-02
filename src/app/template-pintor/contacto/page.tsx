@@ -6,6 +6,18 @@ import { contacto, images, business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-pintor';
   const [formData, setFormData] = useState({ nombre: '', telefono: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -88,7 +100,7 @@ export default function ContactoPage(props: any = {}) {
             <span className="material-symbols-outlined text-4xl text-[#305858]" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span>
             <h3 className="text-xl font-bold text-[#305858]" style={{ fontFamily: "'Manrope', sans-serif" }}>Prefiere WhatsApp?</h3>
             <p className="text-[#305858]/80 text-sm max-w-xs">Obtén una respuesta rápida enviándonos fotos de tu espacio directamente.</p>
-            <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer" className="bg-[#305858] text-[#c0ebea] px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-opacity text-sm" style={{ textDecoration: 'none' }}>
+            <a href={`https://wa.me/${business_.whatsapp}`} target="_blank" rel="noopener noreferrer" className="bg-[#305858] text-[#c0ebea] px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-opacity text-sm" style={{ textDecoration: 'none' }}>
               Contactar por WhatsApp
             </a>
           </div>
@@ -101,21 +113,21 @@ export default function ContactoPage(props: any = {}) {
                 <span className="material-symbols-outlined text-[#757c7d]">location_on</span>
                 <div>
                   <p className="font-semibold text-[#2d3435]">Estudio Central</p>
-                  <p className="text-[#5a6061] text-sm">{business.address}, {business.postalCode} {business.city}</p>
+                  <p className="text-[#5a6061] text-sm">{business_.address}, {business_.postalCode} {business_.city}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-[#757c7d]">mail</span>
                 <div>
                   <p className="font-semibold text-[#2d3435]">Correo</p>
-                  <p className="text-[#5a6061] text-sm">{business.email}</p>
+                  <p className="text-[#5a6061] text-sm">{business_.email}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-[#757c7d]">call</span>
                 <div>
                   <p className="font-semibold text-[#2d3435]">Teléfono</p>
-                  <p className="text-[#5a6061] text-sm">{business.phone}</p>
+                  <p className="text-[#5a6061] text-sm">{business_.phone}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">

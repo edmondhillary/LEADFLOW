@@ -74,7 +74,6 @@ export default async function BusinessLayout({ params, children }: Props) {
 
       <div
         id="urgency-banner"
-        data-lf-banner
         style={{
           backgroundColor: '#c2410c',
           color: '#fff7ed',
@@ -125,23 +124,11 @@ export default async function BusinessLayout({ params, children }: Props) {
         )}
       </div>
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          [data-lf-banner] { min-height: 52px; }
-          [data-lf-page] header.fixed.top-0,
-          [data-lf-page] header[class*="fixed"][class*="top-0"] { top: 52px !important; }
-          [data-lf-page] main.pt-20 { padding-top: calc(5rem + 52px) !important; }
-          [data-lf-page] main[class*="pt-[64px]"] { padding-top: calc(64px + 52px) !important; }
-        `,
-      }} />
-
-      <div data-lf-page>
-        {TemplateLayoutComponent ? (
-          <TemplateLayoutComponent overrides={overrides!}>{children}</TemplateLayoutComponent>
-        ) : (
-          <main id="main-content">{children}</main>
-        )}
-      </div>
+      {TemplateLayoutComponent ? (
+        <TemplateLayoutComponent overrides={overrides!}>{children}</TemplateLayoutComponent>
+      ) : (
+        <main id="main-content">{children}</main>
+      )}
 
       <img src={`/api/track/${lead._id}`} alt="" width={1} height={1} style={{ position: 'absolute', opacity: 0 }} />
 

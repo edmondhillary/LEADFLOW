@@ -6,6 +6,18 @@ import { contacto, images, business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-gimnasio';
   const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', plan: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -30,7 +42,7 @@ export default function ContactoPage(props: any = {}) {
       {/* Brand */}
       <div className="mb-10 text-center relative z-10">
         <h1 className="text-4xl md:text-5xl" style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 900, fontStyle: 'italic', color: '#eb0000', letterSpacing: '-0.05em' }}>
-          {business.name}
+          {business_.name}
         </h1>
         <div className="w-12 h-1 mx-auto mt-2" style={{ backgroundColor: '#eb0000' }} />
       </div>
@@ -122,8 +134,8 @@ export default function ContactoPage(props: any = {}) {
             <span className="material-symbols-outlined" style={{ color: '#eb0000' }}>location_on</span>
             <span className="text-xs font-bold uppercase" style={{ letterSpacing: '0.1em' }}>Ubicación</span>
           </div>
-          <p className="text-sm font-bold">{business.address}</p>
-          <p className="text-sm" style={{ color: '#757575' }}>{business.postalCode} {business.city}</p>
+          <p className="text-sm font-bold">{business_.address}</p>
+          <p className="text-sm" style={{ color: '#757575' }}>{business_.postalCode} {business_.city}</p>
         </div>
       </div>
 

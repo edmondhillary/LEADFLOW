@@ -83,13 +83,13 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
 
       {/* Mobile Overlay */}
       <div
-        className={`fixed inset-0 z-30 transition-opacity duration-300 bg-[#1c1b1b]/60 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-[70] transition-opacity duration-300 bg-[#1c1b1b]/60 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setMenuOpen(false)}
       />
 
       {/* Mobile Menu */}
       <aside
-        className={`fixed top-0 right-0 bottom-0 z-40 w-72 bg-[#1c1b1b] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 bottom-0 z-[80] w-72 bg-[#1c1b1b] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-2">
           {navLinks.map((item, i) => (
@@ -187,37 +187,7 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
         </svg>
       </a>
 
-      {/* ─── MOBILE BOTTOM NAV ─── */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 bg-zinc-900 border-t border-zinc-800 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-40 rounded-t-lg">
-        <Link
-          href={`${baseHref}`}
-          className="flex flex-col items-center justify-center text-yellow-400 bg-zinc-800 px-3 py-1 active:scale-110 transition-transform duration-200"
-        >
-          <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Home</span>
-        </Link>
-        <Link
-          href={`${baseHref}/servicios`}
-          className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
-        >
-          <span className="material-symbols-outlined text-xl">electrical_services</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Servicios</span>
-        </Link>
-        <Link
-          href={`${baseHref}/contacto`}
-          className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
-        >
-          <span className="material-symbols-outlined text-xl">request_quote</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Presup.</span>
-        </Link>
-        <a
-          href={`tel:${business_.phoneIntl}`}
-          className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
-        >
-          <span className="material-symbols-outlined text-xl">phone_in_talk</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Llamar</span>
-        </a>
-      </nav>
+      {/* Bottom nav eliminado: navegación móvil unificada en menú desplegable */}
     </div>
   );
 }

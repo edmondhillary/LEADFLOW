@@ -122,7 +122,7 @@ export default function TemplateYogaLayout(props: any) {
       {/* Mobile overlay */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-40 md:hidden"
+          className="fixed inset-0 z-[70] md:hidden"
           style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
           onClick={() => setMenuOpen(false)}
         />
@@ -130,7 +130,7 @@ export default function TemplateYogaLayout(props: any) {
 
       {/* Mobile slide-in menu */}
       <div
-        className="fixed top-0 right-0 z-50 h-full w-72 md:hidden flex flex-col transition-transform duration-300"
+        className="fixed top-0 right-0 z-[80] h-full w-72 md:hidden flex flex-col transition-transform duration-300"
         style={{
           backgroundColor: '#fbf9f4',
           transform: menuOpen ? 'translateX(0)' : 'translateX(100%)',

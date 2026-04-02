@@ -5,6 +5,18 @@ import { business } from '../data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-peluqueria';
   const [form, setForm] = useState({ nombre: '', email: '', telefono: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -105,10 +117,10 @@ export default function ContactoPage(props: any = {}) {
             <p style={{ fontSize: '11px', fontWeight: 600, color: '#5a6061', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
               Informacion de contacto
             </p>
-            <p style={{ fontSize: '14px', color: '#2d3435', marginBottom: '8px' }}>{business.address}, {business.city}</p>
-            <a href={`tel:${business.phoneIntl}`} style={{ fontSize: '14px', color: '#785a1a', display: 'block', marginBottom: '8px', textDecoration: 'none' }}>{business.phone}</a>
-            <a href={`mailto:${business.email}`} style={{ fontSize: '14px', color: '#785a1a', textDecoration: 'none' }}>{business.email}</a>
-            <p style={{ fontSize: '13px', color: '#5a6061', marginTop: '12px' }}>{business.hours}</p>
+            <p style={{ fontSize: '14px', color: '#2d3435', marginBottom: '8px' }}>{business_.address}, {business_.city}</p>
+            <a href={`tel:${business_.phoneIntl}`} style={{ fontSize: '14px', color: '#785a1a', display: 'block', marginBottom: '8px', textDecoration: 'none' }}>{business_.phone}</a>
+            <a href={`mailto:${business_.email}`} style={{ fontSize: '14px', color: '#785a1a', textDecoration: 'none' }}>{business_.email}</a>
+            <p style={{ fontSize: '13px', color: '#5a6061', marginTop: '12px' }}>{business_.hours}</p>
           </div>
         </div>
       </section>

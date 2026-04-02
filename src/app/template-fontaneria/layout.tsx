@@ -63,16 +63,18 @@ export default function TemplateLayout(props: any = {}) {
             LLAMAR AHORA
           </a>
 
-          {/* Mobile Dropdown */}
+          {/* Mobile dropdown con icono de 3 líneas */}
           <details className="md:hidden relative">
-            <summary
-              className="list-none inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer"
-              style={{ backgroundColor: '#e2e8f0', color: '#002045' }}
-            >
-              Menú
+            <summary className="list-none w-10 h-10 inline-flex items-center justify-center cursor-pointer" aria-label="Abrir menú">
+              <span className="sr-only">Abrir menú</span>
+              <span className="flex flex-col gap-1.5">
+                <span className="block w-6 h-[1.5px]" style={{ backgroundColor: '#002045' }} />
+                <span className="block w-6 h-[1.5px]" style={{ backgroundColor: '#002045' }} />
+                <span className="block w-6 h-[1.5px]" style={{ backgroundColor: '#002045' }} />
+              </span>
             </summary>
             <div
-              className="absolute right-0 mt-2 min-w-[210px] rounded-xl p-3 shadow-xl"
+              className="absolute right-0 mt-2 min-w-[230px] rounded-xl p-3 shadow-xl z-[80]"
               style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
             >
               <div className="flex flex-col gap-2">

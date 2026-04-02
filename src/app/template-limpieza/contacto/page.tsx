@@ -14,6 +14,18 @@ type FormState = {
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-limpieza';
   const [form, setForm] = useState<FormState>({
     nombre: '',
@@ -74,10 +86,10 @@ export default function ContactoPage(props: any = {}) {
             <div className="flex flex-col gap-6">
               {/* Info cards */}
               {[
-                { icon: 'phone', label: 'Teléfono', value: business.phone, href: `tel:${business.phoneIntl}` },
-                { icon: 'mail', label: 'Email', value: business.email, href: `mailto:${business.email}` },
-                { icon: 'schedule', label: 'Horario', value: contacto.schedule, href: undefined },
-                { icon: 'location_on', label: 'Dirección', value: business.address, href: undefined },
+                { icon: 'phone', label: 'Teléfono', value: business_.phone, href: `tel:${business_.phoneIntl}` },
+                { icon: 'mail', label: 'Email', value: business_.email, href: `mailto:${business_.email}` },
+                { icon: 'schedule', label: 'Horario', value: contacto.schedule, href: mapLink },
+                { icon: 'location_on', label: 'Dirección', value: business_.address, href: mapLink },
               ].map(item => (
                 <div key={item.label} className="bg-white rounded-xl p-5 flex items-center gap-4" style={{ boxShadow: '0 10px 40px -10px rgba(25,28,29,0.06)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#edeeef' }}>

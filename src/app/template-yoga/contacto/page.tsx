@@ -7,19 +7,20 @@ import type { LeadOverrides } from '@/lib/lead-template-data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as LeadOverrides | undefined;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-yoga';
   const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
-
-  const business_ = ov
-    ? {
-        ...business,
-        name: ov.businessName,
-        fullName: ov.businessName,
-        phone: ov.phone || business.phone,
-        address: ov.address,
-        city: ov.city,
-      }
-    : business;
 
   const [formData, setFormData] = useState({
     nombre: '',

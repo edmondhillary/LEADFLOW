@@ -13,6 +13,18 @@ type FormState = {
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as any;
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+  } : business;
+const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ov?.address || business_.address || ov?.city || business_.city || '')}`;
   const baseHref = ov?.baseHref || '/template-dentista';
   const [form, setForm] = useState<FormState>({
     nombre: '',
@@ -87,10 +99,10 @@ export default function ContactoPage(props: any = {}) {
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 600, color: '#727781', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Telefono</p>
                   <a
-                    href={`tel:${business.phoneIntl}`}
+                    href={`tel:${business_.phoneIntl}`}
                     style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 700, color: '#191c1e', textDecoration: 'none' }}
                   >
-                    {business.phone}
+                    {business_.phone}
                   </a>
                   <p style={{ fontSize: '13px', color: '#727781', marginTop: '2px' }}>{contactoPage.schedule}</p>
                   <p style={{ fontSize: '13px', color: '#727781' }}>{contactoPage.scheduleWeekend}</p>
@@ -111,10 +123,10 @@ export default function ContactoPage(props: any = {}) {
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 600, color: '#727781', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Email</p>
                   <a
-                    href={`mailto:${business.email}`}
+                    href={`mailto:${business_.email}`}
                     style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 600, color: '#191c1e', textDecoration: 'none' }}
                   >
-                    {business.email}
+                    {business_.email}
                   </a>
                   <p style={{ fontSize: '13px', color: '#727781', marginTop: '2px' }}>Respuesta en {contactoPage.responseTime}</p>
                 </div>
@@ -133,8 +145,8 @@ export default function ContactoPage(props: any = {}) {
                 </div>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 600, color: '#727781', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Direccion</p>
-                  <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 600, color: '#191c1e' }}>{business.address}</p>
-                  <p style={{ fontSize: '13px', color: '#727781', marginTop: '2px' }}>{business.city}, {business.country}</p>
+                  <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 600, color: '#191c1e' }}>{business_.address}</p>
+                  <p style={{ fontSize: '13px', color: '#727781', marginTop: '2px' }}>{business_.city}, {business_.country}</p>
                 </div>
               </div>
 
@@ -152,10 +164,10 @@ export default function ContactoPage(props: any = {}) {
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 700, color: '#991b1b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Urgencias 24h</p>
                   <a
-                    href={`tel:${business.emergency}`}
+                    href={`tel:${business_.emergency}`}
                     style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#7f1d1d', textDecoration: 'none' }}
                   >
-                    {business.emergency}
+                    {business_.emergency}
                   </a>
                   <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '2px' }}>Disponible 24 horas, 365 dias</p>
                 </div>

@@ -58,10 +58,10 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
       </header>
 
       {/* Mobile overlay */}
-      {menuOpen && <div className="fixed inset-0 z-40 md:hidden bg-black/20" onClick={() => setMenuOpen(false)} />}
+      {menuOpen && <div className="fixed inset-0 z-[70] md:hidden bg-black/20" onClick={() => setMenuOpen(false)} />}
 
       {/* Mobile slide-in */}
-      <div className="fixed top-0 right-0 z-50 h-full w-72 md:hidden flex flex-col bg-[#f9f9f9] shadow-2xl transition-transform duration-300" style={{ transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}>
+      <div className="fixed top-0 right-0 z-[80] h-full w-72 md:hidden flex flex-col bg-[#f9f9f9] shadow-2xl transition-transform duration-300" style={{ transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}>
         <nav className="flex flex-col px-6 gap-1">
           {navLinks.map(n => (
             <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-4 py-4 text-zinc-600 hover:text-teal-900 transition-all" style={{ borderBottom: '1px solid rgba(173,179,180,0.15)', textDecoration: 'none' }}>
