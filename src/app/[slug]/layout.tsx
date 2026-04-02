@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const content = await WebsiteContent.findById(lead.contentRef);
   const imgs = getSectorImages(lead.sector);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app';
+  const dynamicOg = `${baseUrl}/api/og/${slug}`;
 
   return {
     title: content?.seo?.metaTitle || `${lead.businessName} | ${lead.sector} en ${lead.city}`,
@@ -27,7 +29,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: content?.seo?.metaTitle || lead.businessName,
       description: content?.seo?.metaDesc,
       type: 'website',
-      images: [{ url: imgs.og, width: 1200, height: 630 }],
+      images: [{ url: dynamicOg, width: 1200, height: 630 }, { url: imgs.og, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content?.seo?.metaTitle || lead.businessName,
+      description: content?.seo?.metaDesc,
+      images: [dynamicOg],
     },
   };
 }
@@ -57,7 +65,7 @@ export default async function BusinessLayout({ params, children }: Props) {
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.vercel.app'}/${slug}`,
   };
 
-  const waNumber = lead.phone?.replace(/\D/g, '');
+  const ownerWa = '34617680026';
   const TemplateLayoutComponent = overrides ? await loadTemplateLayout(templateName) : null;
 
   return (
@@ -66,6 +74,7 @@ export default async function BusinessLayout({ params, children }: Props) {
 
       <div
         id="urgency-banner"
+        data-lf-banner
         style={{
           backgroundColor: '#c2410c',
           color: '#fff7ed',
@@ -92,9 +101,9 @@ export default async function BusinessLayout({ params, children }: Props) {
             · Oferta válida <span id="countdown" style={{ fontFamily: 'monospace', fontWeight: 700 }}>48:00:00</span>
           </span>
         </span>
-        {waNumber && (
+        {ownerWa && (
           <a
-            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola, he visto la web que han creado para ${lead.businessName} y me interesa. ¿Pueden darme más información?`)}`}
+            href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Hola, he visto la web que han creado para ${lead.businessName} y me interesa. ¿Podemos hablar?`)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -116,11 +125,23 @@ export default async function BusinessLayout({ params, children }: Props) {
         )}
       </div>
 
-      {TemplateLayoutComponent ? (
-        <TemplateLayoutComponent overrides={overrides!}>{children}</TemplateLayoutComponent>
-      ) : (
-        <main id="main-content">{children}</main>
-      )}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          [data-lf-banner] { min-height: 52px; }
+          [data-lf-page] header.fixed.top-0,
+          [data-lf-page] header[class*="fixed"][class*="top-0"] { top: 52px !important; }
+          [data-lf-page] main.pt-20 { padding-top: calc(5rem + 52px) !important; }
+          [data-lf-page] main[class*="pt-[64px]"] { padding-top: calc(64px + 52px) !important; }
+        `,
+      }} />
+
+      <div data-lf-page>
+        {TemplateLayoutComponent ? (
+          <TemplateLayoutComponent overrides={overrides!}>{children}</TemplateLayoutComponent>
+        ) : (
+          <main id="main-content">{children}</main>
+        )}
+      </div>
 
       <img src={`/api/track/${lead._id}`} alt="" width={1} height={1} style={{ position: 'absolute', opacity: 0 }} />
 

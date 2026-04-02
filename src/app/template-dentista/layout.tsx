@@ -8,6 +8,19 @@ export default function TemplateDentistaLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-dentista';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -25,13 +38,13 @@ export default function TemplateDentistaLayout(props: any = {}) {
               <span className="material-symbols-outlined text-white" style={{ fontSize: '18px' }}>dentistry</span>
             </div>
             <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: '17px', fontWeight: 800, color: '#003e6f', letterSpacing: '-0.02em' }}>
-              {business.name}
+              {business_.name}
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map(n => (
+            {navLinks.map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -45,7 +58,7 @@ export default function TemplateDentistaLayout(props: any = {}) {
 
           {/* CTA Button */}
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="hidden md:inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90 active:scale-[0.98]"
             style={{ background: 'linear-gradient(135deg, #003e6f 0%, #005696 100%)', color: '#ffffff', padding: '10px 24px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
           >
@@ -81,7 +94,7 @@ export default function TemplateDentistaLayout(props: any = {}) {
         style={{ backgroundColor: '#ffffff', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map(n => (
+          {navLinks.map(n => (
             <Link
               key={n.href}
               href={n.href}
@@ -96,13 +109,13 @@ export default function TemplateDentistaLayout(props: any = {}) {
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="block w-full text-center py-3 rounded-xl"
             style={{ background: 'linear-gradient(135deg, #003e6f 0%, #005696 100%)', color: '#ffffff', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
           >
             Llamar Ahora
           </a>
-          <p className="mt-3 text-center" style={{ fontSize: '12px', color: '#727781' }}>{business.phone}</p>
+          <p className="mt-3 text-center" style={{ fontSize: '12px', color: '#727781' }}>{business_.phone}</p>
         </div>
       </div>
 
@@ -118,10 +131,10 @@ export default function TemplateDentistaLayout(props: any = {}) {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #003e6f 0%, #005696 100%)' }}>
                 <span className="material-symbols-outlined text-white" style={{ fontSize: '16px' }}>dentistry</span>
               </div>
-              <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 800, color: '#003e6f' }}>{business.name}</span>
+              <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 800, color: '#003e6f' }}>{business_.name}</span>
             </div>
-            <p style={{ fontSize: '13px', color: '#414750', lineHeight: 1.8 }}>{business.tagline}</p>
-            <p style={{ fontSize: '13px', color: '#727781', marginTop: '4px' }}>{business.city}, {business.country}</p>
+            <p style={{ fontSize: '13px', color: '#414750', lineHeight: 1.8 }}>{business_.tagline}</p>
+            <p style={{ fontSize: '13px', color: '#727781', marginTop: '4px' }}>{business_.city}, {business_.country}</p>
             <div className="flex items-center gap-4 mt-5">
               <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style={{ backgroundColor: '#e6e8ea', color: '#414750' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>language</span>
@@ -155,15 +168,15 @@ export default function TemplateDentistaLayout(props: any = {}) {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#446279' }}>phone</span>
-                <span style={{ fontSize: '13px', color: '#414750' }}>{business.phone}</span>
+                <span style={{ fontSize: '13px', color: '#414750' }}>{business_.phone}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#446279' }}>mail</span>
-                <span style={{ fontSize: '13px', color: '#414750' }}>{business.email}</span>
+                <span style={{ fontSize: '13px', color: '#414750' }}>{business_.email}</span>
               </div>
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#446279', marginTop: '1px' }}>location_on</span>
-                <span style={{ fontSize: '13px', color: '#414750', lineHeight: 1.6 }}>{business.address}</span>
+                <span style={{ fontSize: '13px', color: '#414750', lineHeight: 1.6 }}>{business_.address}</span>
               </div>
             </div>
           </div>
@@ -173,7 +186,7 @@ export default function TemplateDentistaLayout(props: any = {}) {
           className="mt-12 px-6 md:px-8 max-w-[1920px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 pt-8"
           style={{ borderTop: '1px solid rgba(193,199,210,0.3)' }}
         >
-          <p style={{ fontSize: '12px', color: '#727781' }}>&copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
+          <p style={{ fontSize: '12px', color: '#727781' }}>&copy; {new Date().getFullYear()} {business_.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
@@ -187,7 +200,7 @@ export default function TemplateDentistaLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

@@ -8,6 +8,19 @@ export default function RestauranteLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-restaurante';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -32,12 +45,12 @@ export default function RestauranteLayout(props: any = {}) {
             className="tracking-[0.2em] uppercase text-2xl font-bold text-[#1A1A1A]"
             style={{ fontFamily: "'Noto Serif', serif" }}
           >
-            {business.name}
+            {business_.name}
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map((item) => (
+            {navLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -89,7 +102,7 @@ export default function RestauranteLayout(props: any = {}) {
         className={`fixed top-0 right-0 bottom-0 z-30 w-72 bg-[#FBFBE2] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-1">
-          {nav.map((item) => (
+          {navLinks.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -111,8 +124,8 @@ export default function RestauranteLayout(props: any = {}) {
           </Link>
         </div>
         <div className="mt-auto">
-          <p className="text-xs text-[#1B1D0E]/40 tracking-[0.1em] uppercase">{business.phone}</p>
-          <p className="text-xs text-[#1B1D0E]/40 mt-1">{business.email}</p>
+          <p className="text-xs text-[#1B1D0E]/40 tracking-[0.1em] uppercase">{business_.phone}</p>
+          <p className="text-xs text-[#1B1D0E]/40 mt-1">{business_.email}</p>
         </div>
       </aside>
 
@@ -131,17 +144,17 @@ export default function RestauranteLayout(props: any = {}) {
                 className="tracking-[0.15em] uppercase text-xl font-bold text-[#1A1A1A] mb-3"
                 style={{ fontFamily: "'Noto Serif', serif" }}
               >
-                {business.name}
+                {business_.name}
               </p>
-              <p className="text-sm text-[#444748] leading-relaxed">{business.tagline}</p>
-              <p className="text-xs text-[#1B1D0E]/40 mt-4">Est. {business.foundedYear}</p>
+              <p className="text-sm text-[#444748] leading-relaxed">{business_.tagline}</p>
+              <p className="text-xs text-[#1B1D0E]/40 mt-4">Est. {business_.foundedYear}</p>
             </div>
 
             {/* Navigation */}
             <div>
               <p className="text-xs tracking-[0.15em] uppercase text-[#444748] mb-4">Navegacion</p>
               <nav className="flex flex-col gap-2">
-                {nav.map((item) => (
+                {navLinks.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -157,7 +170,7 @@ export default function RestauranteLayout(props: any = {}) {
             <div>
               <p className="text-xs tracking-[0.15em] uppercase text-[#444748] mb-4">Legal</p>
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-[#444748]">{business.legalName}</span>
+                <span className="text-sm text-[#444748]">{business_.legalName}</span>
                 <Link href="#" className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors">Aviso Legal</Link>
                 <Link href="#" className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors">Privacidad</Link>
                 <Link href="#" className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors">Cookies</Link>
@@ -168,17 +181,17 @@ export default function RestauranteLayout(props: any = {}) {
             <div>
               <p className="text-xs tracking-[0.15em] uppercase text-[#444748] mb-4">Contacto</p>
               <div className="flex flex-col gap-2">
-                <p className="text-sm text-[#444748]">{business.address}</p>
-                <p className="text-sm text-[#444748]">{business.postalCode} {business.city}</p>
-                <a href={`tel:${business.phoneIntl}`} className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors mt-2">{business.phone}</a>
-                <a href={`mailto:${business.email}`} className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors">{business.email}</a>
+                <p className="text-sm text-[#444748]">{business_.address}</p>
+                <p className="text-sm text-[#444748]">{business_.postalCode} {business_.city}</p>
+                <a href={`tel:${business_.phoneIntl}`} className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors mt-2">{business_.phone}</a>
+                <a href={`mailto:${business_.email}`} className="text-sm text-[#444748] hover:text-[#1B1D0E] transition-colors">{business_.email}</a>
               </div>
             </div>
           </div>
 
           <div className="pt-8 text-center">
             <p className="text-[#1A1A1A]/40 text-xs tracking-[0.1em] uppercase">
-              &copy; {new Date().getFullYear()} {business.legalName} — Todos los derechos reservados
+              &copy; {new Date().getFullYear()} {business_.legalName} — Todos los derechos reservados
               {' · '}
               <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
                 Made by Nexifydev.com
@@ -190,7 +203,7 @@ export default function RestauranteLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp"

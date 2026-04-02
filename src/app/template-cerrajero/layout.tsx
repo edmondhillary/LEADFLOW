@@ -8,6 +8,19 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-cerrajero';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -25,14 +38,14 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
                 <path d="M12 1C8.676 1 6 3.676 6 7v2H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 1 3.732V17a1 1 0 0 1-2 0v-1.268A2 2 0 0 1 12 12z" fill="currentColor" />
               </svg>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '20px', fontWeight: 800, color: '#ffd700', letterSpacing: '-0.04em', fontStyle: 'italic' }}>
-                {business.name}
+                {business_.name}
               </span>
             </span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map(n => (
+            {navLinks.map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -46,7 +59,7 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
 
           {/* Desktop CTA */}
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="hidden md:inline-block transition-all active:scale-[0.98] rounded-lg"
             style={{ fontSize: '11px', fontWeight: 700, background: 'linear-gradient(to right, #fff6df, #ffd700)', color: '#3a3000', padding: '11px 24px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.12em' }}
           >
@@ -81,7 +94,7 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
         style={{ backgroundColor: '#1c1b1b', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map(n => (
+          {navLinks.map(n => (
             <Link
               key={n.href}
               href={n.href}
@@ -95,13 +108,13 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="block w-full text-center py-4 rounded-lg"
             style={{ background: 'linear-gradient(to right, #fff6df, #ffd700)', color: '#3a3000', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}
           >
             CALL NOW
           </a>
-          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#d0c6ab', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>
+          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#d0c6ab', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business_.phone}</p>
         </div>
       </div>
 
@@ -114,10 +127,10 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
           {/* Brand */}
           <div>
             <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '18px', fontWeight: 800, fontStyle: 'italic', color: '#ffd700', marginBottom: '16px', letterSpacing: '-0.03em' }}>
-              {business.name}
+              {business_.name}
             </p>
             <p style={{ fontSize: '11px', color: '#d0c6ab', lineHeight: 1.8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              {business.tagline}<br />{business.city}, {business.country}
+              {business_.tagline}<br />{business_.city}, {business_.country}
             </p>
           </div>
 
@@ -145,9 +158,9 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#e5e2e1', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Contacto</h4>
             <div style={{ fontSize: '11px', lineHeight: 2, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              <a href={`tel:${business.phoneIntl}`} style={{ color: '#ffd700', display: 'block', textDecoration: 'none', fontWeight: 700 }}>{business.phone}</a>
-              <p style={{ color: '#d0c6ab' }}>{business.email}</p>
-              <p style={{ color: '#d0c6ab' }}>{business.address}</p>
+              <a href={`tel:${business_.phoneIntl}`} style={{ color: '#ffd700', display: 'block', textDecoration: 'none', fontWeight: 700 }}>{business_.phone}</a>
+              <p style={{ color: '#d0c6ab' }}>{business_.email}</p>
+              <p style={{ color: '#d0c6ab' }}>{business_.address}</p>
             </div>
           </div>
         </div>
@@ -157,7 +170,7 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
           style={{ borderTop: '1px solid rgba(255,215,0,0.08)' }}
         >
           <p style={{ fontSize: '10px', color: '#d0c6ab', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
+            &copy; {new Date().getFullYear()} {business_.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
@@ -170,7 +183,7 @@ export default function TemplateCerrajeroLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

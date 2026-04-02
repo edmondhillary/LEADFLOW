@@ -8,6 +8,19 @@ export default function MecanicoLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-mecanico';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -44,7 +57,7 @@ export default function MecanicoLayout(props: any = {}) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map((item, i) => (
+            {navLinks.map((item, i) => (
               <Link
                 key={`${item.href}-${i}`}
                 href={item.href}
@@ -59,10 +72,10 @@ export default function MecanicoLayout(props: any = {}) {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href={`tel:${business.phoneIntl}`}
+              href={`tel:${business_.phoneIntl}`}
               className="text-[#ffb599] text-sm font-bold tracking-wide hover:text-[#ff5f00] transition-colors duration-200"
             >
-              {business.phone}
+              {business_.phone}
             </a>
             <Link
               href={`${baseHref}/servicios`}
@@ -103,7 +116,7 @@ export default function MecanicoLayout(props: any = {}) {
         className={`fixed top-0 right-0 bottom-0 z-30 w-72 bg-[#1a1c1e] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-1">
-          {nav.map((item, i) => (
+          {navLinks.map((item, i) => (
             <Link
               key={`mobile-${item.href}-${i}`}
               href={item.href}
@@ -126,10 +139,10 @@ export default function MecanicoLayout(props: any = {}) {
           </Link>
         </div>
         <div className="mt-auto">
-          <a href={`tel:${business.phoneIntl}`} className="text-sm text-[#ffb599] font-bold tracking-wide">
-            {business.phone}
+          <a href={`tel:${business_.phoneIntl}`} className="text-sm text-[#ffb599] font-bold tracking-wide">
+            {business_.phone}
           </a>
-          <p className="text-xs text-[#c4c6cc]/50 mt-1">{business.email}</p>
+          <p className="text-xs text-[#c4c6cc]/50 mt-1">{business_.email}</p>
         </div>
       </aside>
 
@@ -150,8 +163,8 @@ export default function MecanicoLayout(props: any = {}) {
               >
                 <span className="text-[#ff5f00]">INDUSTRIAL</span> AUTHORITY
               </p>
-              <p className="text-sm text-[#c4c6cc]/70 leading-relaxed">{business.tagline}</p>
-              <p className="text-xs text-[#c4c6cc]/40 mt-4 uppercase tracking-widest">Est. {business.founded}</p>
+              <p className="text-sm text-[#c4c6cc]/70 leading-relaxed">{business_.tagline}</p>
+              <p className="text-xs text-[#c4c6cc]/40 mt-4 uppercase tracking-widest">Est. {business_.founded}</p>
             </div>
 
             {/* Navigation */}
@@ -163,7 +176,7 @@ export default function MecanicoLayout(props: any = {}) {
                 Navegación
               </p>
               <nav className="flex flex-col gap-2">
-                {nav.map((item, i) => (
+                {navLinks.map((item, i) => (
                   <Link
                     key={`footer-${item.href}-${i}`}
                     href={item.href}
@@ -184,7 +197,7 @@ export default function MecanicoLayout(props: any = {}) {
                 Legal
               </p>
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-[#c4c6cc]/70">{business.legalName}</span>
+                <span className="text-sm text-[#c4c6cc]/70">{business_.legalName}</span>
                 <Link href="#" className="text-sm text-[#c4c6cc]/70 hover:text-[#ffb599] transition-colors">Aviso Legal</Link>
                 <Link href="#" className="text-sm text-[#c4c6cc]/70 hover:text-[#ffb599] transition-colors">Privacidad</Link>
                 <Link href="#" className="text-sm text-[#c4c6cc]/70 hover:text-[#ffb599] transition-colors">Cookies</Link>
@@ -200,19 +213,19 @@ export default function MecanicoLayout(props: any = {}) {
                 Contacto
               </p>
               <div className="flex flex-col gap-2">
-                <p className="text-sm text-[#c4c6cc]/70">{business.address}</p>
-                <p className="text-sm text-[#c4c6cc]/70">{business.postalCode} {business.city}</p>
+                <p className="text-sm text-[#c4c6cc]/70">{business_.address}</p>
+                <p className="text-sm text-[#c4c6cc]/70">{business_.postalCode} {business_.city}</p>
                 <a
-                  href={`tel:${business.phoneIntl}`}
+                  href={`tel:${business_.phoneIntl}`}
                   className="text-sm text-[#ffb599] font-bold hover:text-[#ff5f00] transition-colors mt-2"
                 >
-                  {business.phone}
+                  {business_.phone}
                 </a>
                 <a
-                  href={`mailto:${business.email}`}
+                  href={`mailto:${business_.email}`}
                   className="text-sm text-[#c4c6cc]/70 hover:text-[#ffb599] transition-colors"
                 >
-                  {business.email}
+                  {business_.email}
                 </a>
               </div>
             </div>
@@ -220,7 +233,7 @@ export default function MecanicoLayout(props: any = {}) {
 
           <div className="pt-8 text-center">
             <p className="text-[#c4c6cc]/30 text-xs tracking-[0.1em] uppercase">
-              &copy; {new Date().getFullYear()} {business.legalName} — Todos los derechos reservados
+              &copy; {new Date().getFullYear()} {business_.legalName} — Todos los derechos reservados
               {' · '}
               <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
                 Made by Nexifydev.com
@@ -232,7 +245,7 @@ export default function MecanicoLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp"

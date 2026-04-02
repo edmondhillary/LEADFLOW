@@ -8,6 +8,19 @@ export default function PeluqueriaLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-peluqueria';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -35,12 +48,12 @@ export default function PeluqueriaLayout(props: any = {}) {
             className="tracking-[0.15em] text-xl font-bold text-[#2d3435]"
             style={{ fontFamily: "'Noto Serif', serif", fontStyle: 'italic' }}
           >
-            {business.logoDisplay}
+            {business_.logoDisplay}
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-10">
-            {nav.map((item) => (
+            {navLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -54,7 +67,7 @@ export default function PeluqueriaLayout(props: any = {}) {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center">
             <Link
-              href={`https://wa.me/${business.whatsapp}`}
+              href={`https://wa.me/${business_.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#785a1a] text-[#fff8f1] uppercase tracking-widest text-xs font-semibold px-7 py-3 hover:bg-[#6b4e0e] transition-colors duration-200"
@@ -93,7 +106,7 @@ export default function PeluqueriaLayout(props: any = {}) {
         className={`fixed top-0 right-0 bottom-0 z-30 w-72 bg-[#f9f9f9] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-0">
-          {nav.map((item) => (
+          {navLinks.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -106,7 +119,7 @@ export default function PeluqueriaLayout(props: any = {}) {
         </nav>
         <div className="mt-8">
           <Link
-            href={`https://wa.me/${business.whatsapp}`}
+            href={`https://wa.me/${business_.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setMenuOpen(false)}
@@ -116,9 +129,9 @@ export default function PeluqueriaLayout(props: any = {}) {
           </Link>
         </div>
         <div className="mt-auto">
-          <p className="text-xs text-[#5a6061] tracking-wide">{business.phone}</p>
-          <p className="text-xs text-[#5a6061] mt-1">{business.email}</p>
-          <p className="text-xs text-[#5a6061] mt-1">{business.hours}</p>
+          <p className="text-xs text-[#5a6061] tracking-wide">{business_.phone}</p>
+          <p className="text-xs text-[#5a6061] mt-1">{business_.email}</p>
+          <p className="text-xs text-[#5a6061] mt-1">{business_.hours}</p>
         </div>
       </aside>
 
@@ -134,35 +147,35 @@ export default function PeluqueriaLayout(props: any = {}) {
             {/* Dirección */}
             <div>
               <p className="text-xs tracking-widest uppercase text-[#5a6061] mb-5">Dirección</p>
-              <p className="text-sm text-[#2d3435] leading-relaxed">{business.address}</p>
-              <p className="text-sm text-[#2d3435]">{business.city}</p>
+              <p className="text-sm text-[#2d3435] leading-relaxed">{business_.address}</p>
+              <p className="text-sm text-[#2d3435]">{business_.city}</p>
               <a
-                href={`tel:${business.phoneIntl}`}
+                href={`tel:${business_.phoneIntl}`}
                 className="text-sm text-[#5a6061] hover:text-[#785a1a] transition-colors mt-3 block"
               >
-                {business.phone}
+                {business_.phone}
               </a>
               <a
-                href={`mailto:${business.email}`}
+                href={`mailto:${business_.email}`}
                 className="text-sm text-[#5a6061] hover:text-[#785a1a] transition-colors mt-1 block"
               >
-                {business.email}
+                {business_.email}
               </a>
             </div>
 
             {/* Horarios */}
             <div>
               <p className="text-xs tracking-widest uppercase text-[#5a6061] mb-5">Horarios</p>
-              <p className="text-sm text-[#2d3435] leading-relaxed">{business.hours}</p>
+              <p className="text-sm text-[#2d3435] leading-relaxed">{business_.hours}</p>
               <p className="text-sm text-[#5a6061] mt-2">Domingo y Lunes, cerrado</p>
-              <p className="text-sm text-[#5a6061] mt-4">{business.instagram}</p>
+              <p className="text-sm text-[#5a6061] mt-4">{business_.instagram}</p>
             </div>
 
             {/* Legal */}
             <div>
               <p className="text-xs tracking-widest uppercase text-[#5a6061] mb-5">Legal</p>
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-[#5a6061]">{business.legalName}</span>
+                <span className="text-sm text-[#5a6061]">{business_.legalName}</span>
                 <Link href="#" className="text-sm text-[#5a6061] hover:text-[#2d3435] transition-colors">Aviso Legal</Link>
                 <Link href="#" className="text-sm text-[#5a6061] hover:text-[#2d3435] transition-colors">Privacidad</Link>
                 <Link href="#" className="text-sm text-[#5a6061] hover:text-[#2d3435] transition-colors">Cookies</Link>
@@ -175,10 +188,10 @@ export default function PeluqueriaLayout(props: any = {}) {
               className="text-lg font-bold text-[#2d3435] tracking-[0.1em]"
               style={{ fontFamily: "'Noto Serif', serif", fontStyle: 'italic' }}
             >
-              {business.logoDisplay}
+              {business_.logoDisplay}
             </p>
             <p className="text-[#5a6061] text-xs tracking-wide">
-              &copy; {new Date().getFullYear()} {business.legalName} — Todos los derechos reservados{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
+              &copy; {new Date().getFullYear()} {business_.legalName} — Todos los derechos reservados{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
             </p>
           </div>
         </div>
@@ -186,7 +199,7 @@ export default function PeluqueriaLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp"

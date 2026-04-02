@@ -8,6 +8,19 @@ export default function VeterinarioLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-veterinario';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(true);
 
@@ -33,12 +46,12 @@ export default function VeterinarioLayout(props: any = {}) {
             className="text-2xl font-bold text-[#166875] tracking-tighter"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            {business.name}
+            {business_.name}
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {nav.map((item) => (
+            {navLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -91,7 +104,7 @@ export default function VeterinarioLayout(props: any = {}) {
         className={`fixed top-0 right-0 bottom-0 z-30 w-72 bg-[#fff8f4] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-2">
-          {nav.map((item) => (
+          {navLinks.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -113,16 +126,16 @@ export default function VeterinarioLayout(props: any = {}) {
             Reservar cita
           </Link>
           <a
-            href={`tel:${business.emergency}`}
+            href={`tel:${business_.emergency}`}
             className="block w-full text-center border border-[#ac3434]/20 text-[#ac3434] rounded-full font-semibold px-6 py-3 hover:bg-[#ac3434]/5 transition-colors text-sm"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            Emergency: {business.emergency}
+            Emergency: {business_.emergency}
           </a>
         </div>
         <div className="mt-auto">
-          <p className="text-xs text-[#827971] tracking-wide">{business.phone}</p>
-          <p className="text-xs text-[#827971] mt-1">{business.email}</p>
+          <p className="text-xs text-[#827971] tracking-wide">{business_.phone}</p>
+          <p className="text-xs text-[#827971] mt-1">{business_.email}</p>
         </div>
       </aside>
 
@@ -141,23 +154,23 @@ export default function VeterinarioLayout(props: any = {}) {
                 className="text-xl font-bold text-[#166875] mb-4"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                {business.name}
+                {business_.name}
               </div>
               <p className="text-[#827971] text-sm leading-relaxed mb-6">
-                {business.description}
+                {business_.description}
               </p>
               <div className="flex flex-col gap-1">
                 <a
-                  href={`tel:${business.phoneIntl}`}
+                  href={`tel:${business_.phoneIntl}`}
                   className="text-sm text-[#166875] font-semibold hover:text-[#005c68] transition-colors"
                 >
-                  {business.phone}
+                  {business_.phone}
                 </a>
                 <a
-                  href={`mailto:${business.email}`}
+                  href={`mailto:${business_.email}`}
                   className="text-sm text-[#827971] hover:text-[#166875] transition-colors"
                 >
-                  {business.email}
+                  {business_.email}
                 </a>
               </div>
             </div>
@@ -171,7 +184,7 @@ export default function VeterinarioLayout(props: any = {}) {
                 Clinic
               </h5>
               <ul className="flex flex-col gap-3 text-sm text-[#827971]">
-                {nav.map((item) => (
+                {navLinks.map((item) => (
                   <li key={item.href}>
                     <Link href={item.href} className="hover:text-[#166875] transition-colors">
                       {item.label}
@@ -206,16 +219,16 @@ export default function VeterinarioLayout(props: any = {}) {
                 Visit Us
               </h5>
               <div className="flex flex-col gap-2 text-sm text-[#827971]">
-                <p>{business.address}</p>
-                <p>{business.city}, {business.state} {business.zip}</p>
+                <p>{business_.address}</p>
+                <p>{business_.city}, {business_.state} {business_.zip}</p>
                 <a
-                  href={`tel:${business.phoneIntl}`}
+                  href={`tel:${business_.phoneIntl}`}
                   className="text-[#166875] font-semibold hover:text-[#005c68] transition-colors mt-2"
                 >
-                  {business.phone}
+                  {business_.phone}
                 </a>
                 <p className="text-[#ac3434] font-semibold text-xs uppercase tracking-widest mt-1">
-                  Emergency 24/7: {business.emergency}
+                  Emergency 24/7: {business_.emergency}
                 </p>
               </div>
             </div>
@@ -223,7 +236,7 @@ export default function VeterinarioLayout(props: any = {}) {
 
           <div className="pt-8 text-center">
             <p className="text-[#827971] text-xs">
-              &copy; {new Date().getFullYear()} {business.legalName}. High-End Medical Empathy.
+              &copy; {new Date().getFullYear()} {business_.legalName}. High-End Medical Empathy.
               {' · '}
               <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
                 Made by Nexifydev.com
@@ -235,7 +248,7 @@ export default function VeterinarioLayout(props: any = {}) {
 
       {/* ─── WHATSAPP FAB ─── */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp"

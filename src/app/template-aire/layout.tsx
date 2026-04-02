@@ -8,6 +8,19 @@ export default function TemplateAireLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-aire';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -20,11 +33,11 @@ export default function TemplateAireLayout(props: any = {}) {
       <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-sm">
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-[1920px] mx-auto">
           <Link href={`${baseHref}`} style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.04em', textDecoration: 'none' }}>
-            {business.name}
+            {business_.name}
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map(n => (
+            {navLinks.map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -37,7 +50,7 @@ export default function TemplateAireLayout(props: any = {}) {
           </nav>
 
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="hidden md:inline-flex items-center transition-all active:scale-[0.98] rounded-md"
             style={{ fontSize: '13px', fontWeight: 600, background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', padding: '10px 24px', textDecoration: 'none' }}
           >
@@ -71,7 +84,7 @@ export default function TemplateAireLayout(props: any = {}) {
         style={{ backgroundColor: '#fcf8fb', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map(n => (
+          {navLinks.map(n => (
             <Link
               key={n.href}
               href={n.href}
@@ -86,13 +99,13 @@ export default function TemplateAireLayout(props: any = {}) {
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="block w-full text-center py-4 rounded-md"
             style={{ background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}
           >
             Call Now
           </a>
-          <p className="mt-4 text-center" style={{ fontSize: '11px', color: '#717786' }}>{business.phone}</p>
+          <p className="mt-4 text-center" style={{ fontSize: '11px', color: '#717786' }}>{business_.phone}</p>
         </div>
       </div>
 
@@ -104,9 +117,9 @@ export default function TemplateAireLayout(props: any = {}) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-6 md:px-8 max-w-[1920px] mx-auto">
           {/* Brand */}
           <div>
-            <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.04em', marginBottom: '12px' }}>{business.name}</p>
-            <p style={{ fontSize: '13px', color: '#414754', lineHeight: 1.7 }}>{business.tagline}<br />{business.city}, {business.state}</p>
-            <p style={{ fontSize: '12px', color: '#717786', marginTop: '8px' }}>Est. {business.foundedYear}</p>
+            <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.04em', marginBottom: '12px' }}>{business_.name}</p>
+            <p style={{ fontSize: '13px', color: '#414754', lineHeight: 1.7 }}>{business_.tagline}<br />{business_.city}, {business_.state}</p>
+            <p style={{ fontSize: '12px', color: '#717786', marginTop: '8px' }}>Est. {business_.foundedYear}</p>
           </div>
           {/* Services */}
           <div>
@@ -121,7 +134,7 @@ export default function TemplateAireLayout(props: any = {}) {
           <div>
             <h4 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '11px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>Quick Links</h4>
             <nav className="flex flex-col gap-3">
-              {nav.map(n => (
+              {navLinks.map(n => (
                 <Link key={n.href} href={n.href} style={{ fontSize: '13px', color: '#414754', textDecoration: 'none' }}>{n.label}</Link>
               ))}
             </nav>
@@ -130,9 +143,9 @@ export default function TemplateAireLayout(props: any = {}) {
           <div>
             <h4 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '11px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>Contact</h4>
             <div style={{ fontSize: '13px', color: '#414754', lineHeight: 2 }}>
-              <p>{business.phone}</p>
-              <p>{business.email}</p>
-              <p>{business.address}</p>
+              <p>{business_.phone}</p>
+              <p>{business_.email}</p>
+              <p>{business_.address}</p>
             </div>
           </div>
         </div>
@@ -140,7 +153,7 @@ export default function TemplateAireLayout(props: any = {}) {
           className="mt-16 px-6 md:px-8 max-w-[1920px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 pt-8"
           style={{ borderTop: '1px solid rgba(193,198,215,0.4)' }}
         >
-          <p style={{ fontSize: '11px', color: '#717786' }}>&copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
+          <p style={{ fontSize: '11px', color: '#717786' }}>&copy; {new Date().getFullYear()} {business_.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
@@ -151,7 +164,7 @@ export default function TemplateAireLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

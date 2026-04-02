@@ -40,6 +40,14 @@ export async function connectDB() {
 // --- Lead ---
 const LeadSchema = new mongoose.Schema({
   slug: { type: String, required: true, unique: true, index: true },
+  dedupeKey: { type: String },
+
+  source: {
+    engine: { type: String, default: 'google_maps' },
+    placeId: { type: String },
+    providerId: { type: String },
+  },
+
   businessName: { type: String, required: true },
   sector: { type: String, required: true },
   city: { type: String, required: true },
@@ -48,6 +56,26 @@ const LeadSchema = new mongoose.Schema({
   email: String,
   address: String,
   googleMapsUrl: String,
+
+  // Estado del sitio del negocio (para campañas futuras)
+  hasWebsite: { type: Boolean, default: false },
+  websiteStatus: {
+    type: String,
+    enum: ['sin_web', 'con_web', 'con_web_antigua', 'desconocido'],
+    default: 'desconocido',
+  },
+  websiteUrl: String,
+  websiteCheckedAt: Date,
+
+  // Elegibilidad comercial/generación
+  hasMobile: { type: Boolean, default: false },
+  isGenerationCandidate: { type: Boolean, default: false },
+  contactPriority: {
+    type: String,
+    enum: ['alta', 'media', 'baja'],
+    default: 'media',
+  },
+  lastScrapedAt: Date,
 
   // Localización
   locale: { type: String, enum: ['es-ES', 'es-AR'], default: 'es-ES' },
@@ -152,6 +180,12 @@ const CompetitorSchema = new mongoose.Schema({
 
 // Índice compuesto para cachear: mismo sector+ciudad+país = reusar
 CompetitorSchema.index({ sector: 1, city: 1, country: 1 });
+
+// Índices de unicidad para evitar duplicados globales en leads
+LeadSchema.index({ dedupeKey: 1 }, { unique: true, sparse: true });
+LeadSchema.index({ 'source.placeId': 1 }, { unique: true, sparse: true });
+LeadSchema.index({ 'source.providerId': 1 }, { unique: true, sparse: true });
+LeadSchema.index({ sector: 1, city: 1, country: 1, status: 1 });
 
 // --- Website Content ---
 const WebsiteContentSchema = new mongoose.Schema({

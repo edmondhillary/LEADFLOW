@@ -8,6 +8,19 @@ export default function ElectricistaLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-electricista';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -31,12 +44,12 @@ export default function ElectricistaLayout(props: any = {}) {
             href={`${baseHref}`}
             className="text-2xl font-black tracking-tighter text-zinc-900 uppercase"
           >
-            {business.name}
+            {business_.name}
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
-            {nav.map((item, i) => (
+            {navLinks.map((item, i) => (
               <Link
                 key={`${item.href}-${i}`}
                 href={item.href}
@@ -49,7 +62,7 @@ export default function ElectricistaLayout(props: any = {}) {
 
           {/* Desktop CTA */}
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="hidden md:block bg-[#ffd700] text-[#705e00] px-6 py-2 font-bold uppercase tracking-tight hover:bg-[#e9c400] active:scale-95 transition-all text-sm"
           >
             Llamar ahora
@@ -79,7 +92,7 @@ export default function ElectricistaLayout(props: any = {}) {
         className={`fixed top-0 right-0 bottom-0 z-40 w-72 bg-[#1c1b1b] flex flex-col pt-24 px-8 pb-8 transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <nav className="flex flex-col gap-2">
-          {nav.map((item, i) => (
+          {navLinks.map((item, i) => (
             <Link
               key={`${item.href}-m-${i}`}
               href={item.href}
@@ -92,15 +105,15 @@ export default function ElectricistaLayout(props: any = {}) {
         </nav>
         <div className="mt-8">
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="block w-full text-center bg-[#ffd700] text-[#705e00] font-black uppercase tracking-tight px-6 py-3 hover:bg-[#e9c400] transition-colors"
           >
             Llamar ahora
           </a>
         </div>
         <div className="mt-auto">
-          <p className="text-[#ffd700] font-black text-lg">{business.phone}</p>
-          <p className="text-zinc-500 text-xs mt-1">{business.email}</p>
+          <p className="text-[#ffd700] font-black text-lg">{business_.phone}</p>
+          <p className="text-zinc-500 text-xs mt-1">{business_.email}</p>
         </div>
       </aside>
 
@@ -114,8 +127,8 @@ export default function ElectricistaLayout(props: any = {}) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto">
           {/* Brand */}
           <div>
-            <div className="text-xl font-black text-white uppercase mb-6">{business.name}</div>
-            <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">{business.description}</p>
+            <div className="text-xl font-black text-white uppercase mb-6">{business_.name}</div>
+            <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">{business_.description}</p>
           </div>
 
           {/* Links */}
@@ -123,7 +136,7 @@ export default function ElectricistaLayout(props: any = {}) {
             <div className="space-y-4">
               <span className="text-white font-bold uppercase text-xs tracking-widest">Empresa</span>
               <nav className="flex flex-col gap-2">
-                {nav.map((item, i) => (
+                {navLinks.map((item, i) => (
                   <Link key={i} href={item.href} className="text-zinc-500 hover:text-yellow-400 text-sm transition-colors">
                     {item.label}
                   </Link>
@@ -143,15 +156,15 @@ export default function ElectricistaLayout(props: any = {}) {
           {/* Contact */}
           <div className="flex flex-col items-start md:items-end justify-between">
             <div className="text-right">
-              <a href={`tel:${business.phoneIntl}`} className="text-yellow-400 font-black text-2xl hover:text-yellow-300 transition-colors">
-                {business.phone}
+              <a href={`tel:${business_.phoneIntl}`} className="text-yellow-400 font-black text-2xl hover:text-yellow-300 transition-colors">
+                {business_.phone}
               </a>
               <p className="text-zinc-500 text-[10px] uppercase tracking-widest mt-1">Línea de Urgencias 24h</p>
-              <p className="text-zinc-500 text-sm mt-3">{business.address}</p>
-              <p className="text-zinc-500 text-sm">{business.city}, {business.country}</p>
+              <p className="text-zinc-500 text-sm mt-3">{business_.address}</p>
+              <p className="text-zinc-500 text-sm">{business_.city}, {business_.country}</p>
             </div>
             <p className="text-zinc-400 text-xs mt-8">
-              &copy; {new Date().getFullYear()} {business.legalName}
+              &copy; {new Date().getFullYear()} {business_.legalName}
               {' · '}
               <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
                 Made by Nexifydev.com
@@ -163,7 +176,7 @@ export default function ElectricistaLayout(props: any = {}) {
 
       {/* ─── WHATSAPP FAB ─── */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp"
@@ -198,7 +211,7 @@ export default function ElectricistaLayout(props: any = {}) {
           <span className="text-[10px] font-bold uppercase tracking-widest">Presup.</span>
         </Link>
         <a
-          href={`tel:${business.phoneIntl}`}
+          href={`tel:${business_.phoneIntl}`}
           className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
         >
           <span className="material-symbols-outlined text-xl">phone_in_talk</span>

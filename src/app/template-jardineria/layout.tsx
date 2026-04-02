@@ -8,6 +8,19 @@ export default function TemplateJardineriaLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-jardineria';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -38,11 +51,11 @@ export default function TemplateJardineriaLayout(props: any = {}) {
               textDecoration: 'none',
             }}
           >
-            {business.name}
+            {business_.name}
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
-            {nav.map(n => (
+            {navLinks.map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -62,7 +75,7 @@ export default function TemplateJardineriaLayout(props: any = {}) {
           </nav>
 
           <a
-            href={`mailto:${business.email}`}
+            href={`mailto:${business_.email}`}
             className="hidden md:inline-block transition-all active:scale-[0.98] rounded-xl"
             style={{
               fontSize: '11px',
@@ -109,7 +122,7 @@ export default function TemplateJardineriaLayout(props: any = {}) {
         }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map(n => (
+          {navLinks.map(n => (
             <Link
               key={n.href}
               href={n.href}
@@ -123,7 +136,7 @@ export default function TemplateJardineriaLayout(props: any = {}) {
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href={`tel:${business.phoneIntl}`}
+            href={`tel:${business_.phoneIntl}`}
             className="block w-full text-center py-4 rounded-xl"
             style={{
               background: 'linear-gradient(145deg, #283827 0%, #3e4f3c 100%)',
@@ -137,7 +150,7 @@ export default function TemplateJardineriaLayout(props: any = {}) {
           >
             Call Estudio
           </a>
-          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#444842', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>
+          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#444842', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business_.phone}</p>
         </div>
       </div>
 
@@ -149,10 +162,10 @@ export default function TemplateJardineriaLayout(props: any = {}) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-6 md:px-10 max-w-[1920px] mx-auto">
           <div>
             <p style={{ fontFamily: "'Newsreader', serif", fontSize: '18px', fontStyle: 'italic', fontWeight: 400, color: '#283827', marginBottom: '16px' }}>
-              {business.name}
+              {business_.name}
             </p>
             <p style={{ fontSize: '11px', color: '#444842', lineHeight: 1.8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              {business.tagline}<br />{business.city}, {business.country}
+              {business_.tagline}<br />{business_.city}, {business_.country}
             </p>
           </div>
           <div>
@@ -168,7 +181,7 @@ export default function TemplateJardineriaLayout(props: any = {}) {
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#1a1c19', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Company</h4>
             <nav className="flex flex-col gap-3">
-              {nav.map(n => (
+              {navLinks.map(n => (
                 <Link
                   key={n.href}
                   href={n.href}
@@ -183,9 +196,9 @@ export default function TemplateJardineriaLayout(props: any = {}) {
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#1a1c19', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Inquiries</h4>
             <div style={{ fontSize: '11px', color: '#444842', lineHeight: 2, letterSpacing: '0.05em' }}>
-              <p>{business.email}</p>
-              <p style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>{business.phone}</p>
-              <p>{business.address}</p>
+              <p>{business_.email}</p>
+              <p style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>{business_.phone}</p>
+              <p>{business_.address}</p>
             </div>
           </div>
         </div>
@@ -194,17 +207,17 @@ export default function TemplateJardineriaLayout(props: any = {}) {
           style={{ borderTop: '1px solid rgba(40,56,39,0.12)' }}
         >
           <p style={{ fontSize: '10px', color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
+            &copy; {new Date().getFullYear()} {business_.legalName}. Todos los derechos reservados.{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
           </p>
           <p style={{ fontSize: '10px', color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em', fontStyle: 'italic' }}>
-            Est. {business.foundedYear} — London
+            Est. {business_.foundedYear} — London
           </p>
         </div>
       </footer>
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

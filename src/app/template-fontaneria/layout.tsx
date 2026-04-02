@@ -11,6 +11,19 @@ export default function TemplateLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-fontaneria';
+  const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+  const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Google Fonts + Material Symbols */}
@@ -24,12 +37,12 @@ export default function TemplateLayout(props: any = {}) {
           {/* Logo */}
           <Link href={`${baseHref}`} className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl" style={{ color: '#002045' }}>waves</span>
-            <span className="text-xl tracking-tighter" style={{ fontFamily: 'Manrope', fontWeight: 900, color: '#002045' }}>{business.name}</span>
+            <span className="text-xl tracking-tighter" style={{ fontFamily: 'Manrope', fontWeight: 900, color: '#002045' }}>{business_.name}</span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.filter(n => n.label !== 'Blog').map(n => (
+            {navLinks.filter(n => n.label !== 'Blog').map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -43,17 +56,42 @@ export default function TemplateLayout(props: any = {}) {
 
           {/* CTA */}
           <a
-            href={`tel:${business.phoneIntl}`}
-            className="px-6 py-2 rounded-xl font-bold tracking-tight text-sm text-white transition-all hover:opacity-90 active:scale-95"
+            href={`tel:${business_.phoneIntl}`}
+            className="hidden md:inline-flex px-6 py-2 rounded-xl font-bold tracking-tight text-sm text-white transition-all hover:opacity-90 active:scale-95"
             style={{ backgroundColor: '#e88532' }}
           >
             LLAMAR AHORA
           </a>
+
+          {/* Mobile Dropdown */}
+          <details className="md:hidden relative">
+            <summary
+              className="list-none inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer"
+              style={{ backgroundColor: '#e2e8f0', color: '#002045' }}
+            >
+              Menú
+            </summary>
+            <div
+              className="absolute right-0 mt-2 min-w-[210px] rounded-xl p-3 shadow-xl"
+              style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
+            >
+              <div className="flex flex-col gap-2">
+                {navLinks.filter((n) => n.label !== 'Blog').map((n) => (
+                  <Link key={n.href} href={n.href} className="px-3 py-2 rounded-lg text-sm font-medium" style={{ color: '#334155' }}>
+                    {n.label}
+                  </Link>
+                ))}
+                <a href={`tel:${business_.phoneIntl}`} className="mt-1 px-3 py-2 rounded-lg text-sm font-bold text-white text-center" style={{ backgroundColor: '#e88532', textDecoration: 'none' }}>
+                  Llamar ahora
+                </a>
+              </div>
+            </div>
+          </details>
         </div>
       </header>
 
       {/* Page Content */}
-      <main className="flex-1 pt-20 pb-20 md:pb-0" style={{ color: '#191c1e' }}>
+      <main className="flex-1 pt-20 pb-8" style={{ color: '#191c1e' }}>
         {children}
       </main>
 
@@ -63,7 +101,7 @@ export default function TemplateLayout(props: any = {}) {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-2xl" style={{ color: '#002045' }}>waves</span>
-              <span style={{ fontFamily: 'Manrope', fontWeight: 900, color: '#002045' }} className="text-xl tracking-tighter">{business.name}</span>
+              <span style={{ fontFamily: 'Manrope', fontWeight: 900, color: '#002045' }} className="text-xl tracking-tighter">{business_.name}</span>
             </div>
             <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#64748b' }}>
               Ingeniería de fluidos y soluciones de fontanería premium para el hogar moderno.
@@ -73,7 +111,7 @@ export default function TemplateLayout(props: any = {}) {
           <div className="space-y-6">
             <h4 className="font-bold text-xs uppercase tracking-widest" style={{ color: '#002045' }}>Páginas</h4>
             <div className="flex flex-col gap-3">
-              {nav.map(n => (
+              {navLinks.map(n => (
                 <Link key={n.href} href={n.href} className="text-sm underline underline-offset-4 transition-all hover:text-[#0061a5]" style={{ color: '#64748b' }}>
                   {n.label}
                 </Link>
@@ -84,41 +122,17 @@ export default function TemplateLayout(props: any = {}) {
           <div className="space-y-6">
             <h4 className="font-bold text-xs uppercase tracking-widest" style={{ color: '#002045' }}>Contacto</h4>
             <p className="text-sm" style={{ color: '#64748b' }}>Disponible 24 Horas / 365 Días</p>
-            <a href={`tel:${business.phoneIntl}`} className="text-2xl font-black transition-colors hover:opacity-80" style={{ color: '#e88532' }}>
-              {business.phone}
+            <a href={`tel:${business_.phoneIntl}`} className="text-2xl font-black transition-colors hover:opacity-80" style={{ color: '#e88532' }}>
+              {business_.phone}
             </a>
-            <p className="text-xs" style={{ color: '#94a3b8' }}>&copy; {new Date().getFullYear()} {business.legalName} | {business.tagline.toUpperCase()}{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a></p>
+            <p className="text-xs" style={{ color: '#94a3b8' }}>&copy; {new Date().getFullYear()} {business_.legalName} | {business_.tagline.toUpperCase()}{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a></p>
           </div>
         </div>
       </footer>
 
-      {/* Mobile Bottom Nav */}
-      <nav
-        className="md:hidden fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 z-50 rounded-t-2xl"
-        style={{
-          background: 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
-          borderTop: '1px solid #f1f5f9',
-        }}
-      >
-        {nav.filter(n => n.label !== 'Blog').map(n => (
-          <Link
-            key={n.href}
-            href={n.href}
-            className="flex flex-col items-center justify-center px-3 py-1 active:scale-90 transition-transform"
-            style={{ color: '#94a3b8' }}
-          >
-            <span className="material-symbols-outlined mb-0.5">{n.icon}</span>
-            <span className="text-[10px] uppercase tracking-widest font-bold" style={{ fontFamily: 'Inter' }}>{n.label}</span>
-          </Link>
-        ))}
-      </nav>
-
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

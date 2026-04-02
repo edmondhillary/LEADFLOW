@@ -28,6 +28,29 @@ interface SerpApiMapResult {
   gps_coordinates?: { latitude: number; longitude: number };
 }
 
+function cleanForKey(value: string): string {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function buildDedupeKey(
+  result: SerpApiMapResult,
+  city: string,
+  country: string,
+  sector: string,
+): string {
+  if (result.place_id) return `gmaps:place:${result.place_id}`;
+  if (result.provider_id) return `gmaps:provider:${result.provider_id}`;
+  const title = cleanForKey(result.title);
+  const addr = cleanForKey(result.address || 'sin-direccion');
+  return `gmaps:fallback:${country}:${cleanForKey(city)}:${cleanForKey(sector)}:${title}:${addr}`;
+}
+
 // Valida si un número es móvil (muy probable que tenga WhatsApp)
 function isMobileNumber(phone: string | undefined, country: string): boolean {
   if (!phone) return false;
@@ -140,7 +163,7 @@ export async function runScraper(options: {
 }) {
   const { sector, city, country, limit, apiKey } = options;
 
-  const sectorConfig = getSector(sector); // lanza error si no existe
+  getSector(sector); // valida que exista
   const term = getSearchTerm(sector, country);
   const query = `${term} ${city}`;
   const locale = country === 'ES' ? 'es-ES' : 'es-AR';
@@ -156,6 +179,12 @@ export async function runScraper(options: {
   let saved = 0;
   let start = 0;
   const savedIds: string[] = [];
+  const seenThisRun = new Set<string>();
+
+  let withWeb = 0;
+  let withoutWeb = 0;
+  let withMobile = 0;
+  let withoutMobile = 0;
 
   while (saved < limit) {
     const results = await searchGoogleMaps(query, apiKey, start);
@@ -168,51 +197,41 @@ export async function runScraper(options: {
       if (saved >= limit) break;
       found++;
 
-      // Saltamos los que ya tienen web
-      if (result.website) {
-        console.log(`⏭️  Tiene web: ${result.title}`);
-        continue;
-      }
-
       // Obtenemos detalles si hay place_id
       let phone = result.phone;
       let detailPlace: any = null;
-      if (!phone && result.place_id) {
+      let website = result.website || result.links?.website || '';
+
+      if (result.place_id) {
         const details = await getBusinessDetails(result.place_id, apiKey);
-        phone = details.phone;
+        if (!phone) phone = details.phone;
         detailPlace = details.place || null;
-        // Si detalles dice que tiene web, saltamos
-        if (details.website) {
-          console.log(`⏭️  Tiene web (detalles): ${result.title}`);
-          continue;
-        }
+        website = website || details.website || detailPlace?.website || '';
       }
 
       const slug = generateSlug(result.title, city, sector);
+      const dedupeKey = buildDedupeKey(result, city, country, sector);
 
-      // Verificar si ya existe en BD
-      const exists = await Lead.findOne({ slug });
-      if (exists) {
-        console.log(`🔄 Ya existe: ${result.title}`);
-        continue;
-      }
-
-      // Validar que tiene número de móvil (posible WhatsApp)
+      const hasWebsite = Boolean(website);
       const isMobile = isMobileNumber(phone, country);
-      if (!phone || !isMobile) {
-        console.log(`⏭️  Sin móvil WhatsApp: ${result.title} (${phone || 'sin teléfono'})`);
-        continue;
-      }
+      const websiteStatus = hasWebsite ? 'con_web' : 'sin_web';
 
-      // Guardar lead
+      if (hasWebsite) withWeb++; else withoutWeb++;
+      if (isMobile) withMobile++; else withoutMobile++;
+
+      const normalizedPhone = phone ? normalizePhone(phone, country) : undefined;
+      const queryOr: any[] = [{ dedupeKey }, { slug }];
+      if (result.place_id) queryOr.push({ 'source.placeId': result.place_id });
+      if (result.provider_id) queryOr.push({ 'source.providerId': result.provider_id });
+      const exists = await Lead.findOne({ $or: queryOr }).select('_id');
+
+      // Guardar o actualizar lead sin duplicar
       try {
-        const lead = await Lead.create({
-          slug,
+        const setData: any = {
           businessName: result.title,
           sector,
           city,
           country,
-          phone: normalizePhone(phone, country),
           address: result.address || null,
           googleMapsUrl: result.links?.directions || result.place_id_search || null,
           locale,
@@ -220,16 +239,50 @@ export async function runScraper(options: {
           price,
           reviewCount: result.reviews || 0,
           reviewRating: result.rating || 0,
-          status: 'scraped',
+          hasWebsite,
+          websiteStatus,
+          websiteUrl: website || null,
+          websiteCheckedAt: new Date(),
+          hasMobile: isMobile,
+          hasWhatsApp: isMobile,
+          whatsAppValidatedAt: new Date(),
+          isGenerationCandidate: !hasWebsite && isMobile,
+          contactPriority: !hasWebsite && isMobile ? 'alta' : !hasWebsite ? 'media' : 'baja',
+          source: {
+            engine: 'google_maps',
+            placeId: result.place_id,
+            providerId: result.provider_id,
+          },
+          dedupeKey,
           rawScrapeData: {
             ...result,
+            websiteResolved: website || null,
             details: detailPlace,
           },
-        });
+          lastScrapedAt: new Date(),
+        };
+        if (normalizedPhone) setData.phone = normalizedPhone;
 
-        saved++;
-        savedIds.push(lead._id.toString());
-        console.log(`✅ [${saved}/${limit}] Guardado: ${result.title}`);
+        const lead = await Lead.findOneAndUpdate(
+          { $or: queryOr },
+          {
+            $set: setData,
+            $setOnInsert: {
+              slug,
+              status: 'scraped',
+            },
+          },
+          { upsert: true, new: true, setDefaultsOnInsert: true },
+        );
+
+        if (lead && !seenThisRun.has(String(lead._id))) {
+          seenThisRun.add(String(lead._id));
+          saved++;
+          savedIds.push(String(lead._id));
+        }
+
+        console.log(`✅ [${saved}/${limit}] ${exists ? 'Actualizado' : 'Guardado'}: ${result.title}`);
+        console.log(`   🌐 ${hasWebsite ? 'CON WEB' : 'SIN WEB'}${website ? ` (${website})` : ''}`);
         if (phone) console.log(`   📞 ${phone}`);
         if (result.address) console.log(`   📍 ${result.address}`);
 
@@ -245,7 +298,9 @@ export async function runScraper(options: {
 
   console.log(`\n📊 RESUMEN:`);
   console.log(`   Negocios encontrados: ${found}`);
-  console.log(`   Leads guardados: ${saved}`);
+  console.log(`   Leads guardados/actualizados únicos: ${saved}`);
+  console.log(`   Con web: ${withWeb} | Sin web: ${withoutWeb}`);
+  console.log(`   Con móvil: ${withMobile} | Sin móvil: ${withoutMobile}`);
   console.log(`   Sector: ${sector} | Ciudad: ${city} | País: ${country}`);
 
   return { found, saved, leadIds: savedIds };
@@ -274,7 +329,7 @@ if (require.main === module) {
 
   runScraper(options)
     .then(({ saved }) => {
-      console.log(`\n🎉 Scraper finalizado. ${saved} leads nuevos en MongoDB.`);
+      console.log(`\n🎉 Scraper finalizado. ${saved} leads guardados/actualizados en MongoDB.`);
       process.exit(0);
     })
     .catch(err => {

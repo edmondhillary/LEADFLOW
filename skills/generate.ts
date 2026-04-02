@@ -410,8 +410,9 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   // Sigue buscando hasta tener `limit` leads con WhatsApp, o hasta MAX_SCRAPE_ROUNDS intentos.
   console.log(`\n📱 PASOS 1+2 — Scraping + validación WhatsApp (objetivo: ${limit} leads)...`);
   const validLeadIds: string[] = [];
+  const validLeadSet = new Set<string>();
   const MAX_ROUNDS = 5;        // máximo 5 rondas de scraping (evita bucle infinito)
-  const BATCH_SIZE = limit * 3; // pedimos 3× más de lo necesario para compensar los que tienen web
+  const BATCH_SIZE = limit * 4; // pedimos más porque ahora guardamos todos (con/sin web)
   let round = 0;
   let totalScraped = 0;
 
@@ -429,7 +430,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
       });
       batchIds = scraperResult.leadIds;
       totalScraped += batchIds.length;
-      console.log(`   Negocios sin web encontrados en esta ronda: ${batchIds.length}`);
+      console.log(`   Negocios guardados/actualizados en esta ronda: ${batchIds.length}`);
     } catch (err: any) {
       console.error(`❌ Error en scraper (ronda ${round}): ${err.message}`);
       if (round === 1) throw new Error(`Scraping falló: ${err.message}`);
@@ -437,7 +438,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     }
 
     if (batchIds.length === 0) {
-      console.log('   ℹ️  No hay más negocios sin web en esta ciudad/sector.');
+      console.log('   ℹ️  No hay más resultados para esta ciudad/sector.');
       break;
     }
 
@@ -445,19 +446,41 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     for (const leadId of batchIds) {
       if (validLeadIds.length >= limit) break;
       const lead = await Lead.findById(leadId);
-      if (!lead?.phone) continue;
+      if (!lead) continue;
+
+      if (['web_live', 'email_sent', 'visited', 'contacted', 'client'].includes(lead.status)) {
+        console.log(`   🔄 ${lead.businessName} — ya procesado (${lead.status}), se omite`);
+        continue;
+      }
+
+      // Solo generamos para candidatos: sin web + móvil válido
+      if (lead.hasWebsite) {
+        console.log(`   ⏭️  ${lead.businessName} — tiene web (${lead.websiteUrl || 'sin URL'})`);
+        continue;
+      }
+
+      if (!lead.phone) {
+        console.log(`   ⏭️  ${lead.businessName} — sin teléfono`);
+        continue;
+      }
 
       const hasWA = validateWhatsApp(lead.phone, country);
       await Lead.findByIdAndUpdate(leadId, {
         hasWhatsApp: hasWA,
+        hasMobile: hasWA,
         whatsAppValidatedAt: new Date(),
+        isGenerationCandidate: hasWA,
+        contactPriority: hasWA ? 'alta' : 'media',
         reviewCount: (lead.rawScrapeData as any)?.reviews ?? randomBetween(40, 100),
         reviewRating: (lead.rawScrapeData as any)?.rating ?? parseFloat((4 + Math.random()).toFixed(1)),
       });
 
       if (hasWA) {
-        validLeadIds.push(leadId);
-        console.log(`   ✅ ${lead.businessName} — WhatsApp OK (${validLeadIds.length}/${limit})`);
+        if (!validLeadSet.has(leadId)) {
+          validLeadSet.add(leadId);
+          validLeadIds.push(leadId);
+          console.log(`   ✅ ${lead.businessName} — WhatsApp OK (${validLeadIds.length}/${limit})`);
+        }
       } else {
         console.log(`   ⚠️  ${lead.businessName} — Sin móvil válido, descartado`);
       }
@@ -465,7 +488,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   }
 
   if (validLeadIds.length === 0) {
-    console.log('⚠️  No se encontraron negocios sin web con número móvil. Prueba otra ciudad.');
+    console.log('⚠️  No se encontraron candidatos sin web y con número móvil válido. Prueba otra ciudad.');
     return [];
   }
 

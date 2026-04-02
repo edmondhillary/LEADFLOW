@@ -8,6 +8,19 @@ export default function TemplatePilatesLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-pilates';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -20,11 +33,11 @@ export default function TemplatePilatesLayout(props: any = {}) {
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(250,249,246,0.70)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(175,179,174,0.12)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-5 max-w-[1920px] mx-auto">
           <Link href={`${baseHref}`} style={{ fontFamily: "'Noto Serif', serif", fontSize: '18px', fontWeight: 300, color: '#536257', letterSpacing: '0.2em', textDecoration: 'none', textTransform: 'uppercase' }}>
-            {business.name}
+            {business_.name}
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
-            {nav.map(n => (
+            {navLinks.map(n => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -71,7 +84,7 @@ export default function TemplatePilatesLayout(props: any = {}) {
         style={{ backgroundColor: '#faf9f6', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)', paddingTop: '80px' }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map(n => (
+          {navLinks.map(n => (
             <Link
               key={n.href}
               href={n.href}
@@ -92,7 +105,7 @@ export default function TemplatePilatesLayout(props: any = {}) {
           >
             Reservar sesión
           </a>
-          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#5c605c', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>
+          <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#5c605c', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business_.phone}</p>
         </div>
       </div>
 
@@ -103,13 +116,13 @@ export default function TemplatePilatesLayout(props: any = {}) {
       <footer className="w-full pt-20 pb-12" style={{ backgroundColor: '#f4f4f0' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-6 md:px-8 max-w-[1920px] mx-auto">
           <div>
-            <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '16px', fontWeight: 300, fontStyle: 'italic', color: '#536257', marginBottom: '16px', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{business.name}</p>
-            <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.8 }}>{business.tagline}<br />{business.city}, {business.state}</p>
+            <p style={{ fontFamily: "'Noto Serif', serif", fontSize: '16px', fontWeight: 300, fontStyle: 'italic', color: '#536257', marginBottom: '16px', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{business_.name}</p>
+            <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.8 }}>{business_.tagline}<br />{business_.city}, {business_.state}</p>
           </div>
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Estudio</h4>
             <nav className="flex flex-col gap-3">
-              {nav.map(n => (
+              {navLinks.map(n => (
                 <Link
                   key={n.href}
                   href={n.href}
@@ -124,9 +137,9 @@ export default function TemplatePilatesLayout(props: any = {}) {
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Connect</h4>
             <div style={{ fontSize: '12px', color: '#5c605c', lineHeight: 2 }}>
-              <p>{business.email}</p>
-              <p>{business.phone}</p>
-              <p>{business.address}</p>
+              <p>{business_.email}</p>
+              <p>{business_.phone}</p>
+              <p>{business_.address}</p>
             </div>
           </div>
           <div>
@@ -153,7 +166,7 @@ export default function TemplatePilatesLayout(props: any = {}) {
           style={{ borderTop: '1px solid rgba(83,98,87,0.15)' }}
         >
           <p style={{ fontSize: '10px', color: '#5c605c', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.fullName}. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} {business_.fullName}. Todos los derechos reservados.
             {' · '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
@@ -167,7 +180,7 @@ export default function TemplatePilatesLayout(props: any = {}) {
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"

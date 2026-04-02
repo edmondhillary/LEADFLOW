@@ -8,6 +8,19 @@ export default function TemplateMudanzasLayout(props: any = {}) {
   const { children } = props as { children: React.ReactNode };
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-mudanzas';
+const business_ = ov ? {
+    ...business,
+    name: ov.businessName || business.name,
+    fullName: ov.businessName || (business as any).fullName || business.name,
+    legalName: ov.businessName || (business as any).legalName || (business as any).fullName || business.name,
+    phone: ov.phone || business.phone,
+    phoneIntl: ov.phoneIntl || business.phoneIntl,
+    email: ov.email || business.email,
+    address: ov.address || business.address,
+    city: ov.city || business.city,
+    whatsapp: String((ov.phoneIntl || (business as any).whatsapp || '')).replace(/\D/g, ''),
+  } : business;
+const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.replace(/^\/template-[^/]+/, baseHref) })) : [];
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -38,12 +51,12 @@ export default function TemplateMudanzasLayout(props: any = {}) {
               textDecoration: 'none',
             }}
           >
-            {business.name}
+            {business_.name}
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {nav.map((n) => (
+            {navLinks.map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -128,7 +141,7 @@ export default function TemplateMudanzasLayout(props: any = {}) {
         }}
       >
         <nav className="flex flex-col px-8 gap-1">
-          {nav.map((n) => (
+          {navLinks.map((n) => (
             <Link
               key={n.href}
               href={n.href}
@@ -172,7 +185,7 @@ export default function TemplateMudanzasLayout(props: any = {}) {
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            {business.phone}
+            {business_.phone}
           </p>
         </div>
       </div>
@@ -195,15 +208,15 @@ export default function TemplateMudanzasLayout(props: any = {}) {
                 marginBottom: '12px',
               }}
             >
-              {business.name}
+              {business_.name}
             </p>
             <p style={{ fontSize: '13px', color: '#44474e', lineHeight: 1.7, maxWidth: '320px' }}>
-              {business.tagline}
+              {business_.tagline}
               <br />
-              {business.address}
+              {business_.address}
             </p>
             <p style={{ fontSize: '12px', color: '#44474e', marginTop: '12px' }}>
-              {business.email} &middot; {business.phone}
+              {business_.email} &middot; {business_.phone}
             </p>
           </div>
 
@@ -264,7 +277,7 @@ export default function TemplateMudanzasLayout(props: any = {}) {
               Company
             </h4>
             <nav className="flex flex-col gap-2.5">
-              {nav.map((n) => (
+              {navLinks.map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
@@ -292,20 +305,20 @@ export default function TemplateMudanzasLayout(props: any = {}) {
           style={{ borderTop: '1px solid rgba(0,32,70,0.08)' }}
         >
           <p style={{ fontSize: '11px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
+            &copy; {new Date().getFullYear()} {business_.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
           </p>
           <p style={{ fontSize: '11px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>
-            {business.insurance} &middot; California PUC Licensed
+            {business_.insurance} &middot; California PUC Licensed
           </p>
         </div>
       </footer>
 
       {/* WhatsApp FAB */}
       <a
-        href={`https://wa.me/${business.whatsapp}`}
+        href={`https://wa.me/${business_.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"
