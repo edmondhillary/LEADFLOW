@@ -6,7 +6,7 @@
  */
 
 export const business = {
-  name: 'The Clinical Sanctuary',
+  name: 'El Clínico Sanctuary',
   tagline: 'Dentista en Madrid — Urgencias 24h',
   phone: '+34 912 345 678',
   phoneIntl: '+34912345678',
@@ -17,7 +17,7 @@ export const business = {
   postalCode: '28001',
   city: 'Madrid',
   country: 'España',
-  legalName: 'The Clinical Sanctuary S.L.',
+  legalName: 'El Clínico Sanctuary S.L.',
   foundedYear: 2009,
   yearsExperience: '15+',
   leadDentist: 'Dr. Alejandro Reyes',
@@ -185,7 +185,7 @@ export const serviciosPage = {
 export const nosotrosPage = {
   badge: 'Desde 2009 en Madrid',
   heroTitle: 'Excelencia Medica con Trato Humano',
-  heroSubtitle: 'The Clinical Sanctuary nacio con la mision de ofrecer atencion dental de primer nivel con la calidez y cercania que cada paciente merece.',
+  heroSubtitle: 'El Clínico Sanctuary nacio con la mision de ofrecer atencion dental de primer nivel con la calidez y cercania que cada paciente merece.',
   doctor: {
     name: 'Dr. Alejandro Reyes',
     role: 'Director Medico y Especialista en Implantologia',
@@ -260,7 +260,7 @@ export const blogPosts = [
 
 export const contactoPage = {
   badge: 'Reserva tu Cita',
-  title: 'Reserve su Cita',
+  title: 'Reservar su Cita',
   subtitle: 'Estamos disponibles para atenderte. Primera consulta gratuita sin compromiso.',
   formTitle: 'Solicitar Cita',
   formSubtitle: 'Rellena el formulario y te contactaremos en menos de 2 horas en horario de clinica.',

@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-gimnasio';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* Hero */}
@@ -97,7 +99,7 @@ export default function NosotrosPage() {
           {about.cta.title}
         </h2>
         <p className="text-base mb-10 max-w-lg mx-auto" style={{ color: '#ababab' }}>{about.cta.desc}</p>
-        <Link href="/template-gimnasio/contacto" className="inline-block transition-all active:scale-95" style={{ backgroundColor: '#eb0000', color: '#000', padding: '18px 48px', fontFamily: "'Epilogue', sans-serif", fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', letterSpacing: '0.05em', textDecoration: 'none', boxShadow: '0 0 30px rgba(235,0,0,0.3)' }}>
+        <Link href={`${baseHref}/contacto`} className="inline-block transition-all active:scale-95" style={{ backgroundColor: '#eb0000', color: '#000', padding: '18px 48px', fontFamily: "'Epilogue', sans-serif", fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', letterSpacing: '0.05em', textDecoration: 'none', boxShadow: '0 0 30px rgba(235,0,0,0.3)' }}>
           Reservar Sesión Gratis
         </Link>
       </section>

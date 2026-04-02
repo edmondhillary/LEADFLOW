@@ -26,7 +26,7 @@ export default function HomePage(props: any = {}) {
         <div className="absolute inset-0 z-0">
           <img
             src={images.heroBg}
-            alt="Kinetic Gallery Studio"
+            alt="Kinetic Gallery Estudio"
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay: left-heavy */}
@@ -88,7 +88,7 @@ export default function HomePage(props: any = {}) {
         <div className="max-w-[1920px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
             <div>
-              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Our Practice</span>
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestra práctica</span>
               <h2 className="text-3xl md:text-5xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.15 }}>
                 Every body, every <span style={{ fontStyle: 'italic' }}>intention.</span>
               </h2>
@@ -97,7 +97,7 @@ export default function HomePage(props: any = {}) {
               href={`${base}/servicios`}
               style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2f3430', textDecoration: 'none', borderBottom: '1px solid #2f3430', paddingBottom: '4px', alignSelf: 'flex-start' }}
             >
-              View All Classes
+              Ver todas las clases
             </Link>
           </div>
 
@@ -118,7 +118,7 @@ export default function HomePage(props: any = {}) {
               </div>
             </div>
 
-            {/* Small card: Private Studio — col-span-4 */}
+            {/* Small card: Private Estudio — col-span-4 */}
             <div className="md:col-span-4 relative group overflow-hidden rounded-xl" style={{ minHeight: '300px' }}>
               <img
                 src={images.privateSession}
@@ -172,7 +172,7 @@ export default function HomePage(props: any = {}) {
             <div style={{ aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px' }}>
               <img
                 src={images.studioMain}
-                alt="Kinetic Gallery Studio"
+                alt="Kinetic Gallery Estudio"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -231,7 +231,7 @@ export default function HomePage(props: any = {}) {
               <div key={i} className="overflow-hidden rounded-xl" style={{ height: '100%' }}>
                 <img
                   src={img}
-                  alt={`Studio ${i + 1}`}
+                  alt={`Estudio ${i + 1}`}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                   style={{ marginTop: i % 2 === 1 ? '24px' : 0 }}
                 />
@@ -309,7 +309,7 @@ export default function HomePage(props: any = {}) {
             className="inline-block transition-all active:scale-[0.98]"
             style={{ backgroundColor: '#ebfced', color: '#536257', padding: '18px 48px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
           >
-            Book Your Intro Class
+            Reservar clase inicial
           </Link>
         </div>
       </section>

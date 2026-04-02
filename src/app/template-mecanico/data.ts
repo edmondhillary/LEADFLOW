@@ -15,7 +15,7 @@ export const business = {
 };
 
 export const nav = [
-  { href: '/template-mecanico', label: 'Home' },
+  { href: '/template-mecanico', label: 'Inicio' },
   { href: '/template-mecanico/servicios', label: 'Reparación' },
   { href: '/template-mecanico/servicios', label: 'Mantenimiento' },
   { href: '/template-mecanico/servicios', label: 'Diagnóstico' },
@@ -111,7 +111,7 @@ export const credentials = [
 export const precisionProtocol = [
   {
     num: '01',
-    title: 'Safety-First',
+    title: 'Safety-Primero',
     desc: 'Cada intervención sigue el protocolo de seguridad certificado ASE. Ningún vehículo sale del taller sin superar el control de calidad de 47 puntos.',
   },
   {

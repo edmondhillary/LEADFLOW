@@ -6,8 +6,8 @@
  */
 
 export const business = {
-  name: 'The Tailored Sanctuary',
-  fullName: 'The Tailored Sanctuary Dog Grooming',
+  name: 'El santuario a medida',
+  fullName: 'El aseo de perros del santuario a medida',
   tagline: 'Bespoke Grooming — Aspen, Colorado',
   phone: '+1 970 000 0000',
   phoneIntl: '+19700000000',
@@ -17,13 +17,13 @@ export const business = {
   city: 'Aspen',
   state: 'Colorado',
   country: 'USA',
-  legalName: 'The Tailored Sanctuary LLC',
+  legalName: 'El Tailored Sanctuary LLC',
   foundedYear: 2014,
   yearsExperience: 10,
 };
 
 export const nav = [
-  { href: '/template-canina', label: 'Home', icon: 'home' },
+  { href: '/template-canina', label: 'Inicio', icon: 'home' },
   { href: '/template-canina/servicios', label: 'Servicios', icon: 'content_cut' },
   { href: '/template-canina/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-canina/blog', label: 'Blog', icon: 'article' },
@@ -41,7 +41,7 @@ export const images = {
   gallery3: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
   gallery4: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80',
   testimonialAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1548767797-d8c844163c4a?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
@@ -52,95 +52,95 @@ export const images = {
 };
 
 export const hero = {
-  badge: 'Bespoke Pet Care',
+  badge: 'Cuidado de mascotas a medida',
   title: 'Dog Grooming in Aspen',
-  titleHighlight: 'Where Your Pet is Family',
-  subtitle: 'A curated sanctuary for your dog — where organic ingredients, gentle hands, and serene surroundings create the ultimate grooming experience.',
-  ctaPrimary: 'Book Appointment',
-  ctaSecondary: 'Our Services',
+  titleHighlight: 'Donde tu mascota es familia',
+  subtitle: 'Un santuario diseñado para tu perro, donde los ingredientes orgánicos, las manos suaves y el entorno sereno crean la mejor experiencia de aseo.',
+  ctaPrimary: 'Reservar cita',
+  ctaSecondary: 'Nuestros Servicios',
 };
 
 export const services = [
   {
     icon: 'water_drop',
-    name: 'Bath and Dry',
-    desc: 'Organic shampoos, gentle hand-dry, fluffy and fragrant. A spa-like experience your dog will love.',
+    name: 'Baño y secado',
+    desc: 'Champús ecológicos, suaves, secos a mano, esponjosos y perfumados. Una experiencia de spa que le encantará a tu perro.',
     tags: ['Organic Shampoo', 'Hand Dry'],
-    price: 'From $45',
+    price: 'de 45',
   },
   {
     icon: 'content_cut',
-    name: 'Full Grooming',
-    desc: 'The ultimate atelier experience — full cut, styling, and complete hygiene in one relaxing visit.',
-    tags: ['Cut + Style', 'Full Hygiene'],
-    price: 'From $95',
+    name: 'Completo Grooming',
+    desc: 'La mejor experiencia de taller: corte completo, estilo e higiene completa en una visita relajante.',
+    tags: ['Cut + Style', 'Completo Hygiene'],
+    price: 'Desde €95',
   },
   {
     icon: 'brush',
-    name: 'Haircut and Styling',
-    desc: 'Breed-specific or custom artistic cuts tailored to showcase your dog\'s natural elegance.',
+    name: 'Corte de pelo y peinado',
+    desc: 'Cortes artísticos específicos de la raza o personalizados adaptados para mostrar la elegancia natural de tu perro.',
     tags: ['Breed-Specific', 'Custom Style'],
-    price: 'From $65',
+    price: 'de 65',
   },
   {
     icon: 'front_hand',
     name: 'Nail Trimming',
-    desc: 'Precise filing and trimming for healthy, comfortable walking. Gentle technique for nervous pups.',
+    desc: 'Limado y recorte precisos para caminar de forma saludable y cómoda. Técnica suave para cachorros nerviosos.',
     tags: ['Filing', 'Trimming'],
-    price: 'From $20',
+    price: 'Desde 20',
   },
   {
     icon: 'hearing',
     name: 'Ear Cleaning',
-    desc: 'Gentle removal of wax and debris to prevent infections and keep your dog comfortable.',
+    desc: 'Retire suavemente la cera y los residuos para prevenir infecciones y mantener a su perro cómodo.',
     tags: ['Wax Removal', 'Infection Prevention'],
-    price: 'From $15',
+    price: '$5 - $15',
   },
   {
     icon: 'dentistry',
     name: 'Dental Hygiene',
-    desc: 'Professional tooth brushing with pet-safe products for fresh breath and long-term dental health.',
-    tags: ['Pet-Safe Products', 'Fresh Breath'],
-    price: 'From $25',
+    desc: 'Cepillado dental profesional con productos seguros para mascotas para un aliento fresco y una salud dental a largo plazo.',
+    tags: ['Pet-Seguro Products', 'Fresh Breath'],
+    price: 'de 25',
   },
 ];
 
 export const philosophy = [
   {
     icon: 'spa',
-    title: 'Stress-Conscious Care',
-    desc: 'Pheromone diffusers and calming music create an environment where even the most anxious dogs relax.',
+    title: 'Atención consciente del estrés',
+    desc: 'Los difusores de feromonas y la música relajante crean un ambiente donde incluso los perros más ansiosos se relajan.',
   },
   {
     icon: 'favorite',
     title: 'Gentle Handling',
-    desc: 'Low-stress, fear-free techniques that prioritize your dog\'s emotional wellbeing throughout every session.',
+    desc: 'Técnicas de bajo estrés y sin miedo que priorizan el bienestar emocional de tu perro en cada sesión.',
   },
   {
     icon: 'verified',
-    title: 'Clinical Cleanliness',
-    desc: 'Hospital-grade sanitation protocols applied between every appointment. Always fresh, always safe.',
+    title: 'Clínico Cleanliness',
+    desc: 'Protocolos de saneamiento de grado hospitalario aplicados entre cada cita. Siempre fresco, siempre seguro.',
   },
 ];
 
 export const gallery = [
   { src: 'gallery1', alt: 'Golden retriever after grooming' },
-  { src: 'gallery2', alt: 'Corgi looking fresh at the studio' },
+  { src: 'gallery2', alt: 'Corgi se ve fresco en el estudio' },
   { src: 'gallery3', alt: 'Fluffy puppy post-bath' },
-  { src: 'gallery4', alt: 'Labrador grooming session' },
+  { src: 'gallery4', alt: 'Labrador grooming sesión' },
 ];
 
 export const testimonials = [
   {
     name: 'Sarah Jenkins',
     role: 'Owner of Cooper',
-    text: 'The Tailored Sanctuary transformed Cooper\'s grooming experience. He used to dread every appointment, but now he actually gets excited when we pull into the driveway. The care and attention here is unmatched.',
+    text: 'El Tailored Sanctuary transformó la experiencia de aseo personal de Cooper. Solía temer cada cita, pero ahora se emociona cuando llegamos a la entrada. El cuidado y la atención aquí son inigualables.',
     rating: 5,
   },
   {
     name: 'Michael Chen',
     role: 'Owner of Mochi',
-    text: 'I searched for months for a groomer who understood the specific needs of Pomeranians. The team here is incredibly knowledgeable — Mochi always comes home looking like a show dog and smelling incredible.',
+    text: 'Busqué durante meses a un peluquero que entendiera las necesidades específicas de los pomeranios. El equipo aquí está increíblemente bien informado: Mochi siempre llega a casa luciendo como un perro de exposición y oliendo increíble.',
     rating: 5,
   },
 ];
@@ -148,26 +148,26 @@ export const testimonials = [
 export const pricingTiers = [
   {
     name: 'Basic',
-    desc: 'Essential care for your dog',
+    desc: 'Cuidados esenciales para tu perro',
     price: '$45',
-    features: ['Bath and Dry', 'Nail Trimming', 'Ear Check', 'Bandana or Bow'],
-    cta: 'Book Basic',
+    features: ['Baño y secado', 'Nail Trimming', 'Ear Check', 'Bandana or Bow'],
+    cta: 'Reservar Basic',
     highlight: false,
   },
   {
     name: 'Premium',
-    desc: 'Full grooming experience',
+    desc: 'Completo grooming experience',
     price: '$95',
-    features: ['Full Grooming', 'Haircut and Styling', 'Nail Trimming', 'Ear Cleaning', 'Teeth Brushing', 'Cologne Spritz'],
-    cta: 'Book Premium',
+    features: ['Completo Grooming', 'Corte de pelo y peinado', 'Nail Trimming', 'Ear Cleaning', 'Teeth Brushing', 'Cologne Spritz'],
+    cta: 'Reservar Premium',
     highlight: true,
   },
   {
-    name: 'VIP Monthly',
-    desc: 'Unlimited monthly visits',
+    name: 'VIP Mensual',
+    desc: 'Unlimited mensual visits',
     price: '$199/mo',
-    features: ['Unlimited Basic Baths', '1 Full Grooming Monthly', 'Priority Scheduling', 'Grooming Journal', 'Loyalty Treats'],
-    cta: 'Join VIP',
+    features: ['Unlimited Basic Baths', '1 Completo Grooming Mensual', 'Priority Scheduling', 'Grooming Journal', 'Loyalty Treats'],
+    cta: 'Únete a VIP',
     highlight: false,
   },
 ];
@@ -175,42 +175,42 @@ export const pricingTiers = [
 export const groomingProcess = [
   {
     step: '01',
-    title: 'Arrival and Consultation',
-    desc: 'We greet your dog warmly and discuss any special needs, sensitivities, or preferred styles before we begin.',
+    title: 'Llegada y consulta',
+    desc: 'Saludamos a su perro calurosamente y discutimos cualquier necesidad especial, sensibilidad o estilo preferido antes de comenzar.',
   },
   {
     step: '02',
     title: 'Pre-Grooming Assessment',
-    desc: 'A thorough coat and skin check to tailor products and techniques specifically for your dog\'s unique needs.',
+    desc: 'Una revisión exhaustiva del pelaje y la piel para adaptar los productos y técnicas específicamente a las necesidades únicas de su perro.',
   },
   {
     step: '03',
-    title: 'The Sanctuary Experience',
-    desc: 'Organic bath, blow-dry, and styling in our calm, pheromone-infused studio with relaxing music playing.',
+    title: 'La experiencia del santuario',
+    desc: 'Baño orgánico, secado y peinado en nuestro estudio tranquilo con feromonas y música relajante.',
   },
   {
     step: '04',
-    title: 'Final Touches and Pickup',
-    desc: 'Finishing spritz, bow or bandana, and a full rundown of observations for your records before heading home.',
+    title: 'Toques finales y recogida',
+    desc: 'Terminar el spritz, el lazo o el pañuelo, y un resumen completo de las observaciones para sus registros antes de regresar a casa.',
   },
 ];
 
 export const serviciosPage = {
-  badge: 'Atelier Grooming Services',
-  title: 'Every Service, Crafted with Care',
-  intro: 'From a simple bath to our full bespoke grooming experience, every service at The Tailored Sanctuary is performed with organic products, gentle hands, and genuine love for your pet.',
+  badge: 'Atelier Grooming Servicios',
+  title: 'Cada servicio, elaborado con cuidado',
+  intro: 'Desde un simple baño hasta nuestra completa experiencia de aseo a medida, cada servicio en El Tailored Sanctuary se realiza con productos orgánicos, manos suaves y amor genuino por su mascota.',
 };
 
 export const about = {
   badge: 'Est. 2014 — Aspen, CO',
-  heroTitle: 'A sanctuary built on love, skill, and ten years of trust.',
-  heroSubtitle: 'The Tailored Sanctuary began as a dream — a grooming space where dogs were treated not as clients, but as guests deserving the highest care.',
+  heroTitle: 'Un santuario construido sobre el amor, la habilidad y diez años de confianza.',
+  heroSubtitle: 'El Tailored Sanctuary comenzó como un sueño: un espacio de aseo donde los perros no eran tratados como clientes, sino como huéspedes que merecían la máxima atención.',
   founder: {
     name: 'Emma Hartley',
-    role: 'Founder and Lead Groomer',
+    role: 'Fundador y peluquero principal',
     bio: [
-      'Emma spent a decade studying animal behavior and grooming technique before opening The Tailored Sanctuary in 2014. Her philosophy centers on the belief that grooming should be a stress-free, joyful experience for every dog — regardless of breed or temperament.',
-      'I opened this studio because I knew there was a better way. Every dog deserves to be handled with patience and skill. Our space is designed from the ground up to feel calm, clean, and safe.',
+      'Emma pasó una década estudiando el comportamiento animal y la técnica de aseo antes de abrir El Tailored Sanctuary en 2014. Su filosofía se centra en la creencia de que el aseo debe ser una experiencia alegre y libre de estrés para todos los perros, independientemente de su raza o temperamento.',
+      'Abrí este estudio porque sabía que había una mejor manera. Todos los perros merecen ser manejados con paciencia y habilidad. Nuestro espacio está diseñado desde cero para que te sientas tranquilo, limpio y seguro.',
     ],
     stats: [
       { value: '10+', label: 'Years of Experience' },
@@ -219,72 +219,72 @@ export const about = {
     ],
   },
   values: [
-    { num: '01', title: 'Fear-Free First', desc: 'We are certified fear-free groomers. Every technique, product, and environmental choice is made with your dog\'s emotional comfort in mind.' },
-    { num: '02', title: 'Organic Ingredients', desc: 'Only plant-based, organic shampoos and conditioners. No sulfates, no parabens — just nature\'s best for your dog\'s coat and skin.' },
-    { num: '03', title: 'Transparency Always', desc: 'We share everything we observe during grooming — skin conditions, coat health, and any concerns — so you stay fully informed.' },
+    { num: '01', title: 'Sin miedo primero', desc: 'Estamos certificados como peluqueros sin miedo. Cada técnica, producto y elección ambiental se realiza teniendo en cuenta la comodidad emocional de tu perro.' },
+    { num: '02', title: 'Organic Ingredients', desc: 'Solo champús y acondicionadores orgánicos a base de plantas. Sin sulfatos, sin parabenos, solo lo mejor de la naturaleza para el pelaje y la piel de tu perro.' },
+    { num: '03', title: 'Transparency Always', desc: 'Compartimos todo lo que observamos durante el aseo: afecciones de la piel, salud del pelaje y cualquier inquietud, para que te mantengas completamente informado.' },
   ],
   team: {
-    title: 'Our Grooming Team',
-    desc: 'Certified groomers, animal behavior specialists, and front-of-house staff who share one mission: making every dog feel safe and beautiful.',
-    badge: 'Certified Fear-Free Groomers',
+    title: 'Nuestro equipo de aseo personal',
+    desc: 'Peluqueros certificados, especialistas en comportamiento animal y personal de atención al cliente que comparten una misión: hacer que cada perro se sienta seguro y hermoso.',
+    badge: 'Peluqueros sin miedo certificados',
   },
   cta: {
     title: 'Come meet us.',
-    desc: 'Book a visit and see the sanctuary for yourself. First-time clients receive a complimentary consultation and coat assessment.',
+    desc: 'Reserva una visita y descubre el santuario por ti mismo. Los clientes primerizos reciben una consulta gratuita y una evaluación del pelaje.',
   },
 };
 
 export const contacto = {
-  badge: 'Book Your Visit',
-  title: 'Book Your Appointment',
-  subtitle: 'First appointments include a complimentary consultation and coat health assessment for your dog.',
-  formTitle: 'Request an Appointment',
-  formSubtitle: 'Tell us about your dog. Our team will confirm availability within 24 hours.',
+  badge: 'Reservar su visita',
+  title: 'Reservar su cita',
+  subtitle: 'Las primeras citas incluyen una consulta gratuita y una evaluación de la salud del pelaje de su perro.',
+  formTitle: 'Solicitar una Cita',
+  formSubtitle: 'Cuéntanos sobre tu perro. Nuestro equipo confirmará la disponibilidad en un plazo de 24 horas.',
   serviceOptions: ['Bano y Secado', 'Grooming Completo', 'Corte y Estilo', 'Unas', 'Limpieza de Oidos', 'Primera Cita'],
-  schedule: 'Tuesday to Saturday / 8:00 AM to 5:00 PM',
-  responseTime: 'Within 24 Hours',
-  note: 'First appointment includes a complimentary consultation and coat health assessment.',
+  schedule: 'Martes to Sábado / 8:00 AM to 5:00 PM',
+  responseTime: 'Within 24 Horario',
+  note: 'La primera cita incluye una consulta gratuita y una evaluación de la salud del pelaje.',
 };
 
 export const blogPosts = [
   {
     slug: 'top-dog-grooming-tips',
-    title: 'Ten Grooming Tips Every Dog Owner Should Know.',
+    title: 'Diez consejos de aseo que todo dueño de perro debe saber.',
     category: 'Cuidado',
     readTime: '8 min',
-    excerpt: 'From brushing frequency to choosing the right shampoo, these expert tips will keep your dog looking and feeling their best between salon visits.',
+    excerpt: 'Desde la frecuencia de cepillado hasta la elección del champú adecuado, estos consejos expertos harán que tu perro se vea y se sienta lo mejor posible entre las visitas al salón.',
     featured: true,
   },
   {
     slug: 'how-to-choose-a-groomer',
-    title: 'How to Choose the Right Groomer for Your Dog.',
+    title: 'Cómo elegir el peluquero adecuado para tu perro.',
     category: 'Cuidado',
     readTime: '6 min',
-    excerpt: 'Not all groomers are created equal. Here is what to look for — and what to avoid — when entrusting someone with your dog\'s care.',
+    excerpt: 'Not all groomers are created equal. Here is what to look para — y what to avoid — when entrusting someone con tu dog\\\\\\\'s cuidado.',
     featured: false,
   },
   {
     slug: 'breed-specific-care-guide',
-    title: 'Breed-Specific Grooming: A Complete Guide.',
+    title: 'Breed-Specific Grooming: A Completo Guía.',
     category: 'Razas',
     readTime: '12 min',
-    excerpt: 'Poodles, Retrievers, Shih Tzus — every breed has unique coat needs. Learn what your dog requires to thrive.',
+    excerpt: 'Poodles, Retrievers, Shih Tzus — every breed has unique coat needs. Aprender what tu dog requires to thrive.',
     featured: false,
   },
   {
     slug: 'bathing-your-dog-at-home',
-    title: 'Bathing Your Dog at Home Between Appointments.',
+    title: 'Bathing Tu Dog at Inicio Between Appointments.',
     category: 'Cuidado',
     readTime: '7 min',
-    excerpt: 'A step-by-step guide to safely and effectively bathing your dog at home without undoing your groomer\'s hard work.',
+    excerpt: 'A step-by-step guía to safely y effectively bathing tu dog at inicio without undoing tu groomer\\\\\\\'s hard work.',
     featured: false,
   },
   {
     slug: 'post-grooming-care',
-    title: 'Post-Grooming Care: Keeping That Fresh Look Longer.',
+    title: 'Post-Grooming Cuidado: Keeping That Fresh Look Longer.',
     category: 'Salud',
     readTime: '5 min',
-    excerpt: 'What to do in the 48 hours after grooming to maintain coat health, prevent tangles, and extend the life of the style.',
+    excerpt: 'What to do in el 48 horario after grooming to maintain coat health, prevent tangles, y extend el life of el style.',
     featured: false,
   },
 ];

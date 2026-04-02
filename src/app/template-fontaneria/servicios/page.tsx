@@ -2,7 +2,9 @@
 
 import { serviciosPage, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-fontaneria';
   return (
     <main className="min-h-screen bg-white">
       {/* HERO/INTRO SECTION */}
@@ -171,7 +173,7 @@ export default function ServiciosPage() {
 
                 {/* Más info link */}
                 <a
-                  href="/template-fontaneria/contacto"
+                  href={`${baseHref}/contacto`}
                   className="inline-flex items-center gap-2 text-[#e88532] font-semibold hover:gap-3 transition-all"
                   style={{ fontFamily: 'Inter' }}
                 >
@@ -232,7 +234,7 @@ export default function ServiciosPage() {
 
               {/* CTA Button */}
               <a
-                href="/template-fontaneria/contacto"
+                href={`${baseHref}/contacto`}
                 className="inline-block mt-10 px-8 py-4 bg-[#e88532] text-white font-bold rounded-lg hover:bg-[#d67420] transition-colors"
                 style={{ fontFamily: 'Inter' }}
               >

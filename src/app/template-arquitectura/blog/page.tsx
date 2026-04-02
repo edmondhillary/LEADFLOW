@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
-  const blogImages = [images.blogFeatured, images.blog1, images.blog2, images.blog3, images.blog4, images.blog5];
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-arquitectura';
+  const blogImages = [images.blogDestacado, images.blog1, images.blog2, images.blog3, images.blog4, images.blog5];
 
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
-      {/* Featured Article */}
+      {/* Artículo destacado */}
       <section className="px-6 md:px-8 max-w-[1920px] mx-auto mb-16 md:mb-24 pt-4 md:pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0" style={{ backgroundColor: '#f3f4f0' }}>
           <div className="lg:col-span-7 overflow-hidden">
@@ -110,7 +112,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="px-6 md:px-8 max-w-[1920px] mx-auto mb-16 md:mb-24">
         <div className="p-12 md:p-20 flex flex-col items-center text-center" style={{ backgroundColor: '#e5e9e4' }}>
           <h2 className="text-3xl md:text-4xl mb-4" style={{ fontFamily: "'Noto Serif', serif", color: '#2e3430' }}>El Journal del Estudio</h2>

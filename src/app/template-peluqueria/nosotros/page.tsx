@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, images, founder, philosophyValues } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-peluqueria';
   const iconMap: Record<string, string> = {
     content_cut: 'content_cut',
     favorite: 'favorite',
@@ -194,7 +196,7 @@ export default function NosotrosPage() {
               RESERVAR TURNO
             </a>
             <Link
-              href="/template-peluqueria/servicios"
+              href={`${baseHref}/servicios`}
               className="border border-[#adb3b4] text-[#2d3435] uppercase tracking-widest text-xs font-semibold px-10 py-4 hover:border-[#785a1a] hover:text-[#785a1a] transition-colors"
             >
               VER SERVICIOS

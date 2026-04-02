@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { serviciosPage, credentials, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-dentista';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f7f9fb' }}>
 
@@ -64,7 +66,7 @@ export default function ServiciosPage() {
                   ))}
                 </div>
                 <Link
-                  href="/template-dentista/contacto"
+                  href={`${baseHref}/contacto`}
                   className="inline-flex items-center gap-2 transition-opacity hover:opacity-70"
                   style={{ fontSize: '14px', fontWeight: 600, color: item.accent ? '#ffffff' : '#003e6f', textDecoration: 'none' }}
                 >
@@ -151,7 +153,7 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/template-dentista/contacto"
+                  href={`${baseHref}/contacto`}
                   className="block text-center rounded-xl py-3 transition-all hover:opacity-90"
                   style={{
                     backgroundColor: i === 2 ? '#ffffff' : 'transparent',
@@ -202,7 +204,7 @@ export default function ServiciosPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/template-dentista/contacto"
+                href={`${baseHref}/contacto`}
                 className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90"
                 style={{ backgroundColor: '#ffffff', color: '#003e6f', padding: '14px 28px', fontSize: '15px', fontWeight: 700, textDecoration: 'none' }}
               >

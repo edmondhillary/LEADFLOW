@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { services, pricingTiers, faqs, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mudanzas';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f8f9fa' }}>
 
@@ -231,7 +233,7 @@ export default function ServiciosPage() {
                 </div>
 
                 <Link
-                  href="/template-mudanzas/contacto"
+                  href={`${baseHref}/contacto`}
                   className="mt-8 text-center transition-opacity hover:opacity-90"
                   style={{
                     fontFamily: "'Manrope', sans-serif",
@@ -245,7 +247,7 @@ export default function ServiciosPage() {
                     display: 'block',
                   }}
                 >
-                  Get a Quote
+                  Pedir presupuesto
                 </Link>
               </div>
             ))}
@@ -410,7 +412,7 @@ export default function ServiciosPage() {
             or fill out the form.
           </p>
           <Link
-            href="/template-mudanzas/contacto"
+            href={`${baseHref}/contacto`}
             style={{
               fontFamily: "'Manrope', sans-serif",
               fontSize: '14px',

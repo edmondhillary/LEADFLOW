@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateAireLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateAireLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-aire';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplateAireLayout({ children }: { children: React.React
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-sm">
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-[1920px] mx-auto">
-          <Link href="/template-aire" style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.04em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.04em', textDecoration: 'none' }}>
             {business.name}
           </Link>
 
@@ -38,7 +41,7 @@ export default function TemplateAireLayout({ children }: { children: React.React
             className="hidden md:inline-flex items-center transition-all active:scale-[0.98] rounded-md"
             style={{ fontSize: '13px', fontWeight: 600, background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', padding: '10px 24px', textDecoration: 'none' }}
           >
-            Get Quote
+            Pedir presupuesto
           </a>
 
           <button
@@ -110,7 +113,7 @@ export default function TemplateAireLayout({ children }: { children: React.React
             <h4 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '11px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>Services</h4>
             <div className="flex flex-col gap-3">
               {['Installation', 'Maintenance', 'Repairs', 'Unit Replacement'].map(s => (
-                <Link key={s} href="/template-aire/servicios" style={{ fontSize: '13px', color: '#414754', textDecoration: 'none' }}>{s}</Link>
+                <Link key={s} href={`${baseHref}/servicios`} style={{ fontSize: '13px', color: '#414754', textDecoration: 'none' }}>{s}</Link>
               ))}
             </div>
           </div>
@@ -137,7 +140,7 @@ export default function TemplateAireLayout({ children }: { children: React.React
           className="mt-16 px-6 md:px-8 max-w-[1920px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 pt-8"
           style={{ borderTop: '1px solid rgba(193,198,215,0.4)' }}
         >
-          <p style={{ fontSize: '11px', color: '#717786' }}>&copy; {new Date().getFullYear()} {business.legalName}. All rights reserved.{' '}
+          <p style={{ fontSize: '11px', color: '#717786' }}>&copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
@@ -151,7 +154,7 @@ export default function TemplateAireLayout({ children }: { children: React.React
         href={`https://wa.me/${business.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contact via WhatsApp"
+        aria-label="Contactar por WhatsApp"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105"
         style={{ backgroundColor: '#25d366' }}
       >

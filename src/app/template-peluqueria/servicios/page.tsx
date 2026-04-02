@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, images, servicesCorte, processSteps } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-peluqueria';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -170,7 +172,7 @@ export default function ServiciosPage() {
                 Nuestros servicios de color van más allá del cambio de tonalidad. Son rituales de transformación formulados con pigmentos de alta concentración y técnicas que respetan la integridad de la fibra capilar.
               </p>
               <Link
-                href="/template-peluqueria/color"
+                href={`${baseHref}/color`}
                 className="inline-block bg-[#2d3435] text-white uppercase tracking-widest text-xs font-semibold px-10 py-4 hover:bg-[#5f5e5e] transition-colors duration-200"
               >
                 VER SERVICIOS DE COLOR

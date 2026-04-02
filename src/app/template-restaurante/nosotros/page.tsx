@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, founder, trust, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-restaurante';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -188,13 +190,13 @@ export default function NosotrosPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/template-restaurante/contacto"
+              href={`${baseHref}/contacto`}
               className="bg-[#3C0610] text-white uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#2d0409] transition-colors"
             >
               RESERVAR MESA
             </Link>
             <Link
-              href="/template-restaurante/servicios"
+              href={`${baseHref}/servicios`}
               className="border border-[#FED65B] text-[#735C00] uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#FED65B] hover:text-[#745C00] transition-colors"
             >
               VER CARTA

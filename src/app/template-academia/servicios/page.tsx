@@ -22,7 +22,9 @@ const levelTextColors: Record<string, string> = {
   Avanzado: '#370d00',
 };
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-academia';
   const featuredCourse = courses[0];
 
   return (
@@ -79,7 +81,7 @@ export default function ServiciosPage() {
                       <p style={{ fontSize: '11px', color: '#454652', marginBottom: '2px' }}>{course.duration}</p>
                       <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '22px', fontWeight: 800, color: '#001944' }}>{course.price}</p>
                     </div>
-                    <Link href="/template-academia/contacto" className="rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '12px 20px', textDecoration: 'none' }}>
+                    <Link href={`${baseHref}/contacto`} className="rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '13px', fontWeight: 600, padding: '12px 20px', textDecoration: 'none' }}>
                       Inscribirse
                     </Link>
                   </div>
@@ -164,7 +166,7 @@ export default function ServiciosPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/template-academia/contacto" className="block w-full text-center rounded-xl py-3.5 transition-all hover:opacity-90" style={{ background: plan.highlighted ? 'linear-gradient(to right, #2a6b2c, #307231)' : 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '14px', fontWeight: 700, textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+                <Link href={`${baseHref}/contacto`} className="block w-full text-center rounded-xl py-3.5 transition-all hover:opacity-90" style={{ background: plan.highlighted ? 'linear-gradient(to right, #2a6b2c, #307231)' : 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '14px', fontWeight: 700, textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
                   {plan.cta}
                 </Link>
               </div>
@@ -182,7 +184,7 @@ export default function ServiciosPage() {
             </h2>
             <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.8)', marginTop: '8px' }}>Sin compromiso. Sin tarjeta de credito.</p>
           </div>
-          <Link href="/template-academia/contacto" className="flex-shrink-0 rounded-xl transition-all hover:bg-[#f3f4f5]" style={{ backgroundColor: '#ffffff', color: '#001944', fontSize: '15px', fontWeight: 700, padding: '16px 36px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+          <Link href={`${baseHref}/contacto`} className="flex-shrink-0 rounded-xl transition-all hover:bg-[#f3f4f5]" style={{ backgroundColor: '#ffffff', color: '#001944', fontSize: '15px', fontWeight: 700, padding: '16px 36px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
             Empezar gratis
           </Link>
         </div>

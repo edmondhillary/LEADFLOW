@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-arquitectura';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* Hero */}
@@ -103,7 +105,7 @@ export default function NosotrosPage() {
             <span key={i}>{part}{i === 0 && <span style={{ fontStyle: 'italic' }}>diálogo</span>}</span>
           ))}
         </h2>
-        <Link href="/template-arquitectura/contacto" className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
+        <Link href={`${baseHref}/contacto`} className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
           Consultar Sobre Tu Proyecto
         </Link>
       </section>

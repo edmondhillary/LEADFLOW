@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { serviciosPage, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-arquitectura';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* Hero */}
@@ -111,7 +113,7 @@ export default function ServiciosPage() {
                 <span style={{ fontFamily: "'Noto Serif', serif", fontStyle: 'italic', fontSize: '20px', display: 'block', marginBottom: '8px' }}>{serviciosPage.items[5].num}</span>
                 <h3 className="text-2xl md:text-3xl mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{serviciosPage.items[5].name}</h3>
                 <p className="max-w-md text-sm mb-4" style={{ opacity: 0.9 }}>{serviciosPage.items[5].desc}</p>
-                <Link href="/template-arquitectura/contacto" className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#faf7f6', color: '#2e3430', padding: '12px 32px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+                <Link href={`${baseHref}/contacto`} className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#faf7f6', color: '#2e3430', padding: '12px 32px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
                   Consultar
                 </Link>
               </div>
@@ -125,7 +127,7 @@ export default function ServiciosPage() {
         <h2 className="text-3xl md:text-5xl mb-8" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 700, color: '#2e3430', letterSpacing: '-0.02em' }}>
           Tu visión, <br /><span style={{ fontStyle: 'italic' }}>materializada</span>.
         </h2>
-        <Link href="/template-arquitectura/contacto" className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
+        <Link href={`${baseHref}/contacto`} className="inline-block transition-all active:scale-[0.98]" style={{ backgroundColor: '#5f5e5e', color: '#faf7f6', padding: '18px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none' }}>
           Agendar Consulta
         </Link>
       </section>

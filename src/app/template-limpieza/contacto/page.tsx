@@ -12,7 +12,9 @@ type FormState = {
   mensaje: string;
 };
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-limpieza';
   const [form, setForm] = useState<FormState>({
     nombre: '',
     email: '',
@@ -72,10 +74,10 @@ export default function ContactoPage() {
             <div className="flex flex-col gap-6">
               {/* Info cards */}
               {[
-                { icon: 'phone', label: 'Phone', value: business.phone, href: `tel:${business.phoneIntl}` },
+                { icon: 'phone', label: 'Teléfono', value: business.phone, href: `tel:${business.phoneIntl}` },
                 { icon: 'mail', label: 'Email', value: business.email, href: `mailto:${business.email}` },
-                { icon: 'schedule', label: 'Hours', value: contacto.schedule, href: undefined },
-                { icon: 'location_on', label: 'Address', value: business.address, href: undefined },
+                { icon: 'schedule', label: 'Horario', value: contacto.schedule, href: undefined },
+                { icon: 'location_on', label: 'Dirección', value: business.address, href: undefined },
               ].map(item => (
                 <div key={item.label} className="bg-white rounded-xl p-5 flex items-center gap-4" style={{ boxShadow: '0 10px 40px -10px rgba(25,28,29,0.06)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#edeeef' }}>
@@ -159,7 +161,7 @@ export default function ContactoPage() {
                     </div>
 
                     <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#414754', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>Phone Number</label>
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#414754', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>Teléfono</label>
                       <input
                         type="tel"
                         name="telefono"

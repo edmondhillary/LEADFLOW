@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function ElectricistaLayout({ children }: { children: React.ReactNode }) {
+export default function ElectricistaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-electricista';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -25,7 +28,7 @@ export default function ElectricistaLayout({ children }: { children: React.React
         <nav className="flex justify-between items-center px-6 py-4 max-w-screen-2xl mx-auto">
           {/* Logo */}
           <Link
-            href="/template-electricista"
+            href={`${baseHref}`}
             className="text-2xl font-black tracking-tighter text-zinc-900 uppercase"
           >
             {business.name}
@@ -174,21 +177,21 @@ export default function ElectricistaLayout({ children }: { children: React.React
       {/* ─── MOBILE BOTTOM NAV ─── */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 bg-zinc-900 border-t border-zinc-800 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-40 rounded-t-lg">
         <Link
-          href="/template-electricista"
+          href={`${baseHref}`}
           className="flex flex-col items-center justify-center text-yellow-400 bg-zinc-800 px-3 py-1 active:scale-110 transition-transform duration-200"
         >
           <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
           <span className="text-[10px] font-bold uppercase tracking-widest">Home</span>
         </Link>
         <Link
-          href="/template-electricista/servicios"
+          href={`${baseHref}/servicios`}
           className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
         >
           <span className="material-symbols-outlined text-xl">electrical_services</span>
           <span className="text-[10px] font-bold uppercase tracking-widest">Servicios</span>
         </Link>
         <Link
-          href="/template-electricista/contacto"
+          href={`${baseHref}/contacto`}
           className="flex flex-col items-center justify-center text-zinc-400 active:scale-110 transition-transform duration-200"
         >
           <span className="material-symbols-outlined text-xl">request_quote</span>

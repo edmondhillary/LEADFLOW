@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { contacto, business, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-restaurante';
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -204,7 +206,7 @@ export default function ContactoPage() {
 
             {/* Right — Info (5 cols) */}
             <div className="md:col-span-5 flex flex-col gap-10">
-              {/* Address */}
+              {/* Dirección */}
               <div>
                 <p className="text-xs tracking-[0.3em] uppercase text-[#735C00] mb-3">Direccion</p>
                 <p
@@ -216,7 +218,7 @@ export default function ContactoPage() {
                 </p>
               </div>
 
-              {/* Hours table */}
+              {/* Horario table */}
               <div>
                 <p className="text-xs tracking-[0.3em] uppercase text-[#735C00] mb-4">Horario</p>
                 <div className="flex flex-col gap-0">
@@ -236,7 +238,7 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Phone */}
+              {/* Teléfono */}
               <div>
                 <p className="text-xs tracking-[0.3em] uppercase text-[#735C00] mb-3">Telefono</p>
                 <a

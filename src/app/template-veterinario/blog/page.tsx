@@ -11,7 +11,9 @@ const blogImages: Record<string, string> = {
 
 const categories = ['All Topics', 'Puppy Care', 'Senior Pets', 'Health Tips', 'Behavior'];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-veterinario';
   const featured = blogPosts[0];
   const rest = blogPosts.slice(1);
 
@@ -82,7 +84,7 @@ export default function BlogPage() {
                 href={`/template-veterinario/blog/${blogPosts[0].slug}`}
                 className="text-[#166875] font-bold text-sm flex items-center gap-1 group"
               >
-                Read Article
+                Leer artículo
                 <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </Link>
             </div>
@@ -122,7 +124,7 @@ export default function BlogPage() {
 
           {/* Article grid — bento */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Featured large card */}
+            {/* Destacado large card */}
             <div className="md:col-span-2 group">
               <div
                 className="bg-white rounded-2xl overflow-hidden h-full flex flex-col md:flex-row shadow-sm hover:shadow-md transition-shadow"
@@ -230,12 +232,12 @@ export default function BlogPage() {
                   className="text-[#166875] font-bold text-sm underline underline-offset-4 decoration-[#166875]/20 hover:decoration-[#166875] transition-all"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
-                  Read More
+                  Leer más
                 </Link>
               </div>
             </div>
 
-            {/* Featured CTA card — spans 2 cols */}
+            {/* Destacado CTA card — spans 2 cols */}
             <div className="md:col-span-2 bg-[#166875] text-[#edfcff] rounded-2xl p-10 relative overflow-hidden flex flex-col justify-center">
               <div className="absolute right-0 top-0 w-64 h-64 bg-[#005c68] rounded-full blur-3xl opacity-50 -mr-20 -mt-20 pointer-events-none" />
               <div className="relative z-10 max-w-lg">
@@ -250,18 +252,18 @@ export default function BlogPage() {
                 </p>
                 <div className="flex gap-4">
                   <Link
-                    href="/template-veterinario/contacto"
+                    href={`${baseHref}/contacto`}
                     className="px-8 py-3 rounded-full bg-[#edfcff] text-[#166875] font-bold hover:bg-[#a4ebf9] transition-colors"
                     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
-                    Book Now
+                    Reservar ahora
                   </Link>
                   <Link
-                    href="/template-veterinario/servicios"
+                    href={`${baseHref}/servicios`}
                     className="px-8 py-3 rounded-full border border-[#edfcff]/30 text-[#edfcff] font-bold hover:bg-[#edfcff]/10 transition-colors"
                     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
-                    View Services
+                    Ver servicios
                   </Link>
                 </div>
               </div>
@@ -296,7 +298,7 @@ export default function BlogPage() {
             className="px-10 py-4 rounded-full bg-[#166875] text-[#edfcff] font-bold shadow-lg hover:bg-[#005c68] transition-all whitespace-nowrap"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            Subscribe
+            Suscribirme
           </button>
         </form>
         <p className="mt-4 text-xs text-[#827971]">We respect your privacy. No spam, just pure clinical empathy.</p>

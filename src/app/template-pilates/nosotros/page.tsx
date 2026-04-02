@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, about, instructors, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pilates';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
 
@@ -10,7 +12,7 @@ export default function NosotrosPage() {
         <div className="absolute inset-0 z-0">
           <img
             src={images.nosotrosHero}
-            alt="Kinetic Gallery Studio"
+            alt="Kinetic Gallery Estudio"
             className="w-full h-full object-cover"
           />
           <div
@@ -62,7 +64,7 @@ export default function NosotrosPage() {
           </div>
           <div className="md:col-span-7 grid grid-cols-2 gap-3">
             <div style={{ aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px' }}>
-              <img src={images.studioMain} alt="Studio interior" className="w-full h-full object-cover" />
+              <img src={images.studioMain} alt="Estudio interior" className="w-full h-full object-cover" />
             </div>
             <div className="mt-12" style={{ aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px' }}>
               <img src={images.instructorHands} alt="Instructor detail" className="w-full h-full object-cover" />
@@ -169,7 +171,7 @@ export default function NosotrosPage() {
             <div className="md:col-span-7 grid grid-cols-2 gap-3">
               {[images.studioLobby, images.reformer, images.matClass, images.studioDetails].map((img, i) => (
                 <div key={i} style={{ aspectRatio: '4/3', overflow: 'hidden', borderRadius: '8px' }}>
-                  <img src={img} alt={`Studio ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                  <img src={img} alt={`Estudio ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
                 </div>
               ))}
             </div>
@@ -219,7 +221,7 @@ export default function NosotrosPage() {
             Meet {instructors[0].name} or {instructors[1].name}. Try your first class for $25. See what intentional movement can do.
           </p>
           <Link
-            href="/template-pilates/contacto"
+            href={`${baseHref}/contacto`}
             className="inline-block transition-all active:scale-[0.98]"
             style={{ backgroundColor: '#ebfced', color: '#536257', padding: '18px 48px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
           >

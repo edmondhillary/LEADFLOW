@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { business, contacto, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-canina';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -68,7 +70,7 @@ export default function ContactoPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#3f5749' }}>location_on</span>
                 </div>
                 <div>
-                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Address</p>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Dirección</p>
                   <p style={{ fontSize: '14px', color: '#5c605a', lineHeight: 1.65 }}>{business.address}</p>
                 </div>
               </div>
@@ -77,7 +79,7 @@ export default function ContactoPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#3f5749' }}>schedule</span>
                 </div>
                 <div>
-                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Hours</p>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Horario</p>
                   <p style={{ fontSize: '14px', color: '#5c605a' }}>{contacto.schedule}</p>
                 </div>
               </div>
@@ -86,7 +88,7 @@ export default function ContactoPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#3f5749' }}>call</span>
                 </div>
                 <div>
-                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Phone</p>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#2f342e', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>Teléfono</p>
                   <a href={`tel:${business.phoneIntl}`} style={{ fontSize: '14px', color: '#4c6456', textDecoration: 'none', fontWeight: 600 }}>{business.phone}</a>
                 </div>
               </div>
@@ -147,7 +149,7 @@ export default function ContactoPage() {
                       <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Jane Smith" style={inputStyle} />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#5c605a', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Phone</label>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#5c605a', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Teléfono</label>
                       <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 970 000 0000" style={inputStyle} />
                     </div>
                   </div>

@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { nosotros, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-limpieza';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -35,7 +37,7 @@ export default function NosotrosPage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
-              <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Our Story</p>
+              <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Nuestra historia</p>
               <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(2rem, 3vw, 2.8rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#191c1d', marginBottom: '24px', lineHeight: 1.1 }}>
                 {business.yearsExperience} Years of<br />Clinical-Grade Excellence
               </h2>
@@ -94,7 +96,7 @@ export default function NosotrosPage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
-              <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Our People</p>
+              <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Nuestro equipo</p>
               <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(2rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#191c1d', marginBottom: '20px', lineHeight: 1.1 }}>
                 {nosotros.team.title}
               </h2>
@@ -147,7 +149,7 @@ export default function NosotrosPage() {
           <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', marginBottom: '32px', maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
             {nosotros.cta.desc}
           </p>
-          <Link href="/template-limpieza/contacto" className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '14px 32px', textDecoration: 'none' }}>
+          <Link href={`${baseHref}/contacto`} className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '14px 32px', textDecoration: 'none' }}>
             Request Your Free Quote
           </Link>
         </div>

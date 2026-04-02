@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { blogPosts, images, business } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mecanico';
   const featured = blogPosts.find(p => 'featured' in p ? (p as { featured?: boolean }).featured : false) ?? blogPosts[0];
   const rest = blogPosts.filter(p => p !== featured);
 

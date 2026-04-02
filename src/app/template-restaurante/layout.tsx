@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function RestauranteLayout({ children }: { children: React.ReactNode }) {
+export default function RestauranteLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-restaurante';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -25,7 +28,7 @@ export default function RestauranteLayout({ children }: { children: React.ReactN
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link
-            href="/template-restaurante"
+            href={`${baseHref}`}
             className="tracking-[0.2em] uppercase text-2xl font-bold text-[#1A1A1A]"
             style={{ fontFamily: "'Noto Serif', serif" }}
           >
@@ -49,7 +52,7 @@ export default function RestauranteLayout({ children }: { children: React.ReactN
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
             <Link
-              href="/template-restaurante/contacto"
+              href={`${baseHref}/contacto`}
               className="bg-[#FED65B] text-[#745C00] uppercase tracking-[0.1em] text-sm font-bold px-6 py-3 hover:bg-[#f5cb4a] transition-colors duration-200"
             >
               RESERVAR
@@ -100,7 +103,7 @@ export default function RestauranteLayout({ children }: { children: React.ReactN
         </nav>
         <div className="mt-8">
           <Link
-            href="/template-restaurante/contacto"
+            href={`${baseHref}/contacto`}
             onClick={() => setMenuOpen(false)}
             className="block w-full text-center bg-[#FED65B] text-[#745C00] uppercase tracking-[0.1em] text-sm font-bold px-6 py-3 hover:bg-[#f5cb4a] transition-colors"
           >

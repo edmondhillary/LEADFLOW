@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { nosotrosPage, trustStats, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-dentista';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f7f9fb' }}>
 
@@ -184,7 +186,7 @@ export default function NosotrosPage() {
               {nosotrosPage.cta.desc}
             </p>
             <Link
-              href="/template-dentista/contacto"
+              href={`${baseHref}/contacto`}
               className="inline-flex items-center gap-2 rounded-xl transition-all hover:opacity-90"
               style={{ backgroundColor: '#ffffff', color: '#003e6f', padding: '14px 32px', fontSize: '15px', fontWeight: 700, textDecoration: 'none' }}
             >

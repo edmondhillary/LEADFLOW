@@ -3,7 +3,9 @@ import { blogPosts, images } from '../data';
 
 const categories = ['Todos los Temas', 'Seguridad Clinica', 'Armonia Facial', 'Inyectables', 'Prevencion'];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-estetica';
   const featured = blogPosts.find((p) => p.featured);
   const rest = blogPosts.filter((p) => !p.featured);
 
@@ -42,7 +44,7 @@ export default function BlogPage() {
               {/* Image — 3/5 */}
               <div className="w-full md:w-3/5 relative overflow-hidden h-64 md:h-auto min-h-[320px]">
                 <img
-                  src={images.blogFeatured}
+                  src={images.blogDestacado}
                   alt={featured.title}
                   className="w-full h-full object-cover"
                 />
@@ -253,13 +255,13 @@ export default function BlogPage() {
             </div>
             <div className="flex flex-wrap gap-4 shrink-0">
               <Link
-                href="/template-estetica/contacto"
+                href={`${baseHref}/contacto`}
                 className="bg-[#6c5c4a] text-[#fff6f0] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#5f503f] transition-colors duration-200"
               >
                 RESERVAR CONSULTA
               </Link>
               <Link
-                href="/template-estetica/servicios"
+                href={`${baseHref}/servicios`}
                 className="border border-[#6c5c4a] text-[#6c5c4a] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#6c5c4a] hover:text-[#fff6f0] transition-colors duration-200"
               >
                 VER TRATAMIENTOS

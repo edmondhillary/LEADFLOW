@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, images, founder, testimonials } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-estetica';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -154,7 +156,7 @@ export default function NosotrosPage() {
                   Dedicamos el tiempo necesario para entender tus objetivos y disenamos un protocolo exclusivo para tu anatomia.
                 </p>
               </div>
-              <Link href="/template-estetica/contacto" className="text-[#6c5c4a] text-xs tracking-widest uppercase hover:text-[#5f503f] transition-colors">
+              <Link href={`${baseHref}/contacto`} className="text-[#6c5c4a] text-xs tracking-widest uppercase hover:text-[#5f503f] transition-colors">
                 Reservar &rarr;
               </Link>
             </div>
@@ -297,13 +299,13 @@ export default function NosotrosPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/template-estetica/contacto"
+              href={`${baseHref}/contacto`}
               className="bg-[#fff6f0] text-[#6c5c4a] tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors duration-200"
             >
               RESERVAR CONSULTA
             </Link>
             <Link
-              href="/template-estetica/servicios"
+              href={`${baseHref}/servicios`}
               className="border border-[#fff6f0]/40 text-[#fff6f0] tracking-widest uppercase text-sm px-8 py-4 hover:border-[#fff6f0] transition-colors duration-200"
             >
               VER TRATAMIENTOS

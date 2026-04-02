@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, about, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-barberia';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#131313', color: '#e5e2e1' }}>
 
@@ -45,7 +47,7 @@ export default function NosotrosPage() {
       {/* MASTER BARBERS */}
       <section className="py-32 px-6 md:px-8" style={{ backgroundColor: '#0e0e0e' }}>
         <div className="max-w-[1920px] mx-auto">
-          <p style={{ fontSize: '10px', fontWeight: 600, color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '16px' }}>The Team</p>
+          <p style={{ fontSize: '10px', fontWeight: 600, color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '16px' }}>El equipo</p>
           <h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 700, color: '#e5e2e1', marginBottom: '64px', lineHeight: 1.1 }}>
             Master Barbers.<br />
             <em style={{ fontStyle: 'italic', color: '#9a8f80' }}>Dedicated Craft.</em>
@@ -115,7 +117,7 @@ export default function NosotrosPage() {
             {about.cta?.desc ?? 'Reserve your session and meet the team.'}
           </p>
           <Link
-            href="/template-barberia/contacto"
+            href={`${baseHref}/contacto`}
             style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '11px', fontWeight: 700, padding: '16px 48px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
           >
             Book Your Appointment

@@ -25,7 +25,7 @@ export const business = {
 };
 
 export const nav = [
-  { href: '/template-academia', label: 'Home', icon: 'home' },
+  { href: '/template-academia', label: 'Inicio', icon: 'home' },
   { href: '/template-academia/servicios', label: 'Servicios', icon: 'school' },
   { href: '/template-academia/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-academia/blog', label: 'Blog', icon: 'article' },
@@ -41,7 +41,7 @@ export const images = {
   studentAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80',
   testimonialAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80',
   nosotrosHero: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
@@ -53,12 +53,12 @@ export const images = {
 
 export const hero = {
   badge: 'Plataforma Academica N.1 en Espana',
-  title: 'Empower Your Future with Industry-Lead Skills',
+  title: 'Empodere su futuro con habilidades líderes en la industria',
   titleHighlight: 'Industry-Lead Skills',
   subtitle: 'Aprende con los mejores expertos del sector. Cursos intensivos, mentoria personalizada y una comunidad de mas de 50.000 profesionales que ya han transformado sus carreras.',
-  ctaPrimary: 'Start Learning Journey',
-  ctaSecondary: 'View Curriculum',
-  liveCard: 'Live Now',
+  ctaPrimary: 'Empezar a aprender',
+  ctaSecondary: 'Ver plan de estudio',
+  liveCard: 'Live Ahora',
   liveCardSub: 'UX/UI Mastery Masterclass',
 };
 
@@ -97,7 +97,7 @@ export const courses = [
     slug: 'digital-marketing-strategy',
     title: 'Digital Marketing Strategy',
     category: 'Marketing',
-    desc: 'Estrategia de marketing digital 360. SEO, SEM, redes sociales, email marketing y analisis de datos para construir marcas que conectan y convierten.',
+    desc: 'Estrategia de marketing digital 360. SEO, SEM, redes sociales, correo marketing y analisis de datos para construir marcas que conectan y convierten.',
     level: 'Basico',
     duration: '8 semanas',
     price: '299€',
@@ -108,7 +108,7 @@ export const courses = [
     slug: 'data-science',
     title: 'Data Science',
     category: 'Datos',
-    desc: 'Python, machine learning, visualizacion de datos y estadistica aplicada. Transforma datos en decisiones con herramientas del sector como Pandas, Scikit-learn y Tableau.',
+    desc: 'Python, machine learning, visualizacion de datos y estadistica aplicada. Transforma datos en decisiones con herramientas del sector como Pandas, Scikit-aprender y Tableau.',
     level: 'Intermedio',
     duration: '20 semanas',
     price: '799€',
@@ -228,7 +228,7 @@ export const blogPosts = [
     title: 'Como aprender programacion desde cero en 2026.',
     category: 'Programacion',
     readTime: '10 min',
-    excerpt: 'La ruta de aprendizaje mas eficiente para convertirte en desarrollador full-stack partiendo desde cero. Lenguajes, recursos y la mentalidad correcta.',
+    excerpt: 'La ruta de aprendizaje mas eficiente para convertirte en desarrollador completo-stack partiendo desde cero. Lenguajes, recursos y la mentalidad correcta.',
     featured: true,
   },
   {
@@ -252,7 +252,7 @@ export const blogPosts = [
     title: 'Introduccion a Data Science con Python: por donde empezar.',
     category: 'Data Science',
     readTime: '15 min',
-    excerpt: 'Pandas, NumPy, Matplotlib y Scikit-learn. Un recorrido practico por las herramientas esenciales que todo data scientist debe conocer.',
+    excerpt: 'Pandas, NumPy, Matplotlib y Scikit-aprender. Un recorrido practico por las herramientas esenciales que todo data scientist debe conocer.',
     featured: false,
   },
   {

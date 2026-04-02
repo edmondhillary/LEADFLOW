@@ -4,7 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { about, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-fontaneria';
   return (
     <div className="min-h-screen bg-white">
       {/* 1. HERO SECTION */}
@@ -190,7 +192,7 @@ export default function NosotrosPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* Primary button */}
             <Link
-              href="/template-fontaneria/contacto"
+              href={`${baseHref}/contacto`}
               className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-[#e88532] text-white font-semibold hover:bg-[#d67320] transition-colors duration-300"
             >
               Solicitar servicio
@@ -198,7 +200,7 @@ export default function NosotrosPage() {
 
             {/* Secondary button */}
             <Link
-              href="/template-fontaneria"
+              href={`${baseHref}`}
               className="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-[#0061a5] text-[#0061a5] font-semibold hover:bg-[#0061a5]/5 transition-colors duration-300"
             >
               Volver al inicio

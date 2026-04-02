@@ -35,7 +35,7 @@ export const images = {
   // Copper wiring macro
   copperWiring: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
   // Blog featured — electrician with safety gear inspecting panel
-  blogFeatured: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80',
   // Contact map — aerial city
   contactMap: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80',
   // Technical documentation / certification
@@ -138,7 +138,7 @@ export const stats = [
 export const precisionProtocol = [
   {
     num: '01',
-    title: 'Metodología Safety-First',
+    title: 'Metodología Safety-Primero',
     desc: 'Nuestros técnicos aplican un protocolo de seguridad estricto que supera los requisitos normativos. Cada proyecto comienza con una evaluación de riesgos y concluye con un test de estrés de los sistemas instalados.',
   },
   {

@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pilates';
   const categories = ['All', 'Method', 'Beginners', 'Breathwork', 'Wellness', 'Anatomy'];
   const featuredPost = blogPosts.find(p => p.featured);
   const gridPosts = blogPosts.filter(p => !p.featured).slice(0, 4);
@@ -85,7 +87,7 @@ export default function BlogPage() {
                 <span
                   style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#ebfced', backgroundColor: '#536257', padding: '4px 12px', borderRadius: '9999px' }}
                 >
-                  Featured
+                  Destacado
                 </span>
                 <span style={{ fontSize: '11px', color: '#5c605c', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{featuredPost.category}</span>
               </div>
@@ -106,7 +108,7 @@ export default function BlogPage() {
                   href={`/template-pilates/blog/${featuredPost.slug}`}
                   style={{ fontSize: '12px', fontWeight: 600, color: '#536257', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.15em', borderBottom: '1px solid #536257', paddingBottom: '2px' }}
                 >
-                  Read Article
+                  Leer artículo
                 </Link>
               </div>
             </div>
@@ -158,7 +160,7 @@ export default function BlogPage() {
                     href={`/template-pilates/blog/${post.slug}`}
                     style={{ fontSize: '11px', fontWeight: 600, color: '#536257', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid #d6e7d8', paddingBottom: '2px', alignSelf: 'flex-start' }}
                   >
-                    Read More
+                    Leer más
                   </Link>
                 </div>
               </article>
@@ -205,7 +207,7 @@ export default function BlogPage() {
                 whiteSpace: 'nowrap',
               }}
             >
-              Subscribe
+              Suscribirme
             </button>
           </div>
           <p className="mt-4" style={{ fontSize: '11px', color: '#afb3ae' }}>

@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { contacto, business, images, testimonials } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-estetica';
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -59,7 +61,7 @@ export default function ContactoPage() {
 
             {/* Left info — col 5 */}
             <div className="md:col-span-5 flex flex-col gap-10">
-              {/* Address */}
+              {/* Dirección */}
               <div className="flex flex-col gap-3">
                 <span className="text-xs tracking-widest uppercase text-[#6c5c4a] border-b border-[#b1b3ab]/30 pb-3 mb-1">Ubicacion</span>
                 <div className="flex gap-3">
@@ -71,7 +73,7 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Phone */}
+              {/* Teléfono */}
               <div className="flex flex-col gap-3">
                 <span className="text-xs tracking-widest uppercase text-[#6c5c4a] border-b border-[#b1b3ab]/30 pb-3 mb-1">Telefono</span>
                 <a
@@ -103,7 +105,7 @@ export default function ContactoPage() {
                 </a>
               </div>
 
-              {/* Hours */}
+              {/* Horario */}
               <div className="flex flex-col gap-3">
                 <span className="text-xs tracking-widest uppercase text-[#6c5c4a] border-b border-[#b1b3ab]/30 pb-3 mb-1">Horario</span>
                 <div className="flex gap-3">

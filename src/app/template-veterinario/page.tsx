@@ -89,7 +89,7 @@ export default function VeterinarioHome(props: any = {}) {
                 className="text-[#166875] font-bold tracking-widest uppercase text-sm mb-4 block"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                Our Expertise
+                Nuestra experiencia
               </span>
               <h2
                 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#38312b]"
@@ -129,7 +129,7 @@ export default function VeterinarioHome(props: any = {}) {
               </div>
             ))}
 
-            {/* Featured Surgery card — spans 2 cols */}
+            {/* Destacado Surgery card — spans 2 cols */}
             <div
               className="bg-[#166875] p-8 rounded-2xl md:col-span-2 flex flex-col lg:flex-row gap-8 items-center text-[#edfcff]"
               style={{ boxShadow: '0 40px 60px -15px rgba(56,49,43,0.06)' }}
@@ -273,7 +273,7 @@ export default function VeterinarioHome(props: any = {}) {
               className="text-[#166875] font-bold tracking-widest uppercase text-sm mb-4 block"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              Owner Stories
+              Historias de clientes
             </span>
             <h2
               className="text-4xl font-bold tracking-tight text-[#38312b]"
@@ -351,7 +351,7 @@ export default function VeterinarioHome(props: any = {}) {
               className="px-10 py-5 border border-[#edfcff]/20 text-[#edfcff] rounded-full font-bold text-xl hover:bg-[#edfcff]/10 transition-all active:scale-95"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              Meet Our Team
+              Meet Nuestro equipo
             </Link>
           </div>
         </div>

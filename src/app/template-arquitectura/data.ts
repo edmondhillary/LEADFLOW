@@ -6,7 +6,7 @@
  */
 
 export const business = {
-  name: 'ARCHI STUDIO',
+  name: 'ARCHI ESTUDIO',
   tagline: 'Arquitectura de Autor',
   phone: '900 000 000',
   phoneIntl: '+34900000000',
@@ -16,13 +16,13 @@ export const business = {
   postalCode: '28001',
   city: 'Madrid',
   country: 'España',
-  legalName: 'ARCHI STUDIO S.L.',
+  legalName: 'ARCHI ESTUDIO S.L.',
   foundedYear: 2008,
   yearsExperience: 18,
 };
 
 export const nav = [
-  { href: '/template-arquitectura', label: 'Home', icon: 'home' },
+  { href: '/template-arquitectura', label: 'Inicio', icon: 'home' },
   { href: '/template-arquitectura/servicios', label: 'Servicios', icon: 'architecture' },
   { href: '/template-arquitectura/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-arquitectura/blog', label: 'Blog', icon: 'article' },
@@ -45,7 +45,7 @@ export const images = {
   aboutHero: 'https://images.unsplash.com/photo-1460574283810-2aab119d8511?auto=format&fit=crop&w=1600&q=80',
   aboutFounder: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
   aboutTeam: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=800&q=80',
@@ -106,13 +106,13 @@ export const trust = [
 
 export const testimonials = [
   { name: 'María González', role: 'Propietaria Residencial', text: 'El estudio no solo diseñó una casa; curó una forma de existir. Cada mañana la luz llega exactamente donde la necesitamos. Es como vivir dentro de una escultura.', rating: 5 },
-  { name: 'Roberto Martínez', role: 'Fundador, Martínez Arts', text: 'ARCHI STUDIO aborda los materiales con una reverencia que rara vez he visto. Su dominio del hormigón y la madera natural creó un hogar cálido y atmosférico que se siente eterno.', rating: 5 },
+  { name: 'Roberto Martínez', role: 'Fundador, Martínez Arts', text: 'ARCHI ESTUDIO aborda los materiales con una reverencia que rara vez he visto. Su dominio del hormigón y la madera natural creó un hogar cálido y atmosférico que se siente eterno.', rating: 5 },
 ];
 
 export const about = {
   badge: 'Est. 2008 — Madrid',
   heroTitle: 'Construyendo un legado de excelencia en diseño.',
-  heroSubtitle: 'ARCHI STUDIO se fundó sobre el principio de que la arquitectura es la coreografía silenciosa de la vida. Creamos espacios que no solo permanecen, sino que hablan.',
+  heroSubtitle: 'ARCHI ESTUDIO se fundó sobre el principio de que la arquitectura es la coreografía silenciosa de la vida. Creamos espacios que no solo permanecen, sino que hablan.',
   founder: {
     name: 'Carlos Vega',
     role: 'Arquitecto Principal',

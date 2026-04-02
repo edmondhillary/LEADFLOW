@@ -11,21 +11,23 @@ const categoryColors: Record<string, string> = {
 };
 
 const postImages = [
-  images.blogFeatured,
+  images.blogDestacado,
   images.blog1,
   images.blog2,
   images.blog3,
   images.blog4,
 ];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-cerrajero';
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const featured = blogPosts.find(p => p.featured);
   const rest = blogPosts.filter(p => !p.featured);
 
-  function handleNewsletter(e: React.FormEvent) {
+  function handleBoletín(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
   }
@@ -159,7 +161,7 @@ export default function BlogPage() {
                 <p className="mt-2" style={{ fontSize: '13px', color: '#d0c6ab' }}>Recibirás nuestras guias de seguridad en breve.</p>
               </div>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-3">
+              <form onSubmit={handleBoletín} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   value={email}

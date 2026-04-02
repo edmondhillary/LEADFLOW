@@ -21,7 +21,9 @@ const initialForm: FormState = {
   mensaje: '',
 };
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mudanzas';
   const [form, setForm] = useState<FormState>(initialForm);
   const [submitted, setSubmitted] = useState(false);
 
@@ -137,7 +139,7 @@ export default function ContactoPage() {
                       </svg>
                     </div>
                     <div>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Address</p>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Dirección</p>
                       <p style={{ fontSize: '13px', color: '#44474e', marginTop: '2px' }}>{business.address}</p>
                     </div>
                   </div>
@@ -152,7 +154,7 @@ export default function ContactoPage() {
                       </svg>
                     </div>
                     <div>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Phone</p>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Teléfono</p>
                       <a
                         href={`tel:${business.phoneIntl}`}
                         style={{ fontSize: '13px', color: '#002046', textDecoration: 'none', marginTop: '2px', display: 'block' }}
@@ -192,7 +194,7 @@ export default function ContactoPage() {
                       </svg>
                     </div>
                     <div>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Hours</p>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#191c1d' }}>Horario</p>
                       <p style={{ fontSize: '13px', color: '#44474e', marginTop: '2px' }}>{contacto.schedule}</p>
                     </div>
                   </div>
@@ -340,7 +342,7 @@ export default function ContactoPage() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="telefono" style={labelStyle}>Phone</label>
+                      <label htmlFor="telefono" style={labelStyle}>Teléfono</label>
                       <input
                         id="telefono"
                         name="telefono"

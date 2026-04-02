@@ -99,7 +99,7 @@ export default function NosotrosPage(props: any = {}) {
         </div>
       </section>
 
-      {/* Studio Story */}
+      {/* Estudio Story */}
       <section className="w-full py-20 px-6 md:px-16" style={{ backgroundColor: '#f5f3ee' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2
@@ -177,7 +177,7 @@ export default function NosotrosPage(props: any = {}) {
         </div>
       </section>
 
-      {/* Studio Images Gallery */}
+      {/* Estudio Images Gallery */}
       <section className="w-full py-20 px-6 md:px-16" style={{ backgroundColor: '#f5f3ee' }}>
         <div className="max-w-[1920px] mx-auto">
           <h2

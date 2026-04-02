@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { stats, precisionProtocol, credentials, expertiseData, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-electricista';
   return (
     <>
       {/* ─── HERO (dark) ─── */}
@@ -171,13 +173,13 @@ export default function NosotrosPage() {
           </h2>
           <div className="flex flex-col md:flex-row justify-center gap-6">
             <Link
-              href="/template-electricista/contacto"
+              href={`${baseHref}/contacto`}
               className="bg-[#ffd700] text-[#705e00] font-black uppercase tracking-tighter px-10 py-5 text-lg hover:scale-[1.02] transition-transform"
             >
               Solicitar Auditoría
             </Link>
             <Link
-              href="/template-electricista/servicios"
+              href={`${baseHref}/servicios`}
               className="bg-white/10 text-white font-black uppercase tracking-tighter px-10 py-5 text-lg hover:bg-white/20 transition-colors"
             >
               Ver Servicios

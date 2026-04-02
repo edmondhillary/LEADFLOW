@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateDentistaLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateDentistaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-dentista';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -17,7 +20,7 @@ export default function TemplateDentistaLayout({ children }: { children: React.R
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(193,199,210,0.3)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-[1920px] mx-auto">
           {/* Logo */}
-          <Link href="/template-dentista" className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #003e6f 0%, #005696 100%)' }}>
               <span className="material-symbols-outlined text-white" style={{ fontSize: '18px' }}>dentistry</span>
             </div>
@@ -136,7 +139,7 @@ export default function TemplateDentistaLayout({ children }: { children: React.R
               {['Implantes Dentales', 'Ortodoncia', 'Urgencias 24h', 'Limpieza Dental', 'Estetica Dental', 'Carillas'].map(s => (
                 <Link
                   key={s}
-                  href="/template-dentista/servicios"
+                  href={`${baseHref}/servicios`}
                   className="transition-colors hover:text-[#003e6f]"
                   style={{ fontSize: '13px', color: '#414750', textDecoration: 'none' }}
                 >

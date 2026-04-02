@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { business, contacto, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-jardineria';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -59,10 +61,10 @@ export default function ContactoPage() {
             {/* Contact cards */}
             <div className="flex flex-col gap-4">
               {[
-                { label: 'Studio', value: business.address },
+                { label: 'Estudio', value: business.address },
                 { label: 'Telephone', value: business.phone },
                 { label: 'Email', value: business.email },
-                { label: 'Hours', value: contacto.schedule },
+                { label: 'Horario', value: contacto.schedule },
               ].map(item => (
                 <div
                   key={item.label}
@@ -81,7 +83,7 @@ export default function ContactoPage() {
             <div className="rounded-3xl overflow-hidden" style={{ height: '260px' }}>
               <img
                 src={images.contactMap}
-                alt="Studio location — London"
+                alt="Estudio location — London"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -190,7 +192,7 @@ export default function ContactoPage() {
                     </div>
                     <div className="flex flex-col gap-2">
                       <label style={{ fontSize: '11px', fontWeight: 600, color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-                        Email Address
+                        Correo electrónico
                       </label>
                       <input
                         type="email"
@@ -214,7 +216,7 @@ export default function ContactoPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="flex flex-col gap-2">
                       <label style={{ fontSize: '11px', fontWeight: 600, color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-                        Phone Number
+                        Teléfono
                       </label>
                       <input
                         type="tel"

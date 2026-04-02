@@ -105,7 +105,7 @@ export default function EsteticaHome(props: any = {}) {
             <div className="md:col-span-8 relative overflow-hidden h-64 md:h-full">
               <img
                 src={images.treatment1}
-                alt="Featured treatment"
+                alt="Destacado treatment"
                 className="w-full h-full object-cover"
               />
               <div

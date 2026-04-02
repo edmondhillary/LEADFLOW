@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { contacto, images, business } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pilates';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -130,7 +132,7 @@ export default function ContactoPage() {
                   <label
                     style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', display: 'block', marginBottom: '8px' }}
                   >
-                    Phone (optional)
+                    Teléfono (optional)
                   </label>
                   <input
                     type="tel"
@@ -197,13 +199,13 @@ export default function ContactoPage() {
           {/* ===== SIDEBAR ===== */}
           <div className="lg:col-span-5 flex flex-col gap-8">
 
-            {/* Studio info */}
+            {/* Estudio info */}
             <div>
               <h3
                 className="text-xl md:text-2xl mb-6"
                 style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}
               >
-                Studio Information
+                Estudio Information
               </h3>
               <div className="space-y-5">
                 <div className="flex items-start gap-4">
@@ -245,7 +247,7 @@ export default function ContactoPage() {
                 className="text-xl mb-4"
                 style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, fontStyle: 'italic', color: '#2f3430' }}
               >
-                Studio Hours
+                Estudio Horario
               </h4>
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
@@ -275,15 +277,15 @@ export default function ContactoPage() {
             {/* Quick links */}
             <div className="flex flex-col gap-3">
               <Link
-                href="/template-pilates/servicios"
+                href={`${baseHref}/servicios`}
                 className="flex items-center justify-between px-5 py-4 rounded-xl transition-colors hover:bg-[#edeeea]"
                 style={{ border: '1px solid rgba(175,179,174,0.25)', textDecoration: 'none', color: '#2f3430' }}
               >
-                <span style={{ fontSize: '13px', fontWeight: 500 }}>View All Classes</span>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Ver todas las clases</span>
                 <span style={{ color: '#536257', fontSize: '18px' }}>→</span>
               </Link>
               <Link
-                href="/template-pilates/nosotros"
+                href={`${baseHref}/nosotros`}
                 className="flex items-center justify-between px-5 py-4 rounded-xl transition-colors hover:bg-[#edeeea]"
                 style={{ border: '1px solid rgba(175,179,174,0.25)', textDecoration: 'none', color: '#2f3430' }}
               >

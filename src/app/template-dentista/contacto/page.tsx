@@ -11,7 +11,9 @@ type FormState = {
   mensaje: string;
 };
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-dentista';
   const [form, setForm] = useState<FormState>({
     nombre: '',
     email: '',
@@ -71,7 +73,7 @@ export default function ContactoPage() {
 
             {/* Left: Info cards + map */}
             <div className="flex flex-col gap-6">
-              {/* Phone */}
+              {/* Teléfono */}
               <div
                 className="rounded-2xl p-6 flex items-center gap-5"
                 style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 16px rgba(25,28,30,0.06)' }}
@@ -118,7 +120,7 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Address */}
+              {/* Dirección */}
               <div
                 className="rounded-2xl p-6 flex items-center gap-5"
                 style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 16px rgba(25,28,30,0.06)' }}

@@ -2,7 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { nosotros, stats, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-academia';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f8f9fa', color: '#191c1d' }}>
 
@@ -146,7 +148,7 @@ export default function NosotrosPage() {
             <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 36px' }}>
               {nosotros.cta.desc}
             </p>
-            <Link href="/template-academia/contacto" className="inline-flex items-center justify-center rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '16px', fontWeight: 700, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
+            <Link href={`${baseHref}/contacto`} className="inline-flex items-center justify-center rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '16px', fontWeight: 700, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
               Hablar con un asesor
             </Link>
           </div>

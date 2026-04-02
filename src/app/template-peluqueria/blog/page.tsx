@@ -28,7 +28,9 @@ const placeholderPosts = [
   },
 ];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-peluqueria';
   const featured = placeholderPosts.find(p => p.featured);
   const rest = placeholderPosts.filter(p => !p.featured);
 

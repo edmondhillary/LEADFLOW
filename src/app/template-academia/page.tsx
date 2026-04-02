@@ -249,7 +249,7 @@ export default function AcademiaHomePage(props: any = {}) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href={`${base}/servicios`} className="inline-flex items-center justify-center rounded-xl transition-all hover:opacity-90" style={{ background: 'linear-gradient(to right, #2a6b2c, #307231)', color: '#ffffff', fontSize: '16px', fontWeight: 700, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
-                Start Learning Journey
+                Empezar a aprender
               </Link>
               <Link href={`${base}/contacto`} className="inline-flex items-center justify-center rounded-xl transition-all hover:bg-[#e7e8e9]" style={{ backgroundColor: '#f3f4f5', color: '#001944', fontSize: '16px', fontWeight: 600, padding: '18px 40px', textDecoration: 'none', fontFamily: "'Manrope', sans-serif" }}>
                 Hablar con un asesor

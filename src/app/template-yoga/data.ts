@@ -1,13 +1,13 @@
 /**
  * TEMPLATE YOGA — Data Config
  *
- * Breath of Silence Yoga Studio
+ * Breath of Silence Yoga Estudio
  * Solo hay que cambiar este archivo para generar una web nueva.
  */
 
 export const business = {
   name: 'Breath of Silence',
-  fullName: 'Breath of Silence Yoga Studio',
+  fullName: 'Breath of Silence Yoga Estudio',
   tagline: 'Mindfulness & Movement',
   phone: '+44 20 0000 0000',
   phoneIntl: '+442000000000',
@@ -16,17 +16,17 @@ export const business = {
   address: '14 Serenity Row, Notting Hill, London W11 2PH',
   city: 'London',
   country: 'UK',
-  legalName: 'Breath of Silence Yoga Studio Ltd.',
+  legalName: 'Breath of Silence Yoga Estudio Ltd.',
   foundedYear: 2019,
   headInstructor: 'Aria Morant',
-  instructorCredentials: 'Founder & 200hr+ Certified Instructor',
+  instructorCredentials: 'Fundador & 200hr+ Certified Instructor',
   membersCount: '500+',
-  scheduleInfo: '6 days/week, morning and evening sessions',
-  studioQuote: '"Stepping into the studio feels like a deep exhale."',
+  scheduleInfo: '6 days/week, mañana y tarde sesiones',
+  studioQuote: '"Stepping into el estudio feels like a deep exhale."',
 };
 
 export const nav = [
-  { href: '/template-yoga', label: 'Home', icon: 'home' },
+  { href: '/template-yoga', label: 'Inicio', icon: 'home' },
   { href: '/template-yoga/servicios', label: 'Servicios', icon: 'self_improvement' },
   { href: '/template-yoga/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-yoga/blog', label: 'Blog', icon: 'article' },
@@ -41,7 +41,7 @@ export const images = {
   studioWide: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1600&q=80',
   instructorPortrait: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80',
   meditationRoom: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1573590330099-d6c7355ec595?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&w=800&q=80',
@@ -52,10 +52,10 @@ export const images = {
 };
 
 export const hero = {
-  badge: 'London\'s Sanctuary of Stillness',
-  title: 'Find Your Balance in the',
-  titleItalic: 'Heart of the City',
-  subtitle: 'A welcoming yoga studio in Notting Hill offering Hatha, Vinyasa, Restorative, and Meditation classes. All levels welcome. 500+ members and growing.',
+  badge: 'London\\\\\\\'s Sanctuary of Stillness',
+  title: 'Find Tu Balance in el',
+  titleItalic: 'Heart of el City',
+  subtitle: 'A welcoming yoga estudio in Notting Hill offering Hatha, Vinyasa, Restorative, y Meditation classes. All levels welcome. 500+ members y growing.',
   ctaPrimary: 'Reservar Clase',
   ctaSecondary: 'Ver Clases',
 };
@@ -64,7 +64,7 @@ export const classes = [
   {
     key: 'hatha',
     name: 'Hatha Yoga',
-    desc: 'A gentle, grounding practice that focuses on alignment, breathwork, and holding poses. Perfect for beginners and those seeking balance.',
+    desc: 'A gentle, grounding practice that focuses on alignment, breathwork, y holding poses. Perfect para beginners y those seeking balance.',
     duration: '60 min',
     level: 'All Levels',
     schedule: 'Mon, Wed, Fri — 7:30 AM',
@@ -72,7 +72,7 @@ export const classes = [
   {
     key: 'vinyasa',
     name: 'Vinyasa Flow',
-    desc: 'A dynamic, flowing practice linking breath with movement. Builds strength, flexibility and a moving meditation for the modern practitioner.',
+    desc: 'A dynamic, flowing practice linking breath con movement. Builds strength, flexibility y a mudanza meditation para el moderno practitioner.',
     duration: '75 min',
     level: 'Intermediate',
     schedule: 'Tue, Thu — 6:30 PM',
@@ -80,7 +80,7 @@ export const classes = [
   {
     key: 'restorative',
     name: 'Restorative Yoga',
-    desc: 'A deeply healing practice using props and long-held poses to activate the parasympathetic nervous system. Pure restoration.',
+    desc: 'A deeply healing practice using props y larga-held poses to activate el parasympathetic nervous system. Pure restoration.',
     duration: '75 min',
     level: 'All Levels',
     schedule: 'Sat — 10:00 AM',
@@ -88,10 +88,10 @@ export const classes = [
 ];
 
 export const benefits = [
-  { icon: '🌿', title: 'Experienced Instructors', desc: '200hr+ certified teachers with years of dedicated practice and teaching.' },
-  { icon: '🤍', title: 'Welcoming Environment', desc: 'A judgement-free space for every body, every background, every level.' },
-  { icon: '🧘', title: 'All Levels Welcome', desc: 'From first-timers to advanced practitioners — our classes adapt to you.' },
-  { icon: '✨', title: 'Mindful Approach', desc: 'We integrate breathwork and mindfulness into every session for deeper results.' },
+  { icon: '🌿', title: 'Experienced Instructors', desc: '200hr+ certified teachers con years of dedicated practice y teaching.' },
+  { icon: '🤍', title: 'Welcoming Environment', desc: 'A judgement-gratis space para every body, every background, every level.' },
+  { icon: '🧘', title: 'All Levels Welcome', desc: 'Desde primero-timers to advanced practitioners — nuestro classes adapt to tú.' },
+  { icon: '✨', title: 'Mindful Approach', desc: 'Nosotros integrate breathwork y mindfulness into every sesión para deeper results.' },
 ];
 
 export const pricing = [
@@ -99,27 +99,27 @@ export const pricing = [
     name: 'Drop-In',
     price: '£18',
     period: 'per class',
-    desc: 'Perfect for trying us out or supplementing your practice.',
-    features: ['Single class access', 'Mat rental included', 'All class types', 'No commitment'],
-    cta: 'Book a Class',
+    desc: 'Perfect para trying us out or supplementing yNuestra práctica.',
+    features: ['Single class acceso', 'Mat rental included', 'All class types', 'No commitment'],
+    cta: 'Reservar a Class',
     highlight: false,
   },
   {
-    name: 'Monthly',
+    name: 'Mensual',
     price: '£89',
     period: 'per month',
-    desc: 'Our most popular option for a consistent practice.',
-    features: ['Unlimited classes', 'Priority booking', 'Mat storage locker', '1 free guest pass/month'],
-    cta: 'Start Monthly',
+    desc: 'Nuestro most popular option para a consistent practice.',
+    features: ['Unlimited classes', 'Priority booking', 'Mat almacenamiento locker', '1 gratis guest pass/month'],
+    cta: 'Empezar Mensual',
     highlight: true,
   },
   {
-    name: 'Annual',
+    name: 'Anual',
     price: '£799',
     period: 'per year',
-    desc: 'Best value for committed practitioners.',
-    features: ['Everything in Monthly', '2 months free', 'Guest passes ×12', 'Retreat discounts 20%'],
-    cta: 'Go Annual',
+    desc: 'Mejor value para committed practitioners.',
+    features: ['Everything in Mensual', '2 months gratis', 'Guest passes ×12', 'Retreat discounts 20%'],
+    cta: 'Go Anual',
     highlight: false,
   },
 ];
@@ -138,7 +138,7 @@ export const allClasses = [
     key: 'hatha',
     name: 'Hatha Yoga',
     type: 'Foundation',
-    desc: 'A classical practice rooted in alignment and breathwork. Each posture is held with awareness, cultivating strength, flexibility, and a deep sense of inner calm. Ideal as a foundation for all other yoga styles.',
+    desc: 'A classical practice rooted in alignment y breathwork. Each posture is held con awareness, cultivating strength, flexibility, y a deep sense of inner calm. Ideal as a foundation para all other yoga styles.',
     duration: '60 min',
     level: 'All Levels',
     teacher: 'Aria Morant',
@@ -148,7 +148,7 @@ export const allClasses = [
     key: 'vinyasa',
     name: 'Vinyasa Flow',
     type: 'Dynamic',
-    desc: 'A rhythmic, breath-led sequence that builds heat and flow. Transitions between postures become a moving meditation. Builds cardio fitness, muscular endurance, and mental focus simultaneously.',
+    desc: 'A rhythmic, breath-led sequence that builds heat y flow. Transitions between postures become a mudanza meditation. Builds cardio fitness, muscular endurance, y mental focus simultaneously.',
     duration: '75 min',
     level: 'Intermediate',
     teacher: 'Aria Morant',
@@ -158,7 +158,7 @@ export const allClasses = [
     key: 'restorative',
     name: 'Restorative Yoga',
     type: 'Healing',
-    desc: 'A therapeutic practice using bolsters, blankets, and blocks to support the body in long-held passive poses. Activates the parasympathetic nervous system — your body\'s rest-and-digest mode.',
+    desc: 'A therapeutic practice using bolsters, blankets, y blocks to support el body in larga-held passive poses. Activates el parasympathetic nervous system — tu body\\\\\\\'s rest-y-digest mode.',
     duration: '75 min',
     level: 'All Levels',
     teacher: 'Aria Morant',
@@ -168,7 +168,7 @@ export const allClasses = [
     key: 'yin',
     name: 'Yin Yoga',
     type: 'Deep Stretch',
-    desc: 'Slow-paced style holding poses for 3–5 minutes, targeting the deeper connective tissues. Deeply meditative — silence and stillness are core to the practice.',
+    desc: 'Slow-paced style holding poses para 3–5 minutes, targeting el deeper connective tissues. Deeply meditative — silence y stillness are core to el practice.',
     duration: '75 min',
     level: 'All Levels',
     teacher: 'Aria Morant',
@@ -178,7 +178,7 @@ export const allClasses = [
     key: 'meditation',
     name: 'Meditation',
     type: 'Mindfulness',
-    desc: 'Guided seated meditation sessions using breathwork, body scan, and visualization techniques. A dedicated space to train the mind toward clarity, ease, and presence.',
+    desc: 'Guided seated meditation sesiones using breathwork, body scan, y visualization techniques. A dedicated space to train el mind toward clarity, ease, y presence.',
     duration: '45 min',
     level: 'All Levels',
     teacher: 'Aria Morant',
@@ -188,7 +188,7 @@ export const allClasses = [
     key: 'breathwork',
     name: 'Breathwork',
     type: 'Pranayama',
-    desc: 'Pranayama and somatic breathwork techniques drawn from yogic and contemporary traditions. Regulates the nervous system, releases stored tension, and awakens vital energy.',
+    desc: 'Pranayama y somatic breathwork techniques drawn desde yogic y contemporary traditions. Regulates el nervous system, releases stored tension, y awakens vital energy.',
     duration: '60 min',
     level: 'All Levels',
     teacher: 'Aria Morant',
@@ -199,42 +199,42 @@ export const allClasses = [
 export const testimonials = [
   {
     name: 'Elena R.',
-    role: 'Monthly Member',
-    text: 'Stepping into the studio feels like a deep exhale. Aria\'s teaching holds both precision and warmth — rare qualities in a yoga space. The restorative class on Saturdays has become sacred to me.',
+    role: 'Mensual Member',
+    text: 'Stepping into el estudio feels like a deep exhale. Aria\\\\\\\'s teaching holds both precision y warmth — rare qualities in a yoga space. El restorative class on Saturdays has become sacred to me.',
     rating: 5,
   },
   {
     name: 'Marcus T.',
-    role: 'Annual Member',
-    text: 'I came in skeptical — a lifelong runner who thought yoga was too slow. Within two weeks the Vinyasa sessions had completely transformed my recovery and mobility. This studio changed my relationship with my body.',
+    role: 'Anual Member',
+    text: 'I came in skeptical — a lifelong runner who thought yoga was too slow. Within two weeks el Vinyasa sesiones had completely transformed my recovery y mobility. This estudio changed my relationship con my body.',
     rating: 5,
   },
 ];
 
 export const about = {
   badge: 'Est. 2019 — Notting Hill, London',
-  heroTitle: 'A sanctuary rooted in stillness and community.',
-  heroSubtitle: 'Breath of Silence was born from a simple belief: that every person deserves a place to stop, breathe, and return to themselves.',
+  heroTitle: 'A sanctuary rooted in stillness y community.',
+  heroSubtitle: 'Breath of Silence was born desde a simple belief: that every person deserves a place to stop, breathe, y return to themselves.',
   storyTitle: 'Why Breath of Silence Exists',
   storyParagraphs: [
-    'In 2019, Aria Morant opened the doors to a small studio in Notting Hill with one intention: to create a yoga space that felt more like a refuge than a fitness class. Having trained across studios in London, Bali, and India, Aria had experienced both the magic and the shortcomings of modern yoga culture.',
-    'She wanted a place with no mirrors, no performance pressure — just practice. Natural oak floors, filtered afternoon light, and the kind of silence that allows you to actually hear your breath. Five years on, that vision has quietly become one of London\'s most cherished wellness communities.',
+    'In 2019, Aria Morant opened el doors to a small estudio in Notting Hill con one intention: to create a yoga space that felt more like a refuge than a fitness class. Having trained across studios in London, Bali, y India, Aria had experienced both el magic y el shortcomings of moderno yoga culture.',
+    'She wanted a place con no mirrors, no performance pressure — just practice. Natural oak floors, filtered afternoon light, y el kind of silence that allows tú to actually hear tu breath. Five years on, that vision has quietly become one of London\\\\\\\'s most cherished wellness communities.',
   ],
   values: [
     {
       icon: '🌱',
       title: 'Rooted in Tradition',
-      desc: 'Our teachings draw from classical Hatha lineage and contemporary somatic research — ancient wisdom made accessible for modern life.',
+      desc: 'Nuestro teachings draw desde classical Hatha lineage y contemporary somatic research — ancient wisdom made accessible para moderno life.',
     },
     {
       icon: '🤝',
-      title: 'Community First',
-      desc: 'We are not a drop-in gym. We are a community. Every class, every conversation, every shared breath builds the fabric of this space.',
+      title: 'Community Primero',
+      desc: 'Nosotros are not a drop-in gym. Nosotros are a community. Every class, every conversation, every shared breath builds el fabric of this space.',
     },
     {
       icon: '🌬️',
       title: 'Breath as Foundation',
-      desc: 'Every class returns to the breath. Not as metaphor, but as the literal anchor that transforms movement into practice.',
+      desc: 'Every class returns to el breath. Not as metaphor, but as el literal anchor that transforms movement into practice.',
     },
   ],
   stats: [
@@ -243,60 +243,60 @@ export const about = {
     { value: '6', label: 'Days a Week' },
     { value: '1', label: 'Lead Instructor' },
   ],
-  ctaTitle: 'Come breathe with us.',
-  ctaSubtitle: 'Your first class is the hardest part. After that, the studio finds a way to become home.',
+  ctaTitle: 'Come breathe con us.',
+  ctaSubtitle: 'Tu primero class is el hardest part. After that, el estudio finds a way to become inicio.',
 };
 
 export const contacto = {
   badge: 'Encuentra tu Espacio',
   title: 'Encuentra tu Espacio',
-  subtitle: 'Whether you\'re brand new to yoga or returning to your practice, we\'d love to welcome you. Reach out — we respond within 24 hours.',
+  subtitle: 'Whether tú\\\\\\\'re brand nuevo to yoga or returning to yNuestra práctica, nosotros\\\\\\\'d love to welcome tú. Reach out — nosotros respond within 24 horario.',
   formTitle: 'Reservar una Clase',
-  formSubtitle: 'Fill in your details and preferred class. We\'ll confirm your booking within 24 hours.',
+  formSubtitle: 'Fill in tu details y preferred class. Nosotros\\\\\\\'ll confirm tu booking within 24 horario.',
   serviceOptions: ['Hatha', 'Vinyasa', 'Restorative', 'Yin', 'Meditación', 'Primera Clase'],
-  schedule: 'Monday – Saturday / 6:30 AM – 8:00 PM',
-  responseTime: '24 Hours',
+  schedule: 'Lunes – Sábado / 6:30 AM – 8:00 PM',
+  responseTime: '24 Horario',
 };
 
 export const blogPosts = [
   {
     slug: 'morning-yoga-routine',
-    title: 'A 20-Minute Morning Yoga Routine to Start Your Day.',
+    title: 'A 20-Minute Mañana Yoga Routine to Empezar Tu Day.',
     category: 'Movimiento',
     readTime: '6 min',
-    excerpt: 'Five gentle poses you can practice before coffee. Wake your spine, open your hips, and arrive in your day with intention rather than urgency.',
+    excerpt: 'Five gentle poses tú can practice before coffee. Wake tu spine, open tu hips, y arrive in tu day con intention rather than urgency.',
     featured: true,
   },
   {
     slug: 'meditation-for-beginners',
-    title: 'Meditation for Beginners: You\'re Already Doing It Wrong (And That\'s Fine).',
+    title: 'Meditation para Beginners: Tú\\\\\\\'re Already Doing It Wrong (Y That\\\\\\\'s Fine).',
     category: 'Meditación',
     readTime: '8 min',
-    excerpt: 'The most common misconception about meditation is that you\'re supposed to stop thinking. Here\'s what you\'re actually supposed to do.',
+    excerpt: 'El most common misconception nosotros meditation is that tú\\\\\\\'re supposed to stop thinking. Here\\\\\\\'s what tú\\\\\\\'re actually supposed to do.',
     featured: false,
   },
   {
     slug: 'breathwork-science',
-    title: 'The Science of Breathwork: Why Your Nervous System Listens.',
+    title: 'El Science of Breathwork: Why Tu Nervous System Listens.',
     category: 'Bienestar',
     readTime: '10 min',
-    excerpt: 'Pranayama isn\'t mysticism — it\'s neuroscience. Discover why controlled breathing changes your physiology in measurable, lasting ways.',
+    excerpt: 'Pranayama isn\\\\\\\'t mysticism — it\\\\\\\'s neuroscience. Discover why controlled breathing changes tu physiology in measurable, lasting ways.',
     featured: false,
   },
   {
     slug: 'yin-vs-restorative',
-    title: 'Yin vs Restorative: What\'s the Difference and Which Do You Need?',
+    title: 'Yin vs Restorative: What\\\\\\\'s el Diferencia y Which Do Tú Need?',
     category: 'Principiantes',
     readTime: '7 min',
-    excerpt: 'Both are slow. Both use props. But they work on different layers of the body and serve different purposes. Here\'s how to choose.',
+    excerpt: 'Both are slow. Both use props. But they work on different layers of el body y serve different purposes. Here\\\\\\\'s how to choose.',
     featured: false,
   },
   {
     slug: 'finding-balance',
-    title: 'Finding Balance: How a Regular Yoga Practice Rewires the Brain.',
+    title: 'Finding Balance: How a Regular Yoga Practice Rewires el Brain.',
     category: 'Bienestar',
     readTime: '9 min',
-    excerpt: 'Neuroplasticity research shows that consistent mindfulness practice literally changes the structure of your brain. Your mat is a laboratory.',
+    excerpt: 'Neuroplasticity research shows that consistent mindfulness practice literally changes el structure of tu brain. Tu mat is a laboratory.',
     featured: false,
   },
 ];

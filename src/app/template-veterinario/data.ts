@@ -1,13 +1,13 @@
 export const business = {
   name: 'Kindred Paws',
-  tagline: 'High-End Medical Empathy',
-  description: 'High-end medical care with a soul. Providing the clinical sanctuary your pets deserve.',
+  tagline: 'de alto nivel Medical Empathy',
+  description: 'de alto nivel medical cuidado con a soul. Providing el clínico sanctuary tu pets deserve.',
   phone: '(555) 248-9000',
   phoneIntl: '+15552489000',
   whatsapp: '15552489000',
   emergency: '(555) 911-7297',
   email: 'care@kindredpaws.vet',
-  address: '1248 Kindred Way, Clinical District',
+  address: '1248 Kindred Way, Clínico District',
   city: 'Portland',
   state: 'OR',
   zip: '97201',
@@ -17,9 +17,9 @@ export const business = {
 };
 
 export const nav = [
-  { href: '/template-veterinario', label: 'Home' },
-  { href: '/template-veterinario/servicios', label: 'Services' },
-  { href: '/template-veterinario/nosotros', label: 'About' },
+  { href: '/template-veterinario', label: 'Inicio' },
+  { href: '/template-veterinario/servicios', label: 'Servicios' },
+  { href: '/template-veterinario/nosotros', label: 'Nosotros' },
   { href: '/template-veterinario/blog', label: 'Blog' },
 ];
 
@@ -64,18 +64,18 @@ export const images = {
 
 export const hero = {
   badge: 'Welcome to Kindred Paws',
-  title: 'High-End',
+  title: 'de alto nivel',
   titleAccent: 'Medical Empathy',
-  titleSuffix: 'for Your Companions.',
-  subtitle: "A clinical sanctuary designed to provide the world's most advanced veterinary care within a warm, grounding environment that feels like home.",
-  ctaPrimary: 'Book Appointment',
-  ctaSecondary: 'Call Clinic',
+  titleSuffix: 'para Tu Companions.',
+  subtitle: "A clínico sanctuary designed to provide el world's most advanced veterinary cuidado within a warm, grounding environment that feels like inicio.",
+  ctaPrimary: 'Reservar cita',
+  ctaSecondary: 'Llama Clinic',
 };
 
 export const homeServices = [
   {
     title: 'Wellness Checkups',
-    desc: "Preventative care tailored to your pet's life stage, breed, and lifestyle.",
+    desc: "Preventative cuidado tailored to tu pet's life stage, breed, y lifestyle.",
     icon: 'health_and_safety',
     bg: '#ffffff',
     iconBg: '#a4ebf9',
@@ -83,7 +83,7 @@ export const homeServices = [
   },
   {
     title: 'Diagnostics',
-    desc: 'In-house laboratory, digital X-rays, and ultrasound for rapid results.',
+    desc: 'In-house laboratory, digital X-rays, y ultrasound para rapid results.',
     icon: 'biotech',
     bg: '#ffffff',
     iconBg: '#cffcd5',
@@ -91,7 +91,7 @@ export const homeServices = [
   },
   {
     title: 'Vaccinations',
-    desc: 'Protecting your pet against preventable diseases with custom protocols.',
+    desc: 'Protecting tu pet against preventable diseases con custom protocols.',
     icon: 'vaccines',
     bg: '#ffffff',
     iconBg: '#fff2db',
@@ -102,36 +102,36 @@ export const homeServices = [
 export const whyUs = [
   {
     icon: 'groups',
-    title: 'Experienced Medical Team',
-    desc: 'Our clinicians carry decades of combined experience in specialist veterinary medicine and nursing.',
+    title: 'Experienced Medical Equipo',
+    desc: 'Nuestro clinicians carry decades of combined experience in specialist veterinary medicine y nursing.',
   },
   {
     icon: 'favorite',
-    title: 'Compassionate Care',
-    desc: 'We treat every patient with the same gentleness and respect we would give our own animal family.',
+    title: 'Compassionate Cuidado',
+    desc: 'Nosotros treat every patient con el same gentleness y respect nosotros would give nuestro own animal family.',
   },
   {
     icon: 'precision_manufacturing',
-    title: 'Modern Equipment',
-    desc: 'Our clinical sanctuary is outfitted with the latest medical technology for precise diagnosis and treatment.',
+    title: 'Moderno Equipment',
+    desc: 'Nuestro clínico sanctuary is outfitted con el último medical technology para precise diagnosis y treatment.',
   },
 ];
 
 export const testimonials = [
   {
-    text: 'The level of empathy shown to both my cat and myself during a stressful emergency was incredible. They are truly medical experts with hearts of gold.',
+    text: 'El level of empathy shown to both my cat y myself during a stressful urgencia was incredible. They are truly medical experts con hearts of gold.',
     name: 'Sarah Jenkins',
     role: "Luna's Guardian",
     image: 'testimonial1',
   },
   {
-    text: "I've never been to a clinic that feels so peaceful. It completely changed my dog's anxiety about vet visits. The facilities are world-class.",
+    text: "I've never been to a clinic that feels so peaceful. It completely changed my dog's anxiety nosotros vet visits. El facilities are de primer nivel.",
     name: 'Mark Thompson',
     role: "Cooper's Guardian",
     image: 'testimonial2',
   },
   {
-    text: "Scientific excellence and absolute transparency. They took the time to explain every detail of the diagnosis. I wouldn't trust anyone else.",
+    text: "Scientific excellence y absolute transparency. They took el time to explain every detail of el diagnosis. I wouldn't trust anyone else.",
     name: 'Emily Chen',
     role: "Mochi's Guardian",
     image: 'testimonial3',
@@ -141,51 +141,51 @@ export const testimonials = [
 export const team = [
   {
     name: 'Dr. Elena Thorne, DVM',
-    role: 'Founder & Lead Surgeon',
+    role: 'Fundador & Lead Surgeon',
     roleColor: '#166875',
-    bio: 'Specializing in soft-tissue surgery with over 15 years of experience in rehabilitative medicine.',
+    bio: 'Specializing in soft-tissue surgery con over 15 years of experience in rehabilitative medicine.',
     image: 'vetFemale',
   },
   {
     name: 'Marcus Chen',
     role: 'Head of Nursing',
     roleColor: '#41684a',
-    bio: 'Certified Fear-Free professional focused on feline-friendly handling and geriatric pet care.',
+    bio: 'Certified Fear-Gratis profesional focused on feline-friendly handling y geriatric pet cuidado.',
     image: 'vetMale',
   },
   {
     name: 'Dr. Sarah Vane, DACVIM',
     role: 'Internal Medicine Specialist',
     roleColor: '#665e4d',
-    bio: 'Expert in cardiology and endocrinology, providing specialized care for chronic conditions.',
+    bio: 'Expert in cardiology y endocrinology, providing specialized cuidado para chronic conditions.',
     image: 'vetSpecialist',
   },
 ];
 
 export const about = {
   badge: 'Established 2012',
-  title: 'The Sanctuary for',
+  title: 'El Sanctuary para',
   titleAccent: 'Healing Paws.',
-  subtitle: "At Kindred Paws, we believe medicine is more than a diagnosis. It is the intersection of clinical precision and profound empathy, delivered in a space designed for calm.",
-  clinicQuote: '"A space where the clinical meets the organic, ensuring every visit is as stress-free for the owner as it is for the companion."',
-  philosophyLabel: 'Our Philosophy',
+  subtitle: "At Kindred Paws, nosotros believe medicine is more than a diagnosis. It is el intersection of clínico precision y profound empathy, delivered in a space designed para calm.",
+  clinicQuote: '"A space where el clínico meets el organic, ensuring every visit is as stress-gratis para el owner as it is para el companion."',
+  philosophyLabel: 'Nuestra filosofía',
   values: [
     {
       icon: 'medical_services',
-      title: 'Uncompromising Clinical Excellence',
-      desc: 'We utilize advanced diagnostic imaging and surgical suites that rival top human hospitals, ensuring zero compromise on care.',
+      title: 'Uncompromising Clínico Excellence',
+      desc: 'Nosotros utilize advanced diagnostic imaging y surgical suites that rival top human hospitals, ensuring zero compromise on cuidado.',
       color: '#166875',
     },
     {
       icon: 'psychology',
-      title: 'Fear-Free Certified Environment',
-      desc: 'Our facility is designed with specialized pheromone diffusers and soundproofing to keep every pet calm and at ease.',
+      title: 'Fear-Gratis Certified Environment',
+      desc: 'Nuestro facility is designed con specialized pheromone diffusers y soundproofing to keep every pet calm y at ease.',
       color: '#41684a',
     },
     {
       icon: 'diversity_3',
       title: 'Human-Animal Bond Advocacy',
-      desc: 'We treat the whole family. Communication and transparency are at the heart of every treatment plan we create.',
+      desc: 'Nosotros treat el whole family. Communication y transparency are at el heart of every treatment plan nosotros create.',
       color: '#005c68',
     },
   ],
@@ -193,40 +193,40 @@ export const about = {
     {
       icon: 'biotech',
       title: 'In-House Laboratory',
-      desc: 'Get diagnostic results in minutes, not days, for urgent medical cases.',
+      desc: 'Get diagnostic results in minutes, not days, para urgent medical cases.',
     },
     {
       icon: 'radiology',
       title: 'Digital Radiology Suite',
-      desc: 'High-resolution imaging including CT scans and ultrasound technology.',
+      desc: 'High-resolution imaging including CT scans y ultrasound technology.',
     },
     {
       icon: 'self_care',
       title: 'Recovery Suites',
-      desc: 'Orthopedic bedding and individually climate-controlled rooms for overnight stays.',
+      desc: 'Orthopedic bedding y individually climate-controlled rooms para overnight stays.',
     },
   ],
 };
 
 export const fullServices = [
   {
-    title: 'Preventive Care',
-    desc: "The cornerstone of longevity. We offer personalized wellness plans including nutrition consulting, parasite prevention, and geriatric screenings.",
+    title: 'Preventive Cuidado',
+    desc: "El cornerstone of longevity. Nosotros offer personalized wellness plans including nutrition consulting, parasite prevention, y geriatric screenings.",
     icon: 'spa',
     iconColor: '#41684a',
-    checks: ['Annual Comprehensive Exams', 'Nutritional Counseling', 'Parasite Prevention'],
+    checks: ['Anual Comprehensive Exams', 'Nutritional Counseling', 'Parasite Prevention'],
     image: 'preventiveCare',
     size: 'large',
   },
   {
     title: 'Vaccinations',
-    desc: "Customized immunization protocols tailored to your pet's lifestyle, breed, and environmental risk factors.",
+    desc: "Customized immunization protocols tailored to tu pet's lifestyle, breed, y environmental risk factors.",
     icon: 'vaccines',
     size: 'featured',
   },
   {
     title: 'Diagnostics',
-    desc: 'In-house laboratory, digital radiology, and ultrasound for immediate answers when time matters most.',
+    desc: 'In-house laboratory, digital radiology, y ultrasound para immediate answers when time matters most.',
     icon: 'biotech',
     iconColor: '#166875',
     tags: ['X-Ray', 'Bloodwork', 'ECG'],
@@ -234,72 +234,72 @@ export const fullServices = [
   },
   {
     title: 'Surgery',
-    desc: 'Soft tissue and orthopedic procedures performed in our sterile surgical suite with continuous vitals monitoring.',
+    desc: 'Soft tissue y orthopedic procedures performed in nuestro sterile surgical suite con continuous vitals monitoring.',
     icon: 'medical_information',
     iconColor: '#ac3434',
     badge: 'Advanced Anesthesia',
     size: 'normal',
   },
   {
-    title: 'Dental Care',
-    desc: 'Professional cleaning and digital dental X-rays to prevent systemic disease and maintain oral health.',
+    title: 'Dental Cuidado',
+    desc: 'Profesional cleaning y digital dental X-rays to prevent systemic disease y maintain oral health.',
     icon: 'dentistry',
-    highlight: '80% of pets show signs of oral disease by age three. Let\'s fix that.',
+    highlight: '80% of pets show signs of oral disease by age three. Let\\\\\\\'s fix that.',
     size: 'accent',
   },
 ];
 
 export const contact = {
   badge: 'Reach Out',
-  title: 'The Sanctuary is',
+  title: 'El Sanctuary is',
   titleAccent: 'Open.',
-  subtitle: "Expert medical care meets gentle empathy. We're here to ensure your companion's journey is supported at every step.",
+  subtitle: "Expert medical cuidado meets gentle empathy. Nosotros're here to ensure tu companion's journey is supported at every step.",
   hours: [
     { day: 'Mon-Fri', hours: '8am - 6pm' },
-    { day: 'Saturday', hours: '9am - 4pm' },
-    { day: 'Sunday', hours: 'Closed' },
+    { day: 'Sábado', hours: '9am - 4pm' },
+    { day: 'Domingo', hours: 'Closed' },
   ],
   visitOptions: [
     'Routine Check-up',
     'Vaccination',
-    'Surgical Consultation',
+    'Surgical Consulta',
     'Behavioral Therapy',
     'Dental Cleaning',
-    'Emergency Care',
+    'Urgencia Cuidado',
   ],
 };
 
 export const blogPosts = [
   {
     slug: 'signs-dog-vet-visit',
-    title: 'When to take your dog to the vet: The Critical Signs',
-    category: 'Puppy Care',
+    title: 'When to take tu dog to el vet: El Critical Signs',
+    category: 'Puppy Cuidado',
     categoryColor: '#166875',
     author: 'Dr. Elena Thorne',
     readTime: '6 min',
-    excerpt: 'Recognizing the subtle behavioral shifts and physical markers that indicate an immediate need for professional medical attention.',
+    excerpt: 'Recognizing el subtle behavioral shifts y physical markers that indicate an immediate need para profesional medical attention.',
     image: 'blog1',
     featured: true,
   },
   {
     slug: 'signs-of-pain-in-cats',
-    title: 'Signs of pain in cats: The Silent Language',
+    title: 'Signs of pain in cats: El Silent Language',
     category: 'Behavior',
     categoryColor: '#41684a',
     author: 'Dr. Sarah Vane',
     readTime: '5 min',
-    excerpt: 'Cats are masters of hiding discomfort. Learn how to spot the "whisker-tense" signs of pain before they become serious.',
+    excerpt: 'Cats are masters of hiding discomfort. Aprender how to spot el "whisker-tense" signs of pain before they become serious.',
     image: 'blog2',
     featured: false,
   },
   {
     slug: 'nutrition-golden-years',
-    title: 'Nutrition for the Golden Years',
+    title: 'Nutrition para el Golden Years',
     category: 'Senior Pets',
     categoryColor: '#665e4d',
     author: 'Marcus Chen',
     readTime: '7 min',
-    excerpt: "Adapting your pet's diet to support joint health and cognitive function as they age gracefully into their senior years.",
+    excerpt: "Adapting tu pet's diet to support joint health y cognitive function as they age gracefully into their senior years.",
     image: 'blog3',
     featured: false,
   },

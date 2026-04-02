@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { menuItems, drinks, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-restaurante';
   const entrantes = menuItems.filter((d) => d.category === 'Entrantes');
   const principales = menuItems.filter((d) => d.category === 'Principales');
   const postres = menuItems.filter((d) => d.category === 'Postres');
@@ -257,7 +259,7 @@ export default function ServiciosPage() {
             Para grupos de mas de 6 personas, eventos privados o el menu degustacion completo, contactenos directamente.
           </p>
           <Link
-            href="/template-restaurante/contacto"
+            href={`${baseHref}/contacto`}
             className="inline-block bg-[#3C0610] text-white uppercase tracking-[0.15em] text-sm font-bold px-12 py-5 hover:bg-[#2d0409] transition-colors duration-200"
           >
             HACER UNA RESERVA

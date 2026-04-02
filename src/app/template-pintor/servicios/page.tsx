@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { serviciosPage, services, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pintor';
   return (
     <main style={{ fontFamily: "'Work Sans', sans-serif" }}>
       {/* Hero */}
@@ -44,7 +46,7 @@ export default function ServiciosPage() {
                 </li>
               ))}
             </ul>
-            <Link href="/template-pintor/contacto" className="group flex items-center gap-2 text-teal-800 font-bold uppercase tracking-tighter text-sm" style={{ fontFamily: "'Manrope', sans-serif", textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} className="group flex items-center gap-2 text-teal-800 font-bold uppercase tracking-tighter text-sm" style={{ fontFamily: "'Manrope', sans-serif", textDecoration: 'none' }}>
               Explorar Interior <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </Link>
           </div>
@@ -146,10 +148,10 @@ export default function ServiciosPage() {
         </h3>
         <p className="text-[#5a6061] mb-10">Solicite una consultoría técnica gratuita en su domicilio para evaluar su proyecto y materiales.</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/template-pintor/contacto" className="text-[#d9fffe] px-8 py-4 rounded-md font-bold shadow-lg transition-all active:scale-95 inline-block" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)', textDecoration: 'none' }}>
+          <Link href={`${baseHref}/contacto`} className="text-[#d9fffe] px-8 py-4 rounded-md font-bold shadow-lg transition-all active:scale-95 inline-block" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)', textDecoration: 'none' }}>
             Programar Visita
           </Link>
-          <Link href="/template-pintor" className="text-teal-900 px-8 py-4 rounded-md font-bold transition-all hover:bg-[#ebeeef] inline-block" style={{ border: '1px solid #adb3b4', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} className="text-teal-900 px-8 py-4 rounded-md font-bold transition-all hover:bg-[#ebeeef] inline-block" style={{ border: '1px solid #adb3b4', textDecoration: 'none' }}>
             Ver Portafolio
           </Link>
         </div>

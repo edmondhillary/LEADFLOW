@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { services, serviciosPage, pricingTiers, groomingProcess, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-canina';
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif", backgroundColor: '#fafaf5', color: '#2f342e' }}>
 
@@ -87,7 +89,7 @@ export default function ServiciosPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/template-canina/contacto" className="inline-flex items-center justify-center gap-2 rounded-full transition-all hover:opacity-90" style={{
+              <Link href={`${baseHref}/contacto`} className="inline-flex items-center justify-center gap-2 rounded-full transition-all hover:opacity-90" style={{
                 backgroundColor: tier.highlight ? '#e6ffed' : '#4c6456',
                 color: tier.highlight ? '#2d4437' : '#e6ffed',
                 padding: '13px 28px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '0.06em', textTransform: 'uppercase',
@@ -158,8 +160,8 @@ export default function ServiciosPage() {
             Reach us at {business.phone} or book online below.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/template-canina/contacto" className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
-              Book Appointment
+            <Link href={`${baseHref}/contacto`} className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
+              Reservar cita
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
             </Link>
             <a href={`tel:${business.phoneIntl}`} className="inline-flex items-center gap-2 rounded-full transition-all" style={{ border: '1.5px solid rgba(230,255,237,0.4)', color: '#e6ffed', padding: '14px 32px', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>

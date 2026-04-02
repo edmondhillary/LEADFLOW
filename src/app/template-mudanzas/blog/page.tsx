@@ -3,7 +3,9 @@ import { blogPosts, images } from '../data';
 
 const categories = ['All', 'Moving Tips', 'Packing Guide', 'Office Relocation', 'Long Distance', 'Storage'];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mudanzas';
   const featured = blogPosts.find((p) => p.featured);
   const rest = blogPosts.filter((p) => !p.featured);
 
@@ -90,7 +92,7 @@ export default function BlogPage() {
             {/* Image */}
             <div className="relative min-h-[320px]">
               <img
-                src={images.blogFeatured}
+                src={images.blogDestacado}
                 alt={featured.title}
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -111,7 +113,7 @@ export default function BlogPage() {
                     textTransform: 'uppercase',
                   }}
                 >
-                  Featured
+                  Destacado
                 </span>
                 <span style={{ fontSize: '12px', color: '#44474e' }}>{featured.category}</span>
                 <span style={{ fontSize: '12px', color: '#44474e' }}>&middot; {featured.readTime} read</span>
@@ -149,7 +151,7 @@ export default function BlogPage() {
                 }}
                 className="hover:opacity-70 transition-opacity"
               >
-                Read Article
+                Leer artículo
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
                 </svg>
@@ -225,7 +227,7 @@ export default function BlogPage() {
                   }}
                   className="hover:opacity-70 transition-opacity mt-auto"
                 >
-                  Read more &rarr;
+                  Leer más &rarr;
                 </Link>
               </div>
             </article>
@@ -269,7 +271,7 @@ export default function BlogPage() {
             </div>
             <div className="flex-1 w-full">
               <p style={{ fontSize: '13px', color: '#44474e', marginBottom: '16px', lineHeight: 1.6 }}>
-                Subscribe to get our best moving guides, seasonal checklists, and SF Bay Area moving news.
+                Suscribirme to get our best moving guides, seasonal checklists, and SF Bay Area moving news.
               </p>
               <div className="flex gap-3 flex-col sm:flex-row">
                 <input
@@ -300,7 +302,7 @@ export default function BlogPage() {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  Subscribe
+                  Suscribirme
                 </button>
               </div>
               <p style={{ fontSize: '11px', color: '#44474e', marginTop: '8px' }}>

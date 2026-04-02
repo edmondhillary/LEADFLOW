@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { business, contacto, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-cerrajero';
   const [form, setForm] = useState({ nombre: '', telefono: '', email: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -80,7 +82,7 @@ export default function ContactoPage() {
 
             {/* Left: info cards + map */}
             <div className="flex flex-col gap-6">
-              {/* Phone card */}
+              {/* Teléfono card */}
               <div className="rounded-2xl bg-[#1c1b1b] p-6 flex items-start gap-5" style={{ border: '1px solid #2a2a2a' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,215,0,0.1)' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffd700">
@@ -109,7 +111,7 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Address card */}
+              {/* Dirección card */}
               <div className="rounded-2xl bg-[#1c1b1b] p-6 flex items-start gap-5" style={{ border: '1px solid #2a2a2a' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,215,0,0.1)' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffd700">

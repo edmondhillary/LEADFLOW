@@ -5,7 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { contacto, business, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-academia';
   const [form, setForm] = useState({
     nombre: '',
     email: '',

@@ -11,7 +11,9 @@ const blogImages: Record<string, string> = {
 
 const categories = ['Todos', 'Producto de Temporada', 'Vinos y Maridaje', 'Tecnica Culinaria', 'Territorio y Origen'];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-restaurante';
   const featured = blogPosts[0];
   const rest = blogPosts.slice(1);
 
@@ -69,7 +71,7 @@ export default function BlogPage() {
             {/* Image — 7 cols */}
             <div className="md:col-span-7 aspect-[4/3] md:aspect-auto overflow-hidden">
               <img
-                src={images.blogFeatured}
+                src={images.blogDestacado}
                 alt={featured.title}
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
               />

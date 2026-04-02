@@ -12,7 +12,16 @@ export default function TemplateYogaLayout(props: any) {
 
   const ov = overrides;
   const business = ov
-    ? { ...defaultBusiness, name: ov.businessName, phone: ov.phone, phoneIntl: ov.phoneIntl, address: ov.address }
+    ? {
+        ...defaultBusiness,
+        name: ov.businessName,
+        fullName: ov.businessName,
+        phone: ov.phone,
+        phoneIntl: ov.phoneIntl,
+        email: ov.email || defaultBusiness.email,
+        address: ov.address,
+        city: ov.city,
+      }
     : defaultBusiness;
 
   const base = ov?.baseHref ?? '/template-yoga';
@@ -183,9 +192,9 @@ export default function TemplateYogaLayout(props: any) {
             </p>
           </div>
 
-          {/* Studio */}
+          {/* Estudio */}
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#e4e2dd', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Studio</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#e4e2dd', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Estudio</h4>
             <nav className="flex flex-col gap-3">
               {nav.map(n => (
                 <Link

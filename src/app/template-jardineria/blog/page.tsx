@@ -4,9 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-jardineria';
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed, setSuscribirmed] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
 
   const categories = ['All', 'Design', 'Maintenance', 'Planting', 'Irrigation', 'Sustainability'];
@@ -14,17 +16,17 @@ export default function BlogPage() {
   const rest = blogPosts.filter(p => !p.featured);
 
   const blogImages: Record<string, string> = {
-    'principles-of-garden-design': images.blogFeatured,
+    'principles-of-garden-design': images.blogDestacado,
     'seasonal-maintenance-guide': images.blog1,
     'plant-selection-for-structure': images.blog2,
     'smart-irrigation-systems': images.blog3,
     'sustainable-landscaping-practices': images.blog4,
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSuscribirme = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      setSubscribed(true);
+      setSuscribirmed(true);
     }
   };
 
@@ -82,16 +84,16 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured Article */}
+      {/* Artículo destacado */}
       {featured && (
         <section className="w-full py-20 px-6 md:px-10 max-w-[1920px] mx-auto">
           <span className="inline-block mb-8 text-xs font-semibold tracking-widest uppercase" style={{ color: '#56642b' }}>
-            Featured
+            Destacado
           </span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="rounded-3xl overflow-hidden" style={{ minHeight: '480px' }}>
               <img
-                src={blogImages[featured.slug] || images.blogFeatured}
+                src={blogImages[featured.slug] || images.blogDestacado}
                 alt={featured.title}
                 className="w-full h-full object-cover"
                 style={{ minHeight: '480px' }}
@@ -139,7 +141,7 @@ export default function BlogPage() {
                   letterSpacing: '0.15em',
                 }}
               >
-                Read Article
+                Leer artículo
               </Link>
             </div>
           </div>
@@ -196,7 +198,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="w-full py-20 px-6 md:px-10" style={{ backgroundColor: '#f4f4ef' }}>
         <div className="max-w-[720px] mx-auto text-center">
           <span className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase" style={{ color: '#56642b' }}>
@@ -217,7 +219,7 @@ export default function BlogPage() {
             Seasonal notes from the studio.
           </h2>
           <p style={{ fontSize: '15px', fontWeight: 300, color: '#444842', lineHeight: 1.75, marginBottom: '36px' }}>
-            Subscribe for quarterly dispatches on planting, design, and horticultural practice.
+            Suscribirme for quarterly dispatches on planting, design, and horticultural practice.
           </p>
           {subscribed ? (
             <div
@@ -229,7 +231,7 @@ export default function BlogPage() {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-[500px] mx-auto">
+            <form onSubmit={handleSuscribirme} className="flex flex-col sm:flex-row gap-3 max-w-[500px] mx-auto">
               <input
                 type="email"
                 value={email}
@@ -261,7 +263,7 @@ export default function BlogPage() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                Subscribe
+                Suscribirme
               </button>
             </form>
           )}

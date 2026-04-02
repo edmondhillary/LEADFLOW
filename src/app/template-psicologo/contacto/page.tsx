@@ -11,7 +11,9 @@ type FormData = {
   mensaje: string;
 };
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-psicologo';
   const [form, setForm] = useState<FormData>({
     nombre: '',
     email: '',

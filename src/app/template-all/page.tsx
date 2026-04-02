@@ -66,7 +66,7 @@ const templates = [
   {
     slug: 'template-pilates',
     name: 'KINETIC GALLERY',
-    industry: 'Pilates Studio',
+    industry: 'Pilates Estudio',
     design: 'Editorial Wellness · Noto Serif',
     color: '#536257',
     accent: '#d6e7d8',
@@ -76,7 +76,7 @@ const templates = [
   {
     slug: 'template-yoga',
     name: 'Breath of Silence',
-    industry: 'Yoga Studio',
+    industry: 'Yoga Estudio',
     design: 'Digital Sanctuary · Noto Serif',
     color: '#566342',
     accent: '#a3b18a',

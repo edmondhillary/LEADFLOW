@@ -2,7 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { business, serviciosPage, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-aire';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -42,11 +44,11 @@ export default function ServiciosPage() {
                   ))}
                 </div>
                 <Link
-                  href="/template-aire/contacto"
+                  href={`${baseHref}/contacto`}
                   className="inline-flex items-center gap-2 rounded-md transition-all hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', fontSize: '14px', fontWeight: 600, padding: '12px 28px', textDecoration: 'none' }}
                 >
-                  Get Quote for {item.name}
+                  Pedir presupuesto for {item.name}
                 </Link>
               </div>
               <div className={`rounded-2xl overflow-hidden ${i % 2 !== 0 ? 'lg:order-1' : ''}`} style={{ boxShadow: '0 12px 40px rgba(27,27,29,0.05)' }}>
@@ -109,7 +111,7 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/template-aire/contacto"
+                  href={`${baseHref}/contacto`}
                   className="inline-flex items-center justify-center rounded-md mt-auto transition-all hover:opacity-90"
                   style={{
                     background: plan.highlight ? 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)' : 'transparent',
@@ -122,7 +124,7 @@ export default function ServiciosPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  Get Started
+                  Empezar
                 </Link>
               </div>
             ))}
@@ -192,11 +194,11 @@ export default function ServiciosPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/template-aire/contacto"
+                href={`${baseHref}/contacto`}
                 className="inline-flex items-center justify-center rounded-md transition-all hover:bg-white/90"
                 style={{ backgroundColor: '#ffffff', color: '#8d4b00', fontSize: '14px', fontWeight: 700, padding: '14px 36px', textDecoration: 'none' }}
               >
-                Get Free Quote
+                Pedir presupuesto gratis
               </Link>
               <a
                 href={`tel:${business.phoneIntl}`}

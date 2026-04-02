@@ -152,7 +152,7 @@ export default function CerrajeroHome(props: any = {}) {
 
           {/* Bento grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Featured — col-span-2 with image overlay */}
+            {/* Destacado — col-span-2 with image overlay */}
             <div className="md:col-span-2 relative rounded-[1.5rem] overflow-hidden min-h-[300px] group">
               <img
                 src={images.techWorking}

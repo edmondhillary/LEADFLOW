@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { serviciosPage, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-gimnasio';
   return (
     <main>
       {/* Hero Editorial — matches ZIP */}
@@ -43,7 +45,7 @@ export default function ServiciosPage() {
               <p className="text-[#ababab] max-w-md">{serviciosPage.personalTraining.mainFeature.desc}</p>
             </div>
             <div className="mt-8 z-10">
-              <Link href="/template-gimnasio/contacto" className="flex items-center gap-2 text-[#eb0000] font-bold uppercase tracking-widest text-sm hover:gap-4 transition-all" style={{ textDecoration: 'none' }}>
+              <Link href={`${baseHref}/contacto`} className="flex items-center gap-2 text-[#eb0000] font-bold uppercase tracking-widest text-sm hover:gap-4 transition-all" style={{ textDecoration: 'none' }}>
                 CONOCER MÁS <span className="material-symbols-outlined">arrow_forward</span>
               </Link>
             </div>
@@ -96,7 +98,7 @@ export default function ServiciosPage() {
               </div>
               <h3 className="font-black text-4xl md:text-5xl uppercase italic mb-2" style={{ fontFamily: "'Epilogue', sans-serif" }}>{serviciosPage.groupClasses.items[0].name}</h3>
               <p className="text-[#ababab] max-w-sm mb-6">{serviciosPage.groupClasses.items[0].desc}</p>
-              <Link href="/template-gimnasio/contacto" className="bg-white text-black px-8 py-3 font-bold uppercase tracking-tighter hover:bg-[#eb0000] hover:text-white transition-all inline-block" style={{ textDecoration: 'none' }}>
+              <Link href={`${baseHref}/contacto`} className="bg-white text-black px-8 py-3 font-bold uppercase tracking-tighter hover:bg-[#eb0000] hover:text-white transition-all inline-block" style={{ textDecoration: 'none' }}>
                 Ver Horarios
               </Link>
             </div>
@@ -144,7 +146,7 @@ export default function ServiciosPage() {
             Agenda una sesión informativa personalizada. Evaluaremos tu estado actual y definiremos tu ruta hacia el máximo rendimiento.
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link href="/template-gimnasio/contacto" className="bg-[#eb0000] text-black px-10 py-5 font-black italic uppercase tracking-widest text-lg hover:scale-105 transition-transform duration-300 text-center active:scale-95" style={{ fontFamily: "'Epilogue', sans-serif", textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} className="bg-[#eb0000] text-black px-10 py-5 font-black italic uppercase tracking-widest text-lg hover:scale-105 transition-transform duration-300 text-center active:scale-95" style={{ fontFamily: "'Epilogue', sans-serif", textDecoration: 'none' }}>
               Agenda una sesión
             </Link>
             <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer" className="border-2 border-[#757575] text-white px-10 py-5 font-black italic uppercase tracking-widest text-lg hover:bg-white hover:text-black transition-all duration-300 text-center" style={{ fontFamily: "'Epilogue', sans-serif", textDecoration: 'none' }}>

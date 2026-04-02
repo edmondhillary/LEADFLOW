@@ -98,7 +98,7 @@ export default function TemplateLimpiezaHome(props: any = {}) {
                 <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 700, color: '#191c1d', marginBottom: '10px' }}>{s.name}</h3>
                 <p style={{ fontSize: '14px', color: '#414754', lineHeight: 1.7 }}>{s.desc}</p>
                 <div className="mt-6 flex items-center gap-2 group-hover:gap-3 transition-all duration-300">
-                  <Link href={`${base}/servicios`} style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>Learn More</Link>
+                  <Link href={`${base}/servicios`} style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>Saber más</Link>
                   <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#0059bb' }}>arrow_forward</span>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export default function TemplateLimpiezaHome(props: any = {}) {
       <section className="w-full bg-[#f3f4f5] py-20 px-6 md:px-8">
         <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-12">
-            <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Client Stories</p>
+            <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Historias de clientes</p>
             <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#191c1d' }}>
               What Our Clients Say
             </h2>
@@ -202,7 +202,7 @@ export default function TemplateLimpiezaHome(props: any = {}) {
             Get your free, no-obligation quote today. Our team responds within 24 hours.
           </p>
           <Link href={`${base}/contacto`} className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '16px 36px', textDecoration: 'none' }}>
-            Get a Free Quote
+            Pedir presupuesto gratis
           </Link>
         </div>
       </section>

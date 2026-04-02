@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
-  const blogImages = [images.blogFeatured, images.blog1, images.blog2, images.blog3, images.blog4];
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-gimnasio';
+  const blogImages = [images.blogDestacado, images.blog1, images.blog2, images.blog3, images.blog4];
 
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
-      {/* Featured */}
+      {/* Destacado */}
       <section className="px-6 max-w-7xl mx-auto mb-16 md:mb-24 pt-4 md:pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0" style={{ backgroundColor: '#131313' }}>
           <div className="lg:col-span-7 overflow-hidden">
@@ -62,7 +64,7 @@ export default function BlogPage() {
         </h2>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="px-6 max-w-7xl mx-auto mb-16 md:mb-24">
         <div className="p-12 md:p-16 text-center" style={{ backgroundColor: '#1f1f1f' }}>
           <h2 className="text-2xl md:text-3xl mb-4" style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase' }}>

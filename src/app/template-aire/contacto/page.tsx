@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { business, contacto, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-aire';
   const [form, setForm] = useState({
     nombre: '',
     email: '',
@@ -49,9 +51,9 @@ export default function ContactoPage() {
               {/* Contact info cards */}
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: 'phone', label: 'Phone', value: business.phone, href: `tel:${business.phoneIntl}` },
+                  { icon: 'phone', label: 'Teléfono', value: business.phone, href: `tel:${business.phoneIntl}` },
                   { icon: 'email', label: 'Email', value: business.email, href: `mailto:${business.email}` },
-                  { icon: 'location_on', label: 'Address', value: business.address, href: undefined },
+                  { icon: 'location_on', label: 'Dirección', value: business.address, href: undefined },
                 ].map(item => (
                   <div key={item.label} className="flex items-center gap-4 p-5 rounded-xl" style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 16px rgba(27,27,29,0.04)', border: '1px solid #e4e2e4' }}>
                     <div
@@ -72,11 +74,11 @@ export default function ContactoPage() {
                 ))}
               </div>
 
-              {/* Hours */}
+              {/* Horario */}
               <div className="rounded-xl p-6" style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 16px rgba(27,27,29,0.04)', border: '1px solid #e4e2e4' }}>
                 <div className="flex items-center gap-2 mb-5">
                   <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#8d4b00', fontVariationSettings: "'FILL' 1" }}>schedule</span>
-                  <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '13px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Business Hours</p>
+                  <p style={{ fontFamily: "'Manrope', sans-serif", fontSize: '13px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Horario comercial</p>
                 </div>
                 <div className="flex flex-col gap-3">
                   {contacto.hours.map(h => (
@@ -181,7 +183,7 @@ export default function ContactoPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
-                        <label htmlFor="telefono" style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Phone</label>
+                        <label htmlFor="telefono" style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#1b1b1d', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Teléfono</label>
                         <input
                           id="telefono"
                           name="telefono"

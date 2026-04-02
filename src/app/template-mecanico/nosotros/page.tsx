@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, stats, precisionProtocol, credentials, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mecanico';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -269,7 +271,7 @@ export default function NosotrosPage() {
               LLAMAR AHORA
             </a>
             <Link
-              href="/template-mecanico/servicios"
+              href={`${baseHref}/servicios`}
               className="border border-[#ffb599]/40 text-[#ffb599] uppercase tracking-[0.15em] text-sm font-bold px-10 py-4 hover:bg-[#ffb599]/10 transition-colors"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >

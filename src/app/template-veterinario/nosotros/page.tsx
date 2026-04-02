@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, team, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-veterinario';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -123,7 +125,7 @@ export default function NosotrosPage() {
               </p>
             </div>
             <Link
-              href="/template-veterinario/contacto"
+              href={`${baseHref}/contacto`}
               className="flex items-center gap-2 font-bold text-[#166875] group shrink-0"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
@@ -228,14 +230,14 @@ export default function NosotrosPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/template-veterinario/contacto"
+              href={`${baseHref}/contacto`}
               className="bg-[#166875] text-[#edfcff] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#005c68] transition-all shadow-lg"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               Book a Facility Tour
             </Link>
             <Link
-              href="/template-veterinario/contacto"
+              href={`${baseHref}/contacto`}
               className="border-2 border-[#bbb0a7]/30 text-[#38312b] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#fff8f4] transition-all"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >

@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { contact, business, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-veterinario';
   const [formData, setFormData] = useState({
     name: '',
     petName: '',
@@ -52,7 +54,7 @@ export default function ContactoPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
             {/* Left — Info (5 cols) */}
             <div className="lg:col-span-5 flex flex-col gap-10">
-              {/* Phone info box */}
+              {/* Teléfono info box */}
               <div className="bg-[#fcf2eb] p-8 rounded-2xl flex flex-col gap-6">
                 <div className="flex items-start gap-6">
                   <div className="bg-[#a4ebf9] p-3 rounded-full text-[#005964] shrink-0">
@@ -98,14 +100,14 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Hours + Parking grid */}
+              {/* Horario + Parking grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#f1e6dd]/50 p-6 rounded-2xl">
                   <h4
                     className="font-bold text-xs uppercase tracking-wider text-[#665e56] mb-4"
                     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
-                    Clinic Hours
+                    Clinic Horario
                   </h4>
                   <ul className="flex flex-col gap-2 text-sm text-[#38312b]">
                     {contact.hours.map((row) => (
@@ -131,7 +133,7 @@ export default function ContactoPage() {
                 </div>
               </div>
 
-              {/* Address */}
+              {/* Dirección */}
               <div>
                 <p
                   className="text-xs uppercase tracking-widest font-bold text-[#665e56] mb-3"
@@ -218,7 +220,7 @@ export default function ContactoPage() {
                           className="text-sm font-bold text-[#665e56] px-1"
                           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
-                          Phone Number
+                          Teléfono
                         </label>
                         <input
                           type="tel"

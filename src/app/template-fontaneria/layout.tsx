@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   description: `${business.name} - Servicios profesionales de fontanería en ${business.city}. Urgencias 24h, presupuesto gratis.`,
 };
 
-export default function TemplateLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-fontaneria';
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Google Fonts + Material Symbols */}
@@ -19,7 +22,7 @@ export default function TemplateLayout({ children }: { children: React.ReactNode
       <header className="fixed top-0 w-full z-50 shadow-sm" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <div className="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
           {/* Logo */}
-          <Link href="/template-fontaneria" className="flex items-center gap-3">
+          <Link href={`${baseHref}`} className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl" style={{ color: '#002045' }}>waves</span>
             <span className="text-xl tracking-tighter" style={{ fontFamily: 'Manrope', fontWeight: 900, color: '#002045' }}>{business.name}</span>
           </Link>

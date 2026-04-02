@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { contacto, images, business } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-gimnasio';
   const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', plan: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -125,7 +127,7 @@ export default function ContactoPage() {
         </div>
       </div>
 
-      <Link href="/template-gimnasio" className="mt-8 flex items-center gap-2 transition-colors hover:text-[#eb0000]" style={{ color: '#ababab', textDecoration: 'none' }}>
+      <Link href={`${baseHref}`} className="mt-8 flex items-center gap-2 transition-colors hover:text-[#eb0000]" style={{ color: '#ababab', textDecoration: 'none' }}>
         <span className="material-symbols-outlined text-sm">arrow_back</span>
         <span className="text-xs font-bold uppercase" style={{ letterSpacing: '0.1em' }}>Volver al inicio</span>
       </Link>

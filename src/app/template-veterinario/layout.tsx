@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function VeterinarioLayout({ children }: { children: React.ReactNode }) {
+export default function VeterinarioLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-veterinario';
   const [menuOpen, setMenuOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(true);
 
@@ -26,7 +29,7 @@ export default function VeterinarioLayout({ children }: { children: React.ReactN
         <div className="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
           {/* Logo */}
           <Link
-            href="/template-veterinario"
+            href={`${baseHref}`}
             className="text-2xl font-bold text-[#166875] tracking-tighter"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
@@ -49,18 +52,18 @@ export default function VeterinarioLayout({ children }: { children: React.ReactN
           {/* Desktop CTAs */}
           <div className="hidden md:flex items-center gap-3">
             <Link
-              href="/template-veterinario/contacto"
+              href={`${baseHref}/contacto`}
               className="hidden lg:block px-6 py-2.5 rounded-full border border-[#827971]/20 text-[#166875] font-semibold hover:bg-[#fcf2eb] transition-all duration-300 text-sm"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               Emergency Care
             </Link>
             <Link
-              href="/template-veterinario/contacto"
+              href={`${baseHref}/contacto`}
               className="px-6 py-2.5 rounded-full bg-[#166875] text-[#edfcff] font-semibold hover:bg-[#005c68] transition-all duration-300 text-sm shadow-sm scale-95 active:scale-90"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              Book Appointment
+              Reservar cita
             </Link>
           </div>
 
@@ -102,12 +105,12 @@ export default function VeterinarioLayout({ children }: { children: React.ReactN
         </nav>
         <div className="mt-8 flex flex-col gap-3">
           <Link
-            href="/template-veterinario/contacto"
+            href={`${baseHref}/contacto`}
             onClick={() => setMenuOpen(false)}
             className="block w-full text-center bg-[#166875] text-[#edfcff] rounded-full font-semibold px-6 py-3 hover:bg-[#005c68] transition-colors"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            Book Appointment
+            Reservar cita
           </Link>
           <a
             href={`tel:${business.emergency}`}
@@ -175,7 +178,7 @@ export default function VeterinarioLayout({ children }: { children: React.ReactN
                     </Link>
                   </li>
                 ))}
-                <li><Link href="/template-veterinario/nosotros" className="hover:text-[#166875] transition-colors">Careers</Link></li>
+                <li><Link href={`${baseHref}/nosotros`} className="hover:text-[#166875] transition-colors">Careers</Link></li>
               </ul>
             </div>
 
@@ -188,8 +191,8 @@ export default function VeterinarioLayout({ children }: { children: React.ReactN
                 Legal
               </h5>
               <ul className="flex flex-col gap-3 text-sm text-[#827971]">
-                <li><Link href="#" className="hover:text-[#166875] transition-colors">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-[#166875] transition-colors">Terms of Service</Link></li>
+                <li><Link href="#" className="hover:text-[#166875] transition-colors">Política de privacidad</Link></li>
+                <li><Link href="#" className="hover:text-[#166875] transition-colors">Términos del servicio</Link></li>
                 <li><Link href="#" className="hover:text-[#166875] transition-colors">Accessibility</Link></li>
               </ul>
             </div>

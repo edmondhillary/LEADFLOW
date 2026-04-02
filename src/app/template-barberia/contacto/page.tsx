@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { business, contacto, images } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-barberia';
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -70,11 +72,11 @@ export default function ContactoPage() {
             {/* Info cards */}
             <div className="flex flex-col gap-6 mb-12">
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
-                <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Address</p>
+                <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Dirección</p>
                 <p style={{ fontSize: '15px', color: '#e5e2e1', lineHeight: 1.6 }}>{business.address}</p>
               </div>
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
-                <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Phone</p>
+                <p style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Teléfono</p>
                 <a href={`tel:${business.phoneIntl}`} style={{ fontSize: '15px', color: '#e5e2e1', textDecoration: 'none' }}>{business.phone}</a>
               </div>
               <div className="p-6" style={{ backgroundColor: '#1c1b1b', borderLeft: '2px solid #e9c176' }}>
@@ -83,9 +85,9 @@ export default function ContactoPage() {
               </div>
             </div>
 
-            {/* Hours */}
+            {/* Horario */}
             <div style={{ borderTop: '1px solid rgba(78,70,57,0.3)', paddingTop: '32px' }}>
-              <p style={{ fontSize: '10px', fontWeight: 600, color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '20px' }}>Studio Hours</p>
+              <p style={{ fontSize: '10px', fontWeight: 600, color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '20px' }}>Estudio Horario</p>
               <div className="flex flex-col gap-3">
                 {[
                   { day: 'Tuesday — Friday', time: '09:00 — 19:00' },
@@ -129,12 +131,12 @@ export default function ContactoPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" style={labelStyle}>Email Address</label>
+                  <label htmlFor="email" style={labelStyle}>Correo electrónico</label>
                   <input id="email" name="email" type="email" required value={form.email} onChange={handleChange} style={inputStyle} placeholder="you@example.com" />
                 </div>
 
                 <div>
-                  <label htmlFor="phone" style={labelStyle}>Phone (optional)</label>
+                  <label htmlFor="phone" style={labelStyle}>Teléfono (optional)</label>
                   <input id="phone" name="phone" type="tel" value={form.phone} onChange={handleChange} style={inputStyle} placeholder="+44 20 0000 0000" />
                 </div>
 

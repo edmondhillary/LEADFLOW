@@ -2,7 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { business, nosotrosPage, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-aire';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -46,7 +48,7 @@ export default function NosotrosPage() {
         <div className="px-6 md:px-8 max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Our Story</p>
+              <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Nuestra historia</p>
               <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.03em', marginBottom: '24px' }}>
                 {business.yearsExperience}+ years serving Austin
               </h2>
@@ -74,7 +76,7 @@ export default function NosotrosPage() {
       <section className="py-24" style={{ backgroundColor: '#f6f3f5' }}>
         <div className="px-6 md:px-8 max-w-[1920px] mx-auto">
           <div className="text-center mb-16">
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Our Values</p>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Nuestros valores</p>
             <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.03em' }}>
               Three pillars of our practice
             </h2>
@@ -141,7 +143,7 @@ export default function NosotrosPage() {
       {/* Team */}
       <section className="py-24" style={{ backgroundColor: '#eae7ea' }}>
         <div className="px-6 md:px-8 max-w-[1920px] mx-auto text-center">
-          <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>The Team</p>
+          <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>El equipo</p>
           <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 800, color: '#1b1b1d', letterSpacing: '-0.03em', marginBottom: '12px' }}>
             {nosotrosPage.team.title}
           </h2>
@@ -169,11 +171,11 @@ export default function NosotrosPage() {
               {nosotrosPage.cta.desc}
             </p>
             <Link
-              href="/template-aire/contacto"
+              href={`${baseHref}/contacto`}
               className="inline-flex items-center justify-center rounded-md transition-all hover:bg-white/90"
               style={{ backgroundColor: '#ffffff', color: '#8d4b00', fontSize: '14px', fontWeight: 700, padding: '14px 36px', textDecoration: 'none' }}
             >
-              Get Free Quote
+              Pedir presupuesto gratis
             </Link>
           </div>
         </div>

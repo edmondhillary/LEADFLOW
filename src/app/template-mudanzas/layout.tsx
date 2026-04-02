@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateMudanzasLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateMudanzasLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mudanzas';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -25,7 +28,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
         <div className="flex justify-between items-center w-full px-6 md:px-10 py-4 max-w-[1440px] mx-auto">
           {/* Logo */}
           <Link
-            href="/template-mudanzas"
+            href={`${baseHref}`}
             style={{
               fontFamily: "'Manrope', sans-serif",
               fontSize: '18px',
@@ -61,7 +64,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
 
           {/* Desktop CTA */}
           <a
-            href="/template-mudanzas/contacto"
+            href={`${baseHref}/contacto`}
             className="hidden md:inline-block transition-all active:scale-[0.98] hover:opacity-90"
             style={{
               fontFamily: "'Manrope', sans-serif",
@@ -75,7 +78,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
               letterSpacing: '0.01em',
             }}
           >
-            Get a Quote
+            Pedir presupuesto
           </a>
 
           {/* Mobile hamburger */}
@@ -146,7 +149,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href="/template-mudanzas/contacto"
+            href={`${baseHref}/contacto`}
             className="block w-full text-center py-4"
             style={{
               backgroundColor: '#552b00',
@@ -159,7 +162,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
             }}
             onClick={() => setMenuOpen(false)}
           >
-            Get a Quote
+            Pedir presupuesto
           </a>
           <p
             className="mt-4 text-center"
@@ -230,7 +233,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
               ].map((s) => (
                 <Link
                   key={s}
-                  href="/template-mudanzas/servicios"
+                  href={`${baseHref}/servicios`}
                   style={{
                     fontSize: '13px',
                     color: '#44474e',
@@ -278,8 +281,8 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
               ))}
             </nav>
             <div className="mt-6 flex flex-col gap-2">
-              <span style={{ fontSize: '12px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>Privacy Policy</span>
-              <span style={{ fontSize: '12px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>Terms of Service</span>
+              <span style={{ fontSize: '12px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>Política de privacidad</span>
+              <span style={{ fontSize: '12px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>Términos del servicio</span>
             </div>
           </div>
         </div>
@@ -289,7 +292,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
           style={{ borderTop: '1px solid rgba(0,32,70,0.08)' }}
         >
           <p style={{ fontSize: '11px', color: '#44474e', fontFamily: "'Inter', sans-serif" }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. All rights reserved.{' '}
+            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
             </a>
@@ -305,7 +308,7 @@ export default function TemplateMudanzasLayout({ children }: { children: React.R
         href={`https://wa.me/${business.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contact via WhatsApp"
+        aria-label="Contactar por WhatsApp"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105"
         style={{ backgroundColor: '#25d366' }}
       >

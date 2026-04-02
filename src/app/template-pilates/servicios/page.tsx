@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { classes, schedule, pricing, instructors, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pilates';
   const classChips = ['All Classes', 'Reformer', 'Mat', 'Private', 'Breathwork', 'Beginner', 'Advanced'];
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
@@ -86,7 +88,7 @@ export default function ServiciosPage() {
                   </h3>
                   <p style={{ fontSize: '13px', color: '#5c605c', lineHeight: 1.7 }}>{cls.desc}</p>
                   <Link
-                    href="/template-pilates/contacto"
+                    href={`${baseHref}/contacto`}
                     className="inline-block mt-4 transition-all"
                     style={{ fontSize: '11px', fontWeight: 600, color: '#536257', textTransform: 'uppercase', letterSpacing: '0.1em', textDecoration: 'none', borderBottom: '1px solid #536257', paddingBottom: '2px' }}
                   >
@@ -207,7 +209,7 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/template-pilates/contacto"
+                  href={`${baseHref}/contacto`}
                   className="block text-center transition-all active:scale-[0.98]"
                   style={{
                     backgroundColor: tier.highlight ? '#ebfced' : '#536257',
@@ -240,10 +242,10 @@ export default function ServiciosPage() {
               </h2>
             </div>
             <Link
-              href="/template-pilates/nosotros"
+              href={`${baseHref}/nosotros`}
               style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2f3430', textDecoration: 'none', borderBottom: '1px solid #2f3430', paddingBottom: '4px', alignSelf: 'flex-start' }}
             >
-              Meet the Team
+              Conoce al equipo
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -286,11 +288,11 @@ export default function ServiciosPage() {
             Book your first session today. Intro class is $25 — all equipment included.
           </p>
           <Link
-            href="/template-pilates/contacto"
+            href={`${baseHref}/contacto`}
             className="inline-block transition-all active:scale-[0.98]"
             style={{ backgroundColor: '#ebfced', color: '#536257', padding: '16px 48px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
           >
-            Book Now
+            Reservar ahora
           </Link>
         </div>
       </section>

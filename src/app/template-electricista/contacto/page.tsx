@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, images, blogPosts, contact } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-electricista';
   const [formData, setFormData] = useState({ nombre: '', email: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -196,11 +198,11 @@ export default function ContactoPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Featured article */}
+            {/* Destacado article */}
             <article className="md:col-span-2 bg-white flex flex-col md:flex-row group cursor-pointer overflow-hidden">
               <div className="md:w-1/2 overflow-hidden h-64 md:h-full">
                 <img
-                  src={images.blogFeatured}
+                  src={images.blogDestacado}
                   alt="Seguridad eléctrica"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />

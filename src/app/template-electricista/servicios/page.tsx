@@ -19,7 +19,9 @@ const installationCards = [
 
 const certChecks = ['Aumentos de potencia', 'Altas de suministro', 'Cambios de titularidad'];
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-electricista';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -129,7 +131,7 @@ export default function ServiciosPage() {
                   ))}
                 </div>
                 <Link
-                  href="/template-electricista/contacto"
+                  href={`${baseHref}/contacto`}
                   className="mt-12 inline-block bg-white text-zinc-900 px-8 py-4 font-black uppercase text-sm tracking-widest hover:bg-[#ffd700] hover:text-[#705e00] transition-colors"
                 >
                   Solicitar CIE

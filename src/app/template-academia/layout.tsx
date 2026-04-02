@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateAcademiaLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateAcademiaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-academia';
   const [menuOpen, setMenuOpen] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -16,7 +19,7 @@ export default function TemplateAcademiaLayout({ children }: { children: React.R
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-white/80 shadow-sm" style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-10 py-4 max-w-[1440px] mx-auto">
-          <Link href="/template-academia" style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#001944', letterSpacing: '-0.04em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#001944', letterSpacing: '-0.04em', textDecoration: 'none' }}>
             {business.name}
           </Link>
 
@@ -29,10 +32,10 @@ export default function TemplateAcademiaLayout({ children }: { children: React.R
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/template-academia/contacto" style={{ fontSize: '14px', fontWeight: 500, color: '#454652', textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} style={{ fontSize: '14px', fontWeight: 500, color: '#454652', textDecoration: 'none' }}>
               Login
             </Link>
-            <Link href="/template-academia/contacto" className="rounded-xl transition-all hover:opacity-90" style={{ fontSize: '14px', fontWeight: 600, background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', padding: '10px 22px', textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} className="rounded-xl transition-all hover:opacity-90" style={{ fontSize: '14px', fontWeight: 600, background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', padding: '10px 22px', textDecoration: 'none' }}>
               Sign Up
             </Link>
           </div>
@@ -58,7 +61,7 @@ export default function TemplateAcademiaLayout({ children }: { children: React.R
           ))}
         </nav>
         <div className="mt-auto px-8 pb-8 flex flex-col gap-3">
-          <Link href="/template-academia/contacto" className="block w-full text-center py-3 rounded-xl" style={{ background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }} onClick={() => setMenuOpen(false)}>
+          <Link href={`${baseHref}/contacto`} className="block w-full text-center py-3 rounded-xl" style={{ background: 'linear-gradient(to right, #001944, #002c6e)', color: '#ffffff', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }} onClick={() => setMenuOpen(false)}>
             Sign Up
           </Link>
           <p className="text-center" style={{ fontSize: '12px', color: '#454652' }}>{business.phone}</p>
@@ -103,9 +106,9 @@ export default function TemplateAcademiaLayout({ children }: { children: React.R
             </div>
           </div>
 
-          {/* Newsletter */}
+          {/* Boletín */}
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '12px' }}>Newsletter</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '12px' }}>Boletín</h4>
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', marginBottom: '16px', lineHeight: 1.7 }}>Recibe recursos exclusivos y novedades del sector cada semana.</p>
             <div className="flex gap-2">
               <input

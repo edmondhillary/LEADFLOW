@@ -7,7 +7,9 @@ const imageMap: Record<string, string> = {
   securityDoor: images.securityDoor,
 };
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-cerrajero';
   return (
     <>
       {/* ── HERO HEADER ── */}
@@ -181,7 +183,7 @@ export default function ServiciosPage() {
               {business.phone}
             </a>
             <Link
-              href="/template-cerrajero/contacto"
+              href={`${baseHref}/contacto`}
               className="rounded-lg px-10 py-5 transition-all hover:bg-[#3a3000]/10"
               style={{ border: '2px solid #3a3000', color: '#3a3000', fontSize: '14px', fontWeight: 700, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.12em' }}
             >

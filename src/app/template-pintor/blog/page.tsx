@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
-  const blogImages = [images.blogFeatured, images.blog1, images.blog2, images.blog3];
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pintor';
+  const blogImages = [images.blogDestacado, images.blog1, images.blog2, images.blog3];
 
   return (
     <main style={{ fontFamily: "'Work Sans', sans-serif" }}>
-      {/* Featured */}
+      {/* Destacado */}
       <section className="px-6 max-w-7xl mx-auto mb-16 md:mb-24 pt-4 md:pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-[#f2f4f4] rounded-xl overflow-hidden shadow-sm">
           <div className="lg:col-span-7 overflow-hidden">
@@ -45,7 +47,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="px-6 max-w-5xl mx-auto mb-16 md:mb-24">
         <div className="rounded-2xl p-12 md:p-16 text-center relative overflow-hidden shadow-xl" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)' }}>
           <h2 className="text-2xl md:text-3xl font-bold text-[#d9fffe] mb-4" style={{ fontFamily: "'Manrope', sans-serif" }}>Consejos de Color y Acabados</h2>

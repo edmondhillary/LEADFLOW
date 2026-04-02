@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { services, tailoredPrograms, processSteps, portfolio, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-jardineria';
   return (
     <div style={{ fontFamily: "'Manrope', sans-serif", backgroundColor: '#fafaf5' }}>
 
@@ -85,7 +87,7 @@ export default function ServiciosPage() {
                   ))}
                 </div>
                 <Link
-                  href="/template-jardineria/contacto"
+                  href={`${baseHref}/contacto`}
                   className="inline-block rounded-xl transition-all hover:opacity-90"
                   style={{
                     background: 'linear-gradient(145deg, #283827 0%, #3e4f3c 100%)',
@@ -176,7 +178,7 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/template-jardineria/contacto"
+                  href={`${baseHref}/contacto`}
                   className="block text-center rounded-xl transition-all hover:opacity-90"
                   style={{
                     backgroundColor: program.featured ? '#ffffff' : 'transparent',
@@ -326,7 +328,7 @@ export default function ServiciosPage() {
                 Contact our studio today and a senior horticulturalist will be in touch within 48 hours.
               </p>
               <Link
-                href="/template-jardineria/contacto"
+                href={`${baseHref}/contacto`}
                 className="inline-block rounded-xl transition-all hover:opacity-90"
                 style={{
                   backgroundColor: '#ffffff',

@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplatePilatesLayout({ children }: { children: React.ReactNode }) {
+export default function TemplatePilatesLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pilates';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
       {/* Header */}
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(250,249,246,0.70)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(175,179,174,0.12)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-5 max-w-[1920px] mx-auto">
-          <Link href="/template-pilates" style={{ fontFamily: "'Noto Serif', serif", fontSize: '18px', fontWeight: 300, color: '#536257', letterSpacing: '0.2em', textDecoration: 'none', textTransform: 'uppercase' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Noto Serif', serif", fontSize: '18px', fontWeight: 300, color: '#536257', letterSpacing: '0.2em', textDecoration: 'none', textTransform: 'uppercase' }}>
             {business.name}
           </Link>
 
@@ -38,7 +41,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
             className="hidden md:inline-block transition-all active:scale-[0.98]"
             style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#536257', color: '#ebfced', padding: '11px 28px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.15em', borderRadius: '9999px' }}
           >
-            Book Now
+            Reservar ahora
           </a>
 
           <button
@@ -83,11 +86,11 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
         </nav>
         <div className="mt-auto px-8 pb-8">
           <a
-            href="/template-pilates/contacto"
+            href={`${baseHref}/contacto`}
             className="block w-full text-center py-4"
             style={{ backgroundColor: '#536257', color: '#ebfced', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none', borderRadius: '9999px' }}
           >
-            Book a Session
+            Reservar sesión
           </a>
           <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#5c605c', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>
         </div>
@@ -104,7 +107,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
             <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.8 }}>{business.tagline}<br />{business.city}, {business.state}</p>
           </div>
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Studio</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Estudio</h4>
             <nav className="flex flex-col gap-3">
               {nav.map(n => (
                 <Link
@@ -127,7 +130,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
             </div>
           </div>
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Newsletter</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Boletín</h4>
             <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.7, marginBottom: '16px' }}>Movement notes, class updates and studio news — delivered monthly.</p>
             <div className="flex gap-2">
               <input
@@ -150,7 +153,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
           style={{ borderTop: '1px solid rgba(83,98,87,0.15)' }}
         >
           <p style={{ fontSize: '10px', color: '#5c605c', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.fullName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {business.fullName}. Todos los derechos reservados.
             {' · '}
             <a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>
               Made by Nexifydev.com
@@ -167,7 +170,7 @@ export default function TemplatePilatesLayout({ children }: { children: React.Re
         href={`https://wa.me/${business.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contact via WhatsApp"
+        aria-label="Contactar por WhatsApp"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105"
         style={{ backgroundColor: '#25d366' }}
       >

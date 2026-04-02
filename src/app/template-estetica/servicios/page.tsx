@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { services, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-estetica';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -116,7 +118,7 @@ export default function ServiciosPage() {
               </div>
               <div className="bg-white p-5 flex-1 flex flex-col justify-between">
                 <p className="text-[#5d605a] text-sm leading-relaxed">{services[1].desc}</p>
-                <Link href="/template-estetica/contacto" className="text-[#6c5c4a] text-xs tracking-widest uppercase mt-3 hover:text-[#5f503f] transition-colors">Consultar &rarr;</Link>
+                <Link href={`${baseHref}/contacto`} className="text-[#6c5c4a] text-xs tracking-widest uppercase mt-3 hover:text-[#5f503f] transition-colors">Consultar &rarr;</Link>
               </div>
             </div>
 
@@ -135,7 +137,7 @@ export default function ServiciosPage() {
                 </h3>
                 <p className="text-[#5d605a] text-sm leading-relaxed">{services[2].desc}</p>
               </div>
-              <Link href="/template-estetica/contacto" className="text-[#6c5c4a] text-xs tracking-widest uppercase hover:text-[#5f503f] transition-colors">Saber mas &rarr;</Link>
+              <Link href={`${baseHref}/contacto`} className="text-[#6c5c4a] text-xs tracking-widest uppercase hover:text-[#5f503f] transition-colors">Saber mas &rarr;</Link>
             </div>
 
             {/* Armonizacion Facial — 2-col internal grid */}
@@ -168,7 +170,7 @@ export default function ServiciosPage() {
                     </ul>
                   )}
                 </div>
-                <Link href="/template-estetica/contacto" className="text-[#eeda7b] text-xs tracking-widest uppercase hover:text-white transition-colors">Consultar &rarr;</Link>
+                <Link href={`${baseHref}/contacto`} className="text-[#eeda7b] text-xs tracking-widest uppercase hover:text-white transition-colors">Consultar &rarr;</Link>
               </div>
             </div>
 
@@ -254,13 +256,13 @@ export default function ServiciosPage() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
-                  href="/template-estetica/contacto"
+                  href={`${baseHref}/contacto`}
                   className="bg-[#6c5c4a] text-[#fff6f0] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#5f503f] transition-colors duration-200"
                 >
                   RESERVAR EVALUACION
                 </Link>
                 <Link
-                  href="/template-estetica/nosotros"
+                  href={`${baseHref}/nosotros`}
                   className="border border-[#6c5c4a] text-[#6c5c4a] tracking-widest uppercase text-sm px-8 py-4 hover:bg-[#6c5c4a] hover:text-[#fff6f0] transition-colors duration-200"
                 >
                   CONOCER AL EQUIPO

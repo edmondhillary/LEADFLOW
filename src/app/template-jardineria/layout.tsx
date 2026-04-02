@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateJardineriaLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateJardineriaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-jardineria';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -24,7 +27,7 @@ export default function TemplateJardineriaLayout({ children }: { children: React
       >
         <div className="flex justify-between items-center w-full px-6 md:px-10 py-5 max-w-[1920px] mx-auto">
           <Link
-            href="/template-jardineria"
+            href={`${baseHref}`}
             style={{
               fontFamily: "'Newsreader', serif",
               fontSize: '20px',
@@ -132,7 +135,7 @@ export default function TemplateJardineriaLayout({ children }: { children: React
               textDecoration: 'none',
             }}
           >
-            Call Studio
+            Call Estudio
           </a>
           <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#444842', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>
         </div>
@@ -191,7 +194,7 @@ export default function TemplateJardineriaLayout({ children }: { children: React
           style={{ borderTop: '1px solid rgba(40,56,39,0.12)' }}
         >
           <p style={{ fontSize: '10px', color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            &copy; {new Date().getFullYear()} {business.legalName}. All rights reserved.{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
+            &copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' · '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a>
           </p>
           <p style={{ fontSize: '10px', color: '#444842', textTransform: 'uppercase', letterSpacing: '0.15em', fontStyle: 'italic' }}>
             Est. {business.foundedYear} — London
@@ -204,7 +207,7 @@ export default function TemplateJardineriaLayout({ children }: { children: React
         href={`https://wa.me/${business.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contact via WhatsApp"
+        aria-label="Contactar por WhatsApp"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105"
         style={{ backgroundColor: '#25d366' }}
       >

@@ -21,6 +21,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { connectDB, Lead, WebsiteContent } from '../src/lib/mongodb';
 import { runScraper } from './scraper/index';
 import { SECTORS, getSector, getTemplateName, getDesign } from '../src/config/sectors';
+import { getSectorImages } from '../src/lib/images';
 
 // ─── Interfaces ────────────────────────────────────────────────────────────
 
@@ -57,6 +58,19 @@ function getLocale(country: string): 'es-ES' | 'es-AR' {
 
 function getCurrency(country: string): 'EUR' | 'USD' {
   return country === 'ES' ? 'EUR' : 'USD';
+}
+
+async function validateImageUrl(url: string | undefined, fallbackUrl: string): Promise<string> {
+  if (!url) return fallbackUrl;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 3500);
+    const res = await fetch(url, { method: 'HEAD', signal: ctrl.signal });
+    clearTimeout(timer);
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.startsWith('image/')) return url;
+  } catch {}
+  return fallbackUrl;
 }
 
 // ─── Validar WhatsApp (método simple: check formato móvil validado) ────────
@@ -103,6 +117,7 @@ ${lead.rawScrapeData?.hours ? `- Horario: ${lead.rawScrapeData.hours}` : ''}
 
 IMPORTANTE: ${toneNote}
 IMPORTANTE: TODO el contenido debe quedar en español natural. No uses inglés (excepto nombres propios/marca).
+IMPORTANTE: Usa exactamente el nombre comercial del negocio para títulos y referencias: "${lead.businessName}".
 IMPORTANTE: Reemplaza TODAS las menciones de ciudades genéricas (Austin, San Francisco, Madrid, Barcelona, Buenos Aires, Montevideo o cualquier ciudad de ejemplo) por "${lead.city}".
 IMPORTANTE: Menciona "${lead.city}" cuando aporte valor, pero evita repeticiones innecesarias.
 IMPORTANTE: NO dupliques la ciudad en el hero. Si el heroTitle ya incluye ciudad, no repetir en otra parte del mismo titular.
@@ -172,13 +187,35 @@ Genera un objeto JSON con el contenido personalizado para la web. El JSON debe t
 
 Devuelve ÚNICAMENTE el JSON válido, sin markdown ni explicaciones.`;
 
-  const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
-    max_tokens: 8192,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  // Retry con backoff exponencial para rate limits
+  const MAX_RETRIES = 4;
+  let lastError: any;
+  let rawText = '';
 
-  const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 8192,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      rawText = response.content[0].type === 'text' ? response.content[0].text : '';
+      break; // éxito, salir del loop
+    } catch (err: any) {
+      lastError = err;
+      const isRateLimit = err?.status === 429 || err?.error?.type === 'rate_limit_error';
+      const isOverloaded = err?.status === 529 || err?.error?.type === 'overloaded_error';
+      if ((isRateLimit || isOverloaded) && attempt < MAX_RETRIES - 1) {
+        const waitSec = Math.pow(2, attempt + 1) * 5; // 10s, 20s, 40s, 80s
+        console.log(`⏳ Rate limit — reintentando en ${waitSec}s (intento ${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise(r => setTimeout(r, waitSec * 1000));
+      } else {
+        throw err; // error no-recuperable o último intento
+      }
+    }
+  }
+
+  if (!rawText && lastError) throw lastError;
 
   // Parse JSON — intentar limpiar si viene con markdown
   let jsonStr = rawText.trim();
@@ -227,6 +264,11 @@ async function processSingleLead(leadId: string): Promise<PipelineResult> {
       // Fallback: contenido genérico con datos reales
       generatedContent = buildFallbackContent(lead);
     }
+
+    // Doble-check de imágenes (si IA devuelve ogImage inválida, usamos Unsplash sectorial)
+    const sectorImages = getSectorImages(lead.sector);
+    generatedContent.seo = generatedContent.seo || {};
+    generatedContent.seo.ogImage = await validateImageUrl(generatedContent.seo?.ogImage, sectorImages.og);
 
     // Guardar WebsiteContent en MongoDB
     const existing = lead.contentRef
@@ -279,12 +321,15 @@ function buildFallbackContent(lead: any) {
   const city = lead.city;
   const sector = lead.sector;
   const name = lead.businessName;
+  const isRioplatense = lead.country === 'AR' || lead.country === 'UY';
 
   return {
     pages: {
       home: {
         heroTitle: `${name} — Servicios de ${sector} en ${city}`,
-        heroSubtitle: `Profesionales de confianza en ${city}. Presupuesto sin compromiso. Llámanos ahora.`,
+        heroSubtitle: isRioplatense
+          ? `Profesionales de confianza en ${city}. Presupuesto sin compromiso. Escribinos ahora.`
+          : `Profesionales de confianza en ${city}. Presupuesto sin compromiso. Llámanos ahora.`,
         heroCTA: 'Pedir Presupuesto',
         featuredServices: [
           { name: `${sector} profesional`, description: `Servicio de ${sector} en ${city} con garantía`, icon: 'build' },
@@ -308,7 +353,9 @@ function buildFallbackContent(lead: any) {
       },
       contacto: {
         title: `Contacta con ${name}`,
-        subtitle: `Estamos en ${city}. Respuesta garantizada en menos de 24 horas.`,
+        subtitle: isRioplatense
+          ? `Estamos en ${city}. Te respondemos en menos de 24 horas.`
+          : `Estamos en ${city}. Te respondemos en menos de 24 horas.`,
         formFields: ['Nombre', 'Teléfono', 'Servicio', 'Mensaje'],
         mapQuery: `${name} ${city}`,
       },

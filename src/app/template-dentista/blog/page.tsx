@@ -4,17 +4,19 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-dentista';
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed, setSuscribirmed] = useState(false);
 
   const featured = blogPosts.find(p => p.featured);
   const rest = blogPosts.filter(p => !p.featured);
 
-  function handleSubscribe(e: React.FormEvent) {
+  function handleSuscribirme(e: React.FormEvent) {
     e.preventDefault();
     if (email.trim()) {
-      setSubscribed(true);
+      setSuscribirmed(true);
       setEmail('');
     }
   }
@@ -53,7 +55,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured Article — 2 col */}
+      {/* Artículo destacado — 2 col */}
       {featured && (
         <section className="py-16" style={{ backgroundColor: '#f2f4f6' }}>
           <div className="max-w-[1920px] mx-auto px-6 md:px-8">
@@ -160,7 +162,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="py-20" style={{ backgroundColor: '#f2f4f6' }}>
         <div className="max-w-[1920px] mx-auto px-6 md:px-8">
           <div
@@ -189,7 +191,7 @@ export default function BlogPage() {
                 <span style={{ fontSize: '15px', fontWeight: 600 }}>Suscripcion confirmada. Gracias por unirte.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
+              <form onSubmit={handleSuscribirme} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   value={email}

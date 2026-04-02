@@ -16,13 +16,13 @@ export const business = {
   postalCode: '28001',
   city: 'Madrid',
   country: 'España',
-  legalName: 'THE FLUID ARCHITECT S.L.',
+  legalName: 'EL FLUID ARCHITECT S.L.',
   foundedYear: 2012,
   yearsExperience: 15,
 };
 
 export const nav = [
-  { href: '/template-fontaneria', label: 'Home', icon: 'home' },
+  { href: '/template-fontaneria', label: 'Inicio', icon: 'home' },
   { href: '/template-fontaneria/servicios', label: 'Servicios', icon: 'plumbing' },
   { href: '/template-fontaneria/nosotros', label: 'Nosotros', icon: 'contact_support' },
   { href: '/template-fontaneria/blog', label: 'Blog', icon: 'article' },
@@ -39,7 +39,7 @@ export const images = {
   aboutHistory: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80',
   aboutTeam: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80',
   contactMap: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=1200&q=80',
   blogCaldera: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=800&q=80',
   blogDrain: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
   blogHeater: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=800&q=80',
@@ -136,7 +136,7 @@ export const contacto = {
   title: 'Contacta con nosotros',
   subtitle: 'Nuestra red de ingenieros certificados está disponible para resolver cualquier incidencia técnica. Ofrecemos tiempos de respuesta inferiores a 60 minutos para casos urgentes.',
   formTitle: 'Solicitar presupuesto',
-  formSubtitle: 'Complete el formulario y un técnico especializado le contactará en breve.',
+  formSubtitle: 'Completo el formulario y un técnico especializado le contactará en breve.',
   serviceOptions: ['Urgencia 24h', 'Instalación Fontanería', 'Mantenimiento Industrial', 'Detección de Fugas', 'Otros'],
   schedule: '24 Horas / 7 Días',
   responseTime: '45 Minutos',

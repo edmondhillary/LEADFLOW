@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { business } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-peluqueria';
   const [form, setForm] = useState({ nombre: '', email: '', telefono: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
 

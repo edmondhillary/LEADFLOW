@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-limpieza';
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -44,14 +46,14 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured Article — 2-col */}
+      {/* Artículo destacado — 2-col */}
       {featured && (
         <section className="w-full bg-[#f3f4f5] py-16 px-6 md:px-8">
           <div className="max-w-[1440px] mx-auto">
-            <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '16px' }}>Featured Article</p>
+            <p style={{ fontSize: '12px', fontWeight: 600, color: '#0059bb', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '16px' }}>Artículo destacado</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-xl overflow-hidden" style={{ boxShadow: '0 10px 40px -10px rgba(25,28,29,0.08)' }}>
               <div className="aspect-[4/3] overflow-hidden">
-                <img src={images.blogFeatured} alt={featured.title} className="w-full h-full object-cover" />
+                <img src={images.blogDestacado} alt={featured.title} className="w-full h-full object-cover" />
               </div>
               <div className="p-10 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-4">
@@ -67,7 +69,7 @@ export default function BlogPage() {
                   {featured.excerpt}
                 </p>
                 <Link href={`/template-limpieza/blog/${featured.slug}`} className="flex items-center gap-2 w-fit transition-all hover:gap-3 duration-200" style={{ fontSize: '14px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>
-                  Read Article
+                  Leer artículo
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                 </Link>
               </div>
@@ -95,7 +97,7 @@ export default function BlogPage() {
                   <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 700, color: '#191c1d', marginBottom: '8px', lineHeight: 1.3 }}>{post.title}</h3>
                   <p style={{ fontSize: '13px', color: '#414754', lineHeight: 1.6, marginBottom: '12px' }}>{post.excerpt}</p>
                   <Link href={`/template-limpieza/blog/${post.slug}`} className="flex items-center gap-1 transition-all hover:gap-2 duration-200" style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>
-                    Read More
+                    Leer más
                     <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
                   </Link>
                 </div>
@@ -105,7 +107,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="w-full bg-[#f3f4f5] py-20 px-6 md:px-8">
         <div className="max-w-[600px] mx-auto text-center">
           <div className="bg-white rounded-2xl p-10" style={{ boxShadow: '0 10px 40px -10px rgba(25,28,29,0.08)' }}>
@@ -149,7 +151,7 @@ export default function BlogPage() {
                   className="rounded-lg px-6 py-3 transition-all hover:opacity-90 active:scale-[0.98] whitespace-nowrap"
                   style={{ background: 'linear-gradient(to right, #0059bb, #0070ea)', color: '#ffffff', fontSize: '14px', fontWeight: 600 }}
                 >
-                  Subscribe
+                  Suscribirme
                 </button>
               </form>
             )}

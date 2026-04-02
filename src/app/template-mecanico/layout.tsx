@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function MecanicoLayout({ children }: { children: React.ReactNode }) {
+export default function MecanicoLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mecanico';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -31,7 +34,7 @@ export default function MecanicoLayout({ children }: { children: React.ReactNode
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link
-            href="/template-mecanico"
+            href={`${baseHref}`}
             className="text-xl font-black uppercase tracking-tighter text-[#e2e2e5] hover:text-[#ffb599] transition-colors duration-200"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
@@ -62,7 +65,7 @@ export default function MecanicoLayout({ children }: { children: React.ReactNode
               {business.phone}
             </a>
             <Link
-              href="/template-mecanico/servicios"
+              href={`${baseHref}/servicios`}
               className="text-[#531a00] text-sm font-black uppercase tracking-widest px-6 py-3 transition-all duration-200 hover:opacity-90"
               style={{ background: 'linear-gradient(135deg, #ffb599 0%, #ff5f00 100%)' }}
             >
@@ -114,7 +117,7 @@ export default function MecanicoLayout({ children }: { children: React.ReactNode
         </nav>
         <div className="mt-8">
           <Link
-            href="/template-mecanico/servicios"
+            href={`${baseHref}/servicios`}
             onClick={() => setMenuOpen(false)}
             className="block w-full text-center text-[#531a00] font-black uppercase tracking-widest px-6 py-3 transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #ffb599 0%, #ff5f00 100%)' }}

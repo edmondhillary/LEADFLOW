@@ -6,8 +6,8 @@
  */
 
 export const business = {
-  name: 'THE SENTINEL',
-  fullName: 'The Sentinel Guard Cerrajero',
+  name: 'EL SENTINEL',
+  fullName: 'El Sentinel Guard Cerrajero',
   tagline: 'Cerrajero Urgente 24h — Madrid',
   phone: '600 000 000',
   phoneIntl: '+34600000000',
@@ -16,13 +16,13 @@ export const business = {
   address: 'Polígono Industrial Sur, Nave 8, 28041 Madrid',
   city: 'Madrid',
   country: 'España',
-  legalName: 'The Sentinel Guard S.L.',
+  legalName: 'El Sentinel Guard S.L.',
   foundedYear: 2015,
   responseTime: '20 minutos',
 };
 
 export const nav = [
-  { href: '/template-cerrajero', label: 'Home', icon: 'home' },
+  { href: '/template-cerrajero', label: 'Inicio', icon: 'home' },
   { href: '/template-cerrajero/servicios', label: 'Servicios', icon: 'lock' },
   { href: '/template-cerrajero/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-cerrajero/blog', label: 'Blog', icon: 'article' },
@@ -34,7 +34,7 @@ export const images = {
   lockDetail: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=crop&w=1200&q=80',
   techWorking: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=1200&q=80',
   securityDoor: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=1200&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=800&q=80',
@@ -115,8 +115,8 @@ export const trustBadges = [
 
 export const credentials = [
   { label: 'ISO 9001' },
-  { label: 'TRUSTED PRO' },
-  { label: 'SECURITY FIRST' },
+  { label: 'CONFIABLE PRO' },
+  { label: 'SECURITY PRIMERO' },
 ];
 
 export const testimonials = [
@@ -129,7 +129,7 @@ export const testimonials = [
   {
     name: 'Laura Sánchez',
     role: 'Directora de Local Comercial',
-    text: 'The Sentinel Guard lleva encargándose de la seguridad de mi local desde hace tres años. Profesionales, puntuales y con garantía escrita en todo lo que hacen.',
+    text: 'El Sentinel Guard lleva encargándose de la seguridad de mi local desde hace tres años. Profesionales, puntuales y con garantía escrita en todo lo que hacen.',
     rating: 5,
   },
   {
@@ -213,9 +213,9 @@ export const serviciosPage = {
 export const nosotrosPage = {
   badge: 'Desde 2015 en Madrid',
   title: 'Profesionales de la seguridad a tu servicio',
-  subtitle: 'The Sentinel Guard nació con una misión clara: ofrecer el servicio de cerrajería más rápido y fiable de Madrid, con la transparencia y profesionalidad que los madrileños merecen.',
+  subtitle: 'El Sentinel Guard nació con una misión clara: ofrecer el servicio de cerrajería más rápido y fiable de Madrid, con la transparencia y profesionalidad que los madrileños merecen.',
   story: [
-    'En 2015, fundamos The Sentinel Guard con una premisa sencilla: no dejar a nadie tirado ante una urgencia de cerrajería. Demasiados madrileños sufrían esperas de horas, presupuestos opacos y trabajos sin garantía.',
+    'En 2015, fundamos El Sentinel Guard con una premisa sencilla: no dejar a nadie tirado ante una urgencia de cerrajería. Demasiados madrileños sufrían esperas de horas, presupuestos opacos y trabajos sin garantía.',
     'Hoy somos el servicio de cerrajería de referencia en Madrid con más de 5.000 intervenciones realizadas. Nuestro equipo de técnicos certificados cubre toda la capital en un tiempo de respuesta garantizado de 20 minutos.',
   ],
   values: [

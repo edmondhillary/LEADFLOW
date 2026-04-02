@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pintor';
   return (
     <main style={{ fontFamily: "'Work Sans', sans-serif" }}>
       {/* Hero */}
@@ -80,7 +82,7 @@ export default function NosotrosPage() {
       <section className="py-20 px-6 text-center max-w-3xl mx-auto">
         <h3 className="text-3xl md:text-5xl font-bold text-teal-900 mb-6" style={{ fontFamily: "'Manrope', sans-serif" }}>{about.cta.title}</h3>
         <p className="text-[#5a6061] mb-10">{about.cta.desc}</p>
-        <Link href="/template-pintor/contacto" className="inline-block text-[#d9fffe] px-10 py-4 rounded-md font-bold text-lg shadow-lg transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)', textDecoration: 'none' }}>
+        <Link href={`${baseHref}/contacto`} className="inline-block text-[#d9fffe] px-10 py-4 rounded-md font-bold text-lg shadow-lg transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3d6565, #315959)', textDecoration: 'none' }}>
           Solicitar Presupuesto
         </Link>
       </section>

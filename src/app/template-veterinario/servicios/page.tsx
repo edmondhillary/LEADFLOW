@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { fullServices, images, business } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-veterinario';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -109,7 +111,7 @@ export default function ServiciosPage() {
               </div>
             </div>
 
-            {/* Vaccinations — Featured teal */}
+            {/* Vaccinations — Destacado teal */}
             <div className="md:col-span-4 bg-[#166875] text-[#edfcff] rounded-2xl p-8 hover:-translate-y-1 transition-transform">
               <span className="material-symbols-outlined text-4xl mb-6 block">vaccines</span>
               <h3
@@ -122,7 +124,7 @@ export default function ServiciosPage() {
                 Customized immunization protocols tailored to your pet&apos;s lifestyle, breed, and environmental risk factors.
               </p>
               <Link
-                href="/template-veterinario/contacto"
+                href={`${baseHref}/contacto`}
                 className="block w-full py-3 rounded-full border border-[#edfcff]/20 hover:bg-[#edfcff] hover:text-[#166875] font-bold transition-all text-center text-sm"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
@@ -241,7 +243,7 @@ export default function ServiciosPage() {
                   Call Now: {business.emergency}
                 </a>
                 <Link
-                  href="/template-veterinario/contacto"
+                  href={`${baseHref}/contacto`}
                   className="bg-white text-[#38312b] px-8 py-4 rounded-full font-bold border border-[#bbb0a7]/20 flex items-center justify-center gap-2 hover:bg-[#f1e6dd] transition-all"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
@@ -279,11 +281,11 @@ export default function ServiciosPage() {
             Our clinic is accepting new patients for all services. Let&apos;s take care of your companion together.
           </p>
           <Link
-            href="/template-veterinario/contacto"
+            href={`${baseHref}/contacto`}
             className="inline-block bg-[#166875] text-[#edfcff] px-12 py-5 rounded-full font-bold text-lg hover:bg-[#005c68] transition-all shadow-lg"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            Book Appointment
+            Reservar cita
           </Link>
         </div>
       </section>

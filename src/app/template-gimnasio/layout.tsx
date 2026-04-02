@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-gimnasio';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplateLayout({ children }: { children: React.ReactNode
       {/* Header */}
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', boxShadow: '0 0 50px rgba(235,0,0,0.08)' }}>
         <div className="flex justify-between items-center px-6 py-4 max-w-full">
-          <Link href="/template-gimnasio" style={{ fontFamily: "'Epilogue', sans-serif", fontSize: '24px', fontWeight: 900, fontStyle: 'italic', color: '#eb0000', letterSpacing: '-0.05em', textDecoration: 'none', textTransform: 'uppercase' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Epilogue', sans-serif", fontSize: '24px', fontWeight: 900, fontStyle: 'italic', color: '#eb0000', letterSpacing: '-0.05em', textDecoration: 'none', textTransform: 'uppercase' }}>
             {business.name}
           </Link>
 

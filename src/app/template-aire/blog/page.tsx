@@ -14,7 +14,9 @@ const blogImages: Record<string, string> = {
   'indoor-air-quality-austin': images.blog5,
 };
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-aire';
   const featured = blogPosts.find(p => p.featured);
   const rest = blogPosts.filter(p => !p.featured);
 
@@ -48,15 +50,15 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured article */}
+      {/* Destacado article */}
       {featured && (
         <section className="py-20" style={{ backgroundColor: '#fcf8fb' }}>
           <div className="px-6 md:px-8 max-w-[1920px] mx-auto">
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>Featured Article</p>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d4b00', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>Artículo destacado</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl overflow-hidden" style={{ boxShadow: '0 12px 40px rgba(27,27,29,0.05)' }}>
               <div className="relative" style={{ minHeight: '400px' }}>
                 <Image
-                  src={images.blogFeatured}
+                  src={images.blogDestacado}
                   alt={featured.title}
                   fill
                   className="object-cover"
@@ -83,7 +85,7 @@ export default function BlogPage() {
                   className="inline-flex items-center gap-2 rounded-md transition-all hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', fontSize: '14px', fontWeight: 600, padding: '12px 28px', textDecoration: 'none', alignSelf: 'flex-start' }}
                 >
-                  Read Article
+                  Leer artículo
                 </Link>
               </div>
             </div>
@@ -126,7 +128,7 @@ export default function BlogPage() {
                     href={`/template-aire/blog/${post.slug}`}
                     style={{ fontSize: '13px', fontWeight: 600, color: '#3a5f94', textDecoration: 'none', marginTop: '4px' }}
                   >
-                    Read more &rarr;
+                    Leer más &rarr;
                   </Link>
                 </div>
               </div>
@@ -135,7 +137,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter */}
+      {/* Boletín */}
       <section className="py-20" style={{ backgroundColor: '#fcf8fb' }}>
         <div className="px-6 md:px-8 max-w-[1920px] mx-auto">
           <div
@@ -149,7 +151,7 @@ export default function BlogPage() {
               </h2>
               <p style={{ fontSize: '14px', color: '#414754' }}>Seasonal maintenance reminders and efficiency guides. No spam.</p>
             </div>
-            <NewsletterForm />
+            <BoletínForm />
           </div>
         </div>
       </section>
@@ -158,7 +160,7 @@ export default function BlogPage() {
   );
 }
 
-function NewsletterForm() {
+function BoletínForm() {
   return (
     <form
       className="flex flex-col sm:flex-row gap-3 w-full md:w-auto"
@@ -175,7 +177,7 @@ function NewsletterForm() {
         className="px-6 py-3 rounded-md transition-all hover:opacity-90"
         style={{ background: 'linear-gradient(135deg, #8d4b00 0%, #b15f00 100%)', color: '#ffffff', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}
       >
-        Subscribe
+        Suscribirme
       </button>
     </form>
   );

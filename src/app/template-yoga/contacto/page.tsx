@@ -7,6 +7,7 @@ import type { LeadOverrides } from '@/lib/lead-template-data';
 
 export default function ContactoPage(props: any = {}) {
   const ov = props.overrides as LeadOverrides | undefined;
+  const baseHref = ov?.baseHref || '/template-yoga';
   const isRioplatense = ov?.country === 'AR' || ov?.country === 'UY';
 
   const business_ = ov
@@ -101,9 +102,9 @@ export default function ContactoPage(props: any = {}) {
       <section className="w-full pb-24 px-6 md:px-16" style={{ backgroundColor: '#fbf9f4' }}>
         <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
 
-          {/* Left — Studio Info */}
+          {/* Left — Estudio Info */}
           <div>
-            {/* Studio details */}
+            {/* Estudio details */}
             <div className="mb-10 p-8" style={{ backgroundColor: '#f5f3ee', borderRadius: '16px' }}>
               <h3
                 style={{ fontFamily: "'Noto Serif', serif", fontSize: '20px', fontWeight: 700, color: '#1b1c19', marginBottom: '20px' }}
@@ -147,7 +148,7 @@ export default function ContactoPage(props: any = {}) {
             <div className="relative rounded-2xl overflow-hidden" style={{ height: '280px' }}>
               <Image
                 src={images.contactMap}
-                alt="Notting Hill, London"
+                alt={`Mapa de ${business_.city}`}
                 fill
                 className="object-cover"
               />
@@ -161,7 +162,7 @@ export default function ContactoPage(props: any = {}) {
                 }}
               >
                 <p style={{ fontSize: '12px', fontWeight: 700, color: '#1b1c19' }}>{business_.city}</p>
-                <p style={{ fontSize: '11px', color: '#45483f' }}>W11 2PH</p>
+                <p style={{ fontSize: '11px', color: '#45483f' }}>{ov?.country === 'AR' ? 'Argentina' : ov?.country === 'UY' ? 'Uruguay' : 'España'}</p>
               </div>
             </div>
           </div>

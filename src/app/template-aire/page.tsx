@@ -161,7 +161,7 @@ export default function TemplateAirePage(props: any = {}) {
                   href={`${base}/servicios`}
                   style={{ fontSize: '13px', fontWeight: 600, color: '#8d4b00', textDecoration: 'none', marginTop: 'auto' }}
                 >
-                  Learn More &rarr;
+                  Saber más &rarr;
                 </Link>
               </div>
             ))}
@@ -316,7 +316,7 @@ export default function TemplateAirePage(props: any = {}) {
                 className="inline-flex items-center justify-center rounded-md transition-all hover:bg-white/90"
                 style={{ backgroundColor: '#ffffff', color: '#8d4b00', fontSize: '14px', fontWeight: 700, padding: '14px 36px', textDecoration: 'none' }}
               >
-                Get Free Quote
+                Pedir presupuesto gratis
               </Link>
               <a
                 href={`tel:${business.phoneIntl}`}

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { blogPosts, images } from '../data';
 
 const imageMap: Record<string, string> = {
-  blogFeatured: images.blogFeatured,
+  blogDestacado: images.blogDestacado,
   blog1: images.blog1,
   blog2: images.blog2,
   blog3: images.blog3,
@@ -15,7 +15,9 @@ const categories = ['All', 'Technique', 'Beard', 'Style', 'Culture'];
 const featuredPost = blogPosts.find(p => p.featured);
 const gridPosts = blogPosts.filter(p => !p.featured);
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-barberia';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#131313', color: '#e5e2e1' }}>
 
@@ -39,7 +41,7 @@ export default function BlogPage() {
           <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="overflow-hidden" style={{ aspectRatio: '4/3' }}>
               <img
-                src={imageMap[featuredPost.image] ?? images.blogFeatured}
+                src={imageMap[featuredPost.image] ?? images.blogDestacado}
                 alt={featuredPost.title}
                 className="w-full h-full object-cover"
                 style={{ filter: 'grayscale(0.2)' }}
@@ -56,7 +58,7 @@ export default function BlogPage() {
                 href={`/template-barberia/blog/${featuredPost.slug}`}
                 style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '10px', fontWeight: 700, padding: '12px 32px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
               >
-                Read Article
+                Leer artículo
               </Link>
             </div>
           </div>
@@ -103,7 +105,7 @@ export default function BlogPage() {
                   href={`/template-barberia/blog/${post.slug}`}
                   style={{ fontSize: '10px', color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none', borderBottom: '1px solid #e9c176', paddingBottom: '2px' }}
                 >
-                  Read More
+                  Leer más
                 </Link>
               </div>
             </article>
@@ -131,7 +133,7 @@ export default function BlogPage() {
             <button
               style={{ background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '10px', fontWeight: 700, padding: '14px 28px', textTransform: 'uppercase', letterSpacing: '0.15em', border: 'none', cursor: 'pointer', flexShrink: 0 }}
             >
-              Subscribe
+              Suscribirme
             </button>
           </div>
         </div>

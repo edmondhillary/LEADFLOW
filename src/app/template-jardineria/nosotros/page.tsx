@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, values, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-jardineria';
   const teamMembers = [
     { name: 'Eleanor Hartley', role: 'Lead Horticulturalist', cert: 'RHS Level 3' },
     { name: 'James Pemberton', role: 'Arboricultural Specialist', cert: 'ISA Certified' },
@@ -74,7 +76,7 @@ export default function NosotrosPage() {
             <div className="rounded-3xl overflow-hidden" style={{ minHeight: '480px' }}>
               <img
                 src={images.maintenance}
-                alt="Studio at work"
+                alt="Estudio at work"
                 className="w-full h-full object-cover"
                 style={{ minHeight: '480px' }}
               />
@@ -143,7 +145,7 @@ export default function NosotrosPage() {
               lineHeight: 1.1,
             }}
           >
-            Our Values
+            Nuestros valores
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -173,7 +175,7 @@ export default function NosotrosPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
             <div>
               <span className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase" style={{ color: '#56642b' }}>
-                The Team
+                El equipo
               </span>
               <h2
                 style={{
@@ -255,11 +257,11 @@ export default function NosotrosPage() {
         </div>
       </section>
 
-      {/* Studio Gallery */}
+      {/* Estudio Gallery */}
       <section className="w-full py-24 px-6 md:px-10 max-w-[1920px] mx-auto">
         <div className="mb-12">
           <span className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase" style={{ color: '#56642b' }}>
-            Our Work
+            Nuestro trabajo
           </span>
           <h2
             style={{
@@ -270,7 +272,7 @@ export default function NosotrosPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Studio Gallery
+            Estudio Gallery
           </h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -282,7 +284,7 @@ export default function NosotrosPage() {
             >
               <img
                 src={img}
-                alt={`Studio work ${i + 1}`}
+                alt={`Estudio work ${i + 1}`}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -325,7 +327,7 @@ export default function NosotrosPage() {
                 Our studio team is available for an initial consultation where we assess your site and discuss your vision.
               </p>
               <Link
-                href="/template-jardineria/contacto"
+                href={`${baseHref}/contacto`}
                 className="inline-block rounded-xl transition-all hover:opacity-90"
                 style={{
                   backgroundColor: '#ffffff',

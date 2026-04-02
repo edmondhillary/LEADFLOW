@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, services, serviciosPage, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-barberia';
   const bgMap: Record<string, string> = {
     haircut: images.haircut,
     beard: images.beard,
@@ -14,7 +16,7 @@ export default function ServiciosPage() {
       {/* HERO */}
       <section className="relative py-40 flex items-center overflow-hidden" style={{ backgroundColor: '#0e0e0e' }}>
         <div className="absolute inset-0">
-          <img src={images.heroBg} alt="Services" className="w-full h-full object-cover" style={{ filter: 'grayscale(1)', opacity: 0.15 }} />
+          <img src={images.heroBg} alt="Servicios" className="w-full h-full object-cover" style={{ filter: 'grayscale(1)', opacity: 0.15 }} />
         </div>
         <div className="relative z-10 px-6 md:px-8 max-w-[1920px] mx-auto">
           <p style={{ fontSize: '10px', fontWeight: 600, color: '#e9c176', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '24px' }}>{serviciosPage.badge}</p>
@@ -63,7 +65,7 @@ export default function ServiciosPage() {
                 </div>
 
                 <Link
-                  href="/template-barberia/contacto"
+                  href={`${baseHref}/contacto`}
                   style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '10px', fontWeight: 700, padding: '14px 36px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
                 >
                   Book This Service
@@ -155,7 +157,7 @@ export default function ServiciosPage() {
             Book your appointment with {business.name} and experience precision grooming in London.
           </p>
           <Link
-            href="/template-barberia/contacto"
+            href={`${baseHref}/contacto`}
             style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '11px', fontWeight: 700, padding: '16px 48px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
           >
             Reserve Your Session

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { contacto, images, business } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-fontaneria';
   const [formData, setFormData] = useState({
     nombre: '',
     telefono: '',
@@ -276,7 +278,7 @@ export default function ContactoPage() {
                 Ubicación y Datos
               </h3>
 
-              {/* Address */}
+              {/* Dirección */}
               <div className="flex gap-3 mb-4">
                 <span
                   className="material-symbols-outlined flex-shrink-0 mt-1"

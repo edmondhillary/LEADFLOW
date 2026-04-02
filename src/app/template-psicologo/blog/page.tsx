@@ -6,9 +6,11 @@ import { blogPosts, images } from '../data';
 
 const categories = ['Todos', 'Ansiedad', 'Duelo', 'Relaciones', 'Autoestima', 'Terapia Online'];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-psicologo';
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed, setSuscribirmed] = useState(false);
 
   const featured = blogPosts.find(p => p.featured);
   const rest = blogPosts.filter(p => !p.featured);
@@ -21,10 +23,10 @@ export default function BlogPage() {
     'terapia-online-eficaz': images.blog5,
   };
 
-  function handleSubscribe(e: React.FormEvent) {
+  function handleSuscribirme(e: React.FormEvent) {
     e.preventDefault();
     if (email) {
-      setSubscribed(true);
+      setSuscribirmed(true);
       setEmail('');
     }
   }
@@ -76,7 +78,7 @@ export default function BlogPage() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-8 md:p-0 rounded-2xl md:rounded-none overflow-hidden" style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 24px rgba(26,28,27,0.06)' }}>
               <div className="md:col-span-6 lg:col-span-7">
                 <img
-                  src={images.blogFeatured}
+                  src={images.blogDestacado}
                   alt={featured.title}
                   className="w-full h-full object-cover"
                   style={{ minHeight: '320px', maxHeight: '480px' }}
@@ -158,14 +160,14 @@ export default function BlogPage() {
               </div>
             ) : (
               <>
-                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#a7b19f', display: 'block', marginBottom: '12px' }}>Newsletter</span>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#a7b19f', display: 'block', marginBottom: '12px' }}>Boletín</span>
                 <h2 className="text-3xl mb-3" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 700, color: '#1a1c1b' }}>
                   Recursos en tu bandeja
                 </h2>
                 <p className="mb-8 leading-[1.7]" style={{ fontSize: '14px', color: '#454841' }}>
                   Artículos mensuales sobre bienestar emocional, técnicas de gestión del estrés y reflexiones terapéuticas. Sin spam, sin presiones.
                 </p>
-                <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleSuscribirme} className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="email"
                     value={email}

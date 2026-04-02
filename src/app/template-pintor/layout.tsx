@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pintor';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplateLayout({ children }: { children: React.ReactNode
       {/* Header — glass nav */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
         <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
-          <Link href="/template-pintor" className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
             <span className="text-xl font-bold tracking-tight text-teal-900" style={{ fontFamily: "'Manrope', sans-serif" }}>{business.name}</span>
           </Link>
 

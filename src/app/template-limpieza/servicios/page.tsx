@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { services, pricingPlans, process, images, serviciosPage } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-limpieza';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
@@ -50,7 +52,7 @@ export default function ServiciosPage() {
                   <h3 style={{ fontFamily: "'Manrope', sans-serif", fontSize: '18px', fontWeight: 700, color: '#191c1d', marginBottom: '8px' }}>{s.name}</h3>
                   <p style={{ fontSize: '14px', color: '#414754', lineHeight: 1.7, marginBottom: '16px' }}>{s.desc}</p>
 
-                  <Link href="/template-limpieza/contacto" className="flex items-center gap-1 transition-all hover:gap-2 duration-200" style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>
+                  <Link href={`${baseHref}/contacto`} className="flex items-center gap-1 transition-all hover:gap-2 duration-200" style={{ fontSize: '13px', fontWeight: 600, color: '#0059bb', textDecoration: 'none' }}>
                     Request Quote
                     <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
                   </Link>
@@ -103,14 +105,14 @@ export default function ServiciosPage() {
                   ))}
                 </ul>
 
-                <Link href="/template-limpieza/contacto" className="block text-center rounded-lg py-3 transition-all hover:opacity-90 active:scale-[0.98]" style={{
+                <Link href={`${baseHref}/contacto`} className="block text-center rounded-lg py-3 transition-all hover:opacity-90 active:scale-[0.98]" style={{
                   backgroundColor: plan.highlighted ? '#ffffff' : '#0059bb',
                   color: plan.highlighted ? '#0059bb' : '#ffffff',
                   fontWeight: 600,
                   fontSize: '15px',
                   textDecoration: 'none',
                 }}>
-                  {plan.cta === 'Most Popular' ? 'Get Started' : plan.cta}
+                  {plan.cta === 'Most Popular' ? 'Empezar' : plan.cta}
                 </Link>
               </div>
             ))}
@@ -158,7 +160,7 @@ export default function ServiciosPage() {
           <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', marginBottom: '32px', maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
             Not sure which service fits best? Contact us for a custom quote tailored to your exact needs.
           </p>
-          <Link href="/template-limpieza/contacto" className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '14px 32px', textDecoration: 'none' }}>
+          <Link href={`${baseHref}/contacto`} className="inline-block rounded-lg transition-all hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: '#ffffff', color: '#0059bb', fontSize: '15px', fontWeight: 700, padding: '14px 32px', textDecoration: 'none' }}>
             Request a Custom Quote
           </Link>
         </div>

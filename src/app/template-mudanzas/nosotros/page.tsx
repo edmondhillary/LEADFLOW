@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { nosotros, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mudanzas';
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#f8f9fa' }}>
 
@@ -84,7 +86,7 @@ export default function NosotrosPage() {
                 marginBottom: '14px',
               }}
             >
-              Our Story
+              Nuestra historia
             </p>
             <h2
               style={{
@@ -169,7 +171,7 @@ export default function NosotrosPage() {
                 marginBottom: '12px',
               }}
             >
-              Our Values
+              Nuestros valores
             </p>
             <h2
               style={{
@@ -381,7 +383,7 @@ export default function NosotrosPage() {
               Experience the Kinetic difference. Get your free quote today.
             </p>
             <Link
-              href="/template-mudanzas/contacto"
+              href={`${baseHref}/contacto`}
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '14px',
@@ -395,7 +397,7 @@ export default function NosotrosPage() {
               }}
               className="hover:opacity-90 transition-opacity"
             >
-              Get a Free Quote
+              Pedir presupuesto gratis
             </Link>
           </div>
         </div>

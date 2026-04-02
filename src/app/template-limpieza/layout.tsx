@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateLimpiezaLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateLimpiezaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-limpieza';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplateLimpiezaLayout({ children }: { children: React.R
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm" style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-[1440px] mx-auto">
-          <Link href="/template-limpieza" style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#0059bb', letterSpacing: '-0.04em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Manrope', sans-serif", fontSize: '20px', fontWeight: 800, color: '#0059bb', letterSpacing: '-0.04em', textDecoration: 'none' }}>
             {business.name}
           </Link>
 
@@ -81,7 +84,7 @@ export default function TemplateLimpiezaLayout({ children }: { children: React.R
             <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#191c1d', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>Services</h4>
             <nav className="flex flex-col gap-3">
               {['Residential', 'Commercial', 'Industrial', 'Post-Construction', 'Medical/Clinical', 'Move-In/Out'].map(s => (
-                <Link key={s} href="/template-limpieza/servicios" className="hover:text-[#0059bb] transition-colors duration-300" style={{ fontSize: '13px', color: '#414754', textDecoration: 'none' }}>{s}</Link>
+                <Link key={s} href={`${baseHref}/servicios`} className="hover:text-[#0059bb] transition-colors duration-300" style={{ fontSize: '13px', color: '#414754', textDecoration: 'none' }}>{s}</Link>
               ))}
             </nav>
           </div>
@@ -117,16 +120,16 @@ export default function TemplateLimpiezaLayout({ children }: { children: React.R
         </div>
 
         <div className="mt-12 px-6 md:px-8 max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 pt-8" style={{ borderTop: '1px solid rgba(193,198,215,0.4)' }}>
-          <p style={{ fontSize: '12px', color: '#414754' }}>&copy; {new Date().getFullYear()} {business.legalName}. All rights reserved.{' ·  '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a></p>
+          <p style={{ fontSize: '12px', color: '#414754' }}>&copy; {new Date().getFullYear()} {business.legalName}. Todos los derechos reservados.{' ·  '}<a href="https://nexifydev.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', opacity: 0.7 }}>Made by Nexifydev.com</a></p>
           <div className="flex gap-6">
-            <span style={{ fontSize: '12px', color: '#414754', cursor: 'pointer' }}>Privacy Policy</span>
-            <span style={{ fontSize: '12px', color: '#414754', cursor: 'pointer' }}>Terms of Service</span>
+            <span style={{ fontSize: '12px', color: '#414754', cursor: 'pointer' }}>Política de privacidad</span>
+            <span style={{ fontSize: '12px', color: '#414754', cursor: 'pointer' }}>Términos del servicio</span>
           </div>
         </div>
       </footer>
 
       {/* WhatsApp FAB */}
-      <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="Contact via WhatsApp" className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105" style={{ backgroundColor: '#25d366' }}>
+      <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105" style={{ backgroundColor: '#25d366' }}>
         <svg aria-hidden="true" className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.857L.059 23.57a.5.5 0 00.611.611l5.713-1.473A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 01-5.068-1.38l-.362-.215-3.748.965.985-3.607-.235-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" /></svg>
       </a>
     </div>

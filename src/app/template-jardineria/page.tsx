@@ -355,7 +355,7 @@ export default function TemplateJardineriaHome(props: any = {}) {
               className="inline-block mb-6 text-xs font-semibold tracking-widest uppercase"
               style={{ color: '#adc0a8' }}
             >
-              Our Philosophy
+              Nuestra filosofía
             </span>
             <h2
               style={{
@@ -533,7 +533,7 @@ export default function TemplateJardineriaHome(props: any = {}) {
                     backgroundColor: 'transparent',
                   }}
                 >
-                  View Services
+                  Ver servicios
                 </Link>
               </div>
             </div>

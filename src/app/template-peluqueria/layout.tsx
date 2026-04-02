@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function PeluqueriaLayout({ children }: { children: React.ReactNode }) {
+export default function PeluqueriaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-peluqueria';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -28,7 +31,7 @@ export default function PeluqueriaLayout({ children }: { children: React.ReactNo
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link
-            href="/template-peluqueria"
+            href={`${baseHref}`}
             className="tracking-[0.15em] text-xl font-bold text-[#2d3435]"
             style={{ fontFamily: "'Noto Serif', serif", fontStyle: 'italic' }}
           >

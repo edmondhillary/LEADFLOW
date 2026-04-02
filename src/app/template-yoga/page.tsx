@@ -70,7 +70,7 @@ export default function YogaHome(props: any = {}) {
         <div className="absolute inset-0 z-0">
           <Image
             src={images.heroBg}
-            alt={ov ? `${ov.businessName} - Yoga Studio` : 'Breath of Silence Yoga Studio'}
+            alt={ov ? `${ov.businessName} - Yoga Estudio` : 'Breath of Silence Yoga Estudio'}
             fill
             className="object-cover"
             priority
@@ -283,11 +283,11 @@ export default function YogaHome(props: any = {}) {
         </div>
       </section>
 
-      {/* Studio Atmosphere — cinematic full-width */}
+      {/* Estudio Atmosphere — cinematic full-width */}
       <section className="w-full" style={{ aspectRatio: '21/9', position: 'relative', overflow: 'hidden' }}>
         <Image
           src={images.studioWide}
-          alt={`${business_.name} Studio Interior`}
+          alt={`${business_.name} Estudio Interior`}
           fill
           className="object-cover"
         />

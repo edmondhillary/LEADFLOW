@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplatePsicologoLayout({ children }: { children: React.ReactNode }) {
+export default function TemplatePsicologoLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-psicologo';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplatePsicologoLayout({ children }: { children: React.
       {/* Header */}
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(249,249,247,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(197,199,191,0.3)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-5 max-w-[1920px] mx-auto">
-          <Link href="/template-psicologo" style={{ fontFamily: "'Noto Serif', serif", fontSize: '18px', fontWeight: 700, fontStyle: 'italic', color: '#586152', letterSpacing: '-0.02em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Noto Serif', serif", fontSize: '18px', fontWeight: 700, fontStyle: 'italic', color: '#586152', letterSpacing: '-0.02em', textDecoration: 'none' }}>
             {business.name}
           </Link>
 
@@ -28,7 +31,7 @@ export default function TemplatePsicologoLayout({ children }: { children: React.
             ))}
           </nav>
 
-          <Link href="/template-psicologo/contacto" className="hidden md:inline-block transition-all active:scale-[0.98] rounded-lg" style={{ fontSize: '11px', fontWeight: 600, background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '12px 28px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+          <Link href={`${baseHref}/contacto`} className="hidden md:inline-block transition-all active:scale-[0.98] rounded-lg" style={{ fontSize: '11px', fontWeight: 600, background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '12px 28px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
             Reservar Consulta
           </Link>
 
@@ -54,7 +57,7 @@ export default function TemplatePsicologoLayout({ children }: { children: React.
           ))}
         </nav>
         <div className="mt-auto px-8 pb-8">
-          <Link href="/template-psicologo/contacto" onClick={() => setMenuOpen(false)} className="block w-full text-center py-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}/contacto`} onClick={() => setMenuOpen(false)} className="block w-full text-center py-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
             Reservar Consulta
           </Link>
           <p className="mt-4 text-center" style={{ fontSize: '10px', color: '#454841', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{business.phone}</p>

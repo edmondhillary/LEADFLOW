@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { about, images, business } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-canina';
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif", backgroundColor: '#fafaf5', color: '#2f342e' }}>
 
@@ -81,7 +83,7 @@ export default function NosotrosPage() {
       <section className="px-6 md:px-10 py-20 max-w-[1920px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
           <div>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#4c6456', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>Meet the Team</p>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#4c6456', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>Conoce al equipo</p>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(26px, 3.5vw, 44px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#2f342e', marginBottom: '20px', lineHeight: 1.1 }}>
               {about.team.title}
             </h2>
@@ -99,11 +101,11 @@ export default function NosotrosPage() {
         </div>
       </section>
 
-      {/* Studio Gallery */}
+      {/* Estudio Gallery */}
       <section className="px-6 md:px-10 py-16" style={{ backgroundColor: '#f3f4ee' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="text-center mb-12">
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#4c6456', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>Inside the Studio</p>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#4c6456', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>Inside the Estudio</p>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(24px, 3vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#2f342e' }}>
               Your Dog&apos;s Sanctuary
             </h2>
@@ -111,7 +113,7 @@ export default function NosotrosPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {[images.gallery1, images.gallery2, images.gallery3, images.gallery4].map((img, i) => (
               <div key={i} className="rounded-xl overflow-hidden" style={{ aspectRatio: '1/1' }}>
-                <img src={img} alt={`Studio gallery ${i + 1}`} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                <img src={img} alt={`Estudio gallery ${i + 1}`} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
               </div>
             ))}
           </div>
@@ -128,7 +130,7 @@ export default function NosotrosPage() {
             {about.cta.desc}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/template-canina/contacto" className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} className="inline-flex items-center gap-2 rounded-full transition-all hover:opacity-90" style={{ backgroundColor: '#e6ffed', color: '#2d4437', padding: '14px 32px', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
               Book Your Visit
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
             </Link>

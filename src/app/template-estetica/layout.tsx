@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { business, nav } from './data';
 
-export default function EsteticaLayout({ children }: { children: React.ReactNode }) {
+export default function EsteticaLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-estetica';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -23,7 +26,7 @@ export default function EsteticaLayout({ children }: { children: React.ReactNode
           <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             {/* Logo */}
             <Link
-              href="/template-estetica"
+              href={`${baseHref}`}
               className="tracking-widest text-stone-800 text-2xl font-semibold"
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
@@ -46,7 +49,7 @@ export default function EsteticaLayout({ children }: { children: React.ReactNode
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-4">
               <Link
-                href="/template-estetica/contacto"
+                href={`${baseHref}/contacto`}
                 className="bg-[#6c5c4a] text-[#fff6f0] tracking-wider uppercase text-sm px-6 py-2.5 hover:bg-[#5f503f] transition-colors duration-200"
               >
                 RESERVAR
@@ -95,7 +98,7 @@ export default function EsteticaLayout({ children }: { children: React.ReactNode
           </nav>
           <div className="mt-8">
             <Link
-              href="/template-estetica/contacto"
+              href={`${baseHref}/contacto`}
               onClick={() => setMenuOpen(false)}
               className="block w-full text-center bg-[#6c5c4a] text-[#fff6f0] tracking-wider uppercase text-sm px-6 py-3 hover:bg-[#5f503f] transition-colors duration-200"
             >

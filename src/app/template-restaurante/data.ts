@@ -1,5 +1,5 @@
 export const business = {
-  name: 'The Culinary Editorial',
+  name: 'El Culinary Editorial',
   tagline: 'Alta Cocina de Autor en Madrid',
   phone: '910 000 000',
   phoneIntl: '+34910000000',
@@ -9,12 +9,12 @@ export const business = {
   postalCode: '28001',
   city: 'Madrid',
   country: 'España',
-  legalName: 'THE CULINARY EDITORIAL S.L.',
+  legalName: 'EL CULINARY EDITORIAL S.L.',
   foundedYear: 2014,
 };
 
 export const nav = [
-  { href: '/template-restaurante', label: 'Home', icon: 'home' },
+  { href: '/template-restaurante', label: 'Inicio', icon: 'home' },
   { href: '/template-restaurante/servicios', label: 'Carta', icon: 'menu_book' },
   { href: '/template-restaurante/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-restaurante/blog', label: 'Blog', icon: 'article' },
@@ -36,7 +36,7 @@ export const images = {
   cocktail: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
   kitchen: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80',
   aboutFounder: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=800&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=800&q=80',
@@ -98,10 +98,10 @@ export const testimonials = [
 export const about = {
   heroTitle: 'Una Cocina que',
   heroTitleAccent: 'Cuenta Historias',
-  heroSubtitle: 'Nació en Madrid como un manifiesto culinario. Diez años después, The Culinary Editorial sigue siendo el lugar donde los ingredientes tienen nombre y apellido.',
+  heroSubtitle: 'Nació en Madrid como un manifiesto culinario. Diez años después, El Culinary Editorial sigue siendo el lugar donde los ingredientes tienen nombre y apellido.',
   philosophyTitle: 'Nuestra Filosofía Editorial',
   philosophy: [
-    'En The Culinary Editorial, cada carta es una edición. Un texto vivo que se reescribe con las estaciones, que dialoga con los productores de confianza y que respeta el tiempo natural de cada ingrediente.',
+    'En El Culinary Editorial, cada carta es una edición. Un texto vivo que se reescribe con las estaciones, que dialoga con los productores de confianza y que respeta el tiempo natural de cada ingrediente.',
     'Rechazamos la cocina de tendencia sin sustancia. Apostamos por la excelencia técnica al servicio de la emoción. Aquí, el producto es el protagonista y la cocina, su mejor narrador.',
   ],
   values: [
@@ -113,7 +113,7 @@ export const about = {
 
 export const contacto = {
   badge: 'Reservas',
-  title: 'Reserve su Mesa',
+  title: 'Reservar su Mesa',
   subtitle: 'Para eventos privados, menús degustación o la experiencia a la carta, contacte con nosotros. Respondemos en menos de 24 horas.',
   serviceOptions: ['Cena a la Carta', 'Menú Degustación (8 pasos)', 'Evento Privado', 'Maridaje de Vinos', 'Celebración Especial', 'Consulta General'],
   schedule: 'Martes a Sábado: 13:30 a 16:00 y 20:30 a 23:30',

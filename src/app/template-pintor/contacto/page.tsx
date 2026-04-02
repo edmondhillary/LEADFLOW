@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { contacto, images, business } from '../data';
 
-export default function ContactoPage() {
+export default function ContactoPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-pintor';
   const [formData, setFormData] = useState({ nombre: '', telefono: '', servicio: '', mensaje: '' });
   const [submitted, setSubmitted] = useState(false);
 

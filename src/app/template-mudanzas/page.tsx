@@ -273,7 +273,7 @@ export default function TemplateMudanzasHome(props: any = {}) {
               </p>
             </div>
             <div className="flex gap-2 mt-6 flex-wrap">
-              {['IT Equipment Handling', 'After-Hours Service'].map((tag) => (
+              {['IT Equipment Handling', 'After-Horario Service'].map((tag) => (
                 <span
                   key={tag}
                   className="px-3 py-1 rounded-full"
@@ -595,7 +595,7 @@ export default function TemplateMudanzasHome(props: any = {}) {
                 marginBottom: '12px',
               }}
             >
-              Client Stories
+              Historias de clientes
             </p>
             <h2
               style={{

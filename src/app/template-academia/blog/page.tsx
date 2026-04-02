@@ -14,7 +14,9 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
 
 const blogImages = [images.blog1, images.blog2, images.blog3, images.blog4, images.blog5];
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-academia';
   const featured = blogPosts.find(p => p.featured)!;
   const rest = blogPosts.filter(p => !p.featured);
 
@@ -47,12 +49,12 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured Article */}
+      {/* Artículo destacado */}
       <section className="w-full py-16" style={{ backgroundColor: '#f8f9fa' }}>
         <div className="max-w-[1440px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="relative rounded-[2rem] overflow-hidden" style={{ height: '420px' }}>
-              <Image src={images.blogFeatured} alt={featured.title} fill className="object-cover" priority />
+              <Image src={images.blogDestacado} alt={featured.title} fill className="object-cover" priority />
               <div className="absolute top-5 left-5">
                 <span className="rounded-full px-4 py-2" style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#001944', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Articulo Destacado
@@ -113,10 +115,10 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter subscription */}
+      {/* Boletín subscription */}
       <section className="w-full py-20" style={{ background: 'linear-gradient(to right, #001944, #002c6e)' }}>
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 text-center">
-          <p style={{ fontSize: '11px', fontWeight: 700, color: '#6b95f3', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '14px' }}>Newsletter Semanal</p>
+          <p style={{ fontSize: '11px', fontWeight: 700, color: '#6b95f3', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '14px' }}>Boletín Semanal</p>
           <h2 style={{ fontFamily: "'Manrope', sans-serif", fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 800, letterSpacing: '-0.04em', color: '#ffffff', lineHeight: 1.1, marginBottom: '16px' }}>
             El conocimiento que importa,<br />directo a tu bandeja.
           </h2>

@@ -6,7 +6,7 @@
  */
 
 export const business = {
-  name: 'The Architectural Canvas',
+  name: 'El Architectural Canvas',
   tagline: 'Acabados Arquitectónicos Premium',
   phone: '900 000 000',
   phoneIntl: '+34900000000',
@@ -22,7 +22,7 @@ export const business = {
 };
 
 export const nav = [
-  { href: '/template-pintor', label: 'Home', icon: 'home' },
+  { href: '/template-pintor', label: 'Inicio', icon: 'home' },
   { href: '/template-pintor/servicios', label: 'Servicios', icon: 'format_paint' },
   { href: '/template-pintor/nosotros', label: 'Nosotros', icon: 'groups' },
   { href: '/template-pintor/blog', label: 'Blog', icon: 'article' },
@@ -42,7 +42,7 @@ export const images = {
   aboutHero: 'https://images.unsplash.com/photo-1562663474-6cbb3eaa4d14?auto=format&fit=crop&w=1600&q=80',
   aboutFounder: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
   aboutTeam: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
-  blogFeatured: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80',
+  blogDestacado: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80',
   blog1: 'https://images.unsplash.com/photo-1615529328331-f8917597711f?auto=format&fit=crop&w=800&q=80',
   blog2: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=800&q=80',
   blog3: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80',

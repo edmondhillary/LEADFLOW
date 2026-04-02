@@ -4,7 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { business, nav } from './data';
 
-export default function TemplateLayout({ children }: { children: React.ReactNode }) {
+export default function TemplateLayout(props: any = {}) {
+  const { children } = props as { children: React.ReactNode };
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-arquitectura';
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +19,7 @@ export default function TemplateLayout({ children }: { children: React.ReactNode
       {/* Header */}
       <header className="fixed top-0 w-full z-50" style={{ background: 'rgba(250,247,243,0.8)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-5 max-w-[1920px] mx-auto">
-          <Link href="/template-arquitectura" style={{ fontFamily: "'Noto Serif', serif", fontSize: '20px', fontWeight: 700, color: '#2e3430', letterSpacing: '-0.03em', textDecoration: 'none' }}>
+          <Link href={`${baseHref}`} style={{ fontFamily: "'Noto Serif', serif", fontSize: '20px', fontWeight: 700, color: '#2e3430', letterSpacing: '-0.03em', textDecoration: 'none' }}>
             {business.name}
           </Link>
 

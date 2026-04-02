@@ -9,7 +9,7 @@ import type { LeadOverrides } from '@/lib/lead-template-data';
 const categories = ['Todos', 'Meditación', 'Movimiento', 'Bienestar', 'Principiantes'];
 
 const postImages: Record<string, string> = {
-  'morning-yoga-routine': images.blogFeatured,
+  'morning-yoga-routine': images.blogDestacado,
   'meditation-for-beginners': images.blog1,
   'breathwork-science': images.blog2,
   'yin-vs-restorative': images.blog3,
@@ -24,15 +24,15 @@ export default function BlogPage(props: any = {}) {
     : blogPosts;
 
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed, setSuscribirmed] = useState(false);
 
   const featuredPost = posts.find((p: any) => p.featured) as any;
   const regularPosts = (posts as any[]).filter((p) => !p.featured);
 
-  function handleSubscribe(e: React.FormEvent) {
+  function handleSuscribirme(e: React.FormEvent) {
     e.preventDefault();
     if (email.trim()) {
-      setSubscribed(true);
+      setSuscribirmed(true);
     }
   }
 
@@ -100,7 +100,7 @@ export default function BlogPage(props: any = {}) {
         </div>
       </section>
 
-      {/* Featured Article */}
+      {/* Artículo destacado */}
       {featuredPost && (
         <section className="w-full px-6 md:px-16 pb-16" style={{ backgroundColor: '#fbf9f4' }}>
           <div className="max-w-[1920px] mx-auto">
@@ -110,7 +110,7 @@ export default function BlogPage(props: any = {}) {
             >
               <div className="relative" style={{ height: '480px', minHeight: '320px' }}>
                 <Image
-                  src={postImages[featuredPost.slug] ?? images.blogFeatured}
+                  src={postImages[featuredPost.slug] ?? images.blogDestacado}
                   alt={featuredPost.title}
                   fill
                   className="object-cover"
@@ -246,7 +246,7 @@ export default function BlogPage(props: any = {}) {
         </div>
       </section>
 
-      {/* Newsletter Signup */}
+      {/* Boletín Signup */}
       <section className="w-full py-24 px-6 md:px-16" style={{ backgroundColor: '#f0eee9' }}>
         <div className="max-w-xl mx-auto text-center">
           <span
@@ -285,7 +285,7 @@ export default function BlogPage(props: any = {}) {
               Welcome to the community. 🌿 Your first letter arrives soon.
             </div>
           ) : (
-            <form onSubmit={handleSubscribe} className="flex gap-3">
+            <form onSubmit={handleSuscribirme} className="flex gap-3">
               <input
                 type="email"
                 value={email}
@@ -318,7 +318,7 @@ export default function BlogPage(props: any = {}) {
                   letterSpacing: '0.03em',
                 }}
               >
-                Subscribe
+                Suscribirme
               </button>
             </form>
           )}

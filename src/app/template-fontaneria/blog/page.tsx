@@ -4,7 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { blogPosts } from '../data';
 
-export default function BlogPage() {
+export default function BlogPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-fontaneria';
   return (
     <div className="min-h-screen bg-[#f7f9fb]">
       {/* Hero Section */}
@@ -36,7 +38,7 @@ export default function BlogPage() {
       {/* Bento Grid Section */}
       <section className="px-6 md:px-12 pb-20">
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
-          {/* Post 0 - Featured (8 cols) */}
+          {/* Post 0 - Destacado (8 cols) */}
           {blogPosts[0] && (
             <div className="col-span-12 md:col-span-8 group cursor-pointer">
               <div className="relative h-[400px] overflow-hidden rounded-lg">

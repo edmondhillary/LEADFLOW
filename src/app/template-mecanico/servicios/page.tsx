@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, repairServices, maintenanceServices, diagnosticsServices, credentials, commonFailures, images } from '../data';
 
-export default function ServiciosPage() {
+export default function ServiciosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-mecanico';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -83,7 +85,7 @@ export default function ServiciosPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Featured card */}
+            {/* Destacado card */}
             <div className="relative bg-[#1e2022] overflow-hidden">
               <div className="aspect-[16/9] overflow-hidden">
                 <img
@@ -367,7 +369,7 @@ export default function ServiciosPage() {
               {business.phone}
             </a>
             <Link
-              href="/template-mecanico"
+              href={`${baseHref}`}
               className="border-2 border-[#531a00] text-[#531a00] uppercase tracking-[0.15em] text-sm font-black px-10 py-4 hover:bg-[#531a00] hover:text-[#ffb599] transition-colors duration-200"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >

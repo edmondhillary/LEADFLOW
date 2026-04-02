@@ -179,7 +179,7 @@ export default function BarberiaHomePage(props: any = {}) {
             href={`${base}/contacto`}
             style={{ display: 'inline-block', background: 'linear-gradient(45deg, #e9c176, #c5a059)', color: '#412d00', fontSize: '11px', fontWeight: 700, padding: '18px 56px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.2em' }}
           >
-            Book Your Session
+            Reservar sesión
           </Link>
         </div>
       </section>

@@ -13,12 +13,18 @@ import { SECTORS, getSector, getSearchTerm } from '../../src/config/sectors';
 interface SerpApiMapResult {
   title: string;
   place_id?: string;
+  place_id_search?: string;
+  provider_id?: string;
   address?: string;
   phone?: string;
   website?: string;
   rating?: number;
   reviews?: number;
+  reviews_original?: string;
   type?: string;
+  links?: { website?: string; directions?: string };
+  hours?: string;
+  description?: string;
   gps_coordinates?: { latitude: number; longitude: number };
 }
 
@@ -105,7 +111,7 @@ async function searchGoogleMaps(
 async function getBusinessDetails(
   placeId: string,
   apiKey: string
-): Promise<{ phone?: string; website?: string }> {
+): Promise<{ phone?: string; website?: string; place?: any }> {
   try {
     const params = new URLSearchParams({
       engine: 'google_maps',
@@ -118,6 +124,7 @@ async function getBusinessDetails(
     return {
       phone: place.phone,
       website: place.website,
+      place,
     };
   } catch {
     return {};
@@ -169,9 +176,11 @@ export async function runScraper(options: {
 
       // Obtenemos detalles si hay place_id
       let phone = result.phone;
+      let detailPlace: any = null;
       if (!phone && result.place_id) {
         const details = await getBusinessDetails(result.place_id, apiKey);
         phone = details.phone;
+        detailPlace = details.place || null;
         // Si detalles dice que tiene web, saltamos
         if (details.website) {
           console.log(`⏭️  Tiene web (detalles): ${result.title}`);
@@ -205,10 +214,17 @@ export async function runScraper(options: {
           country,
           phone: normalizePhone(phone, country),
           address: result.address || null,
+          googleMapsUrl: result.links?.directions || result.place_id_search || null,
           locale,
           currency,
           price,
+          reviewCount: result.reviews || 0,
+          reviewRating: result.rating || 0,
           status: 'scraped',
+          rawScrapeData: {
+            ...result,
+            details: detailPlace,
+          },
         });
 
         saved++;

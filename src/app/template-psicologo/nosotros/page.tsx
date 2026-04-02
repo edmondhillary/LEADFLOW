@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { business, aboutPage, credentials, images } from '../data';
 
-export default function NosotrosPage() {
+export default function NosotrosPage(props: any = {}) {
+  const ov = props.overrides as any;
+  const baseHref = ov?.baseHref || '/template-psicologo';
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
 
@@ -168,7 +170,7 @@ export default function NosotrosPage() {
             <p className="mb-8 leading-[1.7]" style={{ fontSize: '15px', color: '#454841' }}>
               {aboutPage.cta.desc}
             </p>
-            <Link href="/template-psicologo/contacto" className="inline-block rounded-lg transition-all active:scale-[0.98]" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+            <Link href={`${baseHref}/contacto`} className="inline-block rounded-lg transition-all active:scale-[0.98]" style={{ background: 'linear-gradient(135deg, #586152, #a7b19f)', color: '#ffffff', padding: '16px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
               Reservar Consulta Inicial
             </Link>
           </div>
