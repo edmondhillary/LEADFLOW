@@ -28,6 +28,41 @@ interface SerpApiMapResult {
   gps_coordinates?: { latitude: number; longitude: number };
 }
 
+const NON_BUSINESS_WEBSITE_HOSTS = [
+  /(^|\.)google\./,
+  /(^|\.)g\.page$/,
+  /(^|\.)goo\.gl$/,
+  /(^|\.)facebook\.com$/,
+  /(^|\.)instagram\.com$/,
+  /(^|\.)wa\.me$/,
+  /(^|\.)whatsapp\.com$/,
+  /(^|\.)tiktok\.com$/,
+  /(^|\.)youtube\.com$/,
+  /(^|\.)x\.com$/,
+  /(^|\.)twitter\.com$/,
+  /(^|\.)linkedin\.com$/,
+  /(^|\.)linktr\.ee$/,
+  /(^|\.)tripadvisor\./,
+  /(^|\.)yelp\./,
+];
+
+function getHostname(url: string): string {
+  if (!url) return '';
+  try {
+    const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    return new URL(normalized).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function isBusinessWebsite(url: string | undefined): boolean {
+  if (!url) return false;
+  const host = getHostname(url.trim());
+  if (!host) return false;
+  return !NON_BUSINESS_WEBSITE_HOSTS.some((rx) => rx.test(host));
+}
+
 function cleanForKey(value: string): string {
   return (value || '')
     .toLowerCase()
@@ -212,7 +247,8 @@ export async function runScraper(options: {
       const slug = generateSlug(result.title, city, sector);
       const dedupeKey = buildDedupeKey(result, city, country, sector);
 
-      const hasWebsite = Boolean(website);
+      const rawWebsite = website?.trim() || '';
+      const hasWebsite = isBusinessWebsite(rawWebsite);
       const isMobile = isMobileNumber(phone, country);
       const websiteStatus = hasWebsite ? 'con_web' : 'sin_web';
 
@@ -241,7 +277,7 @@ export async function runScraper(options: {
           reviewRating: result.rating || 0,
           hasWebsite,
           websiteStatus,
-          websiteUrl: website || null,
+          websiteUrl: hasWebsite ? rawWebsite : null,
           websiteCheckedAt: new Date(),
           hasMobile: isMobile,
           hasWhatsApp: isMobile,
@@ -256,7 +292,8 @@ export async function runScraper(options: {
           dedupeKey,
           rawScrapeData: {
             ...result,
-            websiteResolved: website || null,
+            websiteResolved: rawWebsite || null,
+            websiteDiscardedAsNonCorporate: rawWebsite && !hasWebsite ? rawWebsite : null,
             details: detailPlace,
           },
           lastScrapedAt: new Date(),
@@ -282,7 +319,10 @@ export async function runScraper(options: {
         }
 
         console.log(`✅ [${saved}/${limit}] ${exists ? 'Actualizado' : 'Guardado'}: ${result.title}`);
-        console.log(`   🌐 ${hasWebsite ? 'CON WEB' : 'SIN WEB'}${website ? ` (${website})` : ''}`);
+        console.log(`   🌐 ${hasWebsite ? 'CON WEB' : 'SIN WEB'}${rawWebsite ? ` (${rawWebsite})` : ''}`);
+        if (rawWebsite && !hasWebsite) {
+          console.log(`   ℹ️  URL descartada como web corporativa: ${rawWebsite}`);
+        }
         if (phone) console.log(`   📞 ${phone}`);
         if (result.address) console.log(`   📍 ${result.address}`);
 

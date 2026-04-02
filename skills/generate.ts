@@ -88,6 +88,74 @@ function validateWhatsApp(phone: string, _country: string): boolean {
   return digits.length >= 8;
 }
 
+const NON_BUSINESS_WEBSITE_HOSTS = [
+  /(^|\.)google\./,
+  /(^|\.)g\.page$/,
+  /(^|\.)goo\.gl$/,
+  /(^|\.)facebook\.com$/,
+  /(^|\.)instagram\.com$/,
+  /(^|\.)wa\.me$/,
+  /(^|\.)whatsapp\.com$/,
+  /(^|\.)tiktok\.com$/,
+  /(^|\.)youtube\.com$/,
+  /(^|\.)x\.com$/,
+  /(^|\.)twitter\.com$/,
+  /(^|\.)linkedin\.com$/,
+  /(^|\.)linktr\.ee$/,
+  /(^|\.)tripadvisor\./,
+  /(^|\.)yelp\./,
+];
+
+function getHostname(url: string): string {
+  if (!url) return '';
+  try {
+    const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    return new URL(normalized).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function isBusinessWebsite(url?: string | null): boolean {
+  if (!url) return false;
+  const host = getHostname(url.trim());
+  if (!host) return false;
+  return !NON_BUSINESS_WEBSITE_HOSTS.some((rx) => rx.test(host));
+}
+
+function leadHasRealWebsite(lead: any): boolean {
+  const raw = (lead.rawScrapeData || {}) as any;
+  const candidates = [
+    lead.websiteUrl,
+    raw.websiteResolved,
+    raw.website,
+    raw?.links?.website,
+  ];
+  return candidates.some((url) => isBusinessWebsite(url));
+}
+
+function pickLeadPhone(lead: any): string | undefined {
+  const raw = (lead.rawScrapeData || {}) as any;
+  const candidates = [lead.phone, raw.phone, raw?.details?.phone, raw?.place?.phone];
+  const hit = candidates.find((p) => typeof p === 'string' && p.trim().length > 0);
+  return hit ? String(hit).trim() : undefined;
+}
+
+function normalizePhoneForCountry(phone: string, country: string): string {
+  const clean = phone.replace(/[\s\-().]/g, '');
+  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598' };
+  const prefix = prefixes[country] || '';
+
+  if (clean.startsWith('+')) return clean;
+  if (country === 'ES' && clean.startsWith('34')) return '+' + clean;
+  if (country === 'ES') return prefix + clean;
+  if (country === 'AR' && clean.startsWith('54')) return '+' + clean;
+  if (country === 'AR') return prefix + clean;
+  if (country === 'UY' && clean.startsWith('598')) return '+' + clean;
+  if (country === 'UY') return prefix + clean;
+  return clean.startsWith('+') ? clean : '+' + clean;
+}
+
 // ─── Inyectar datos reales en el contenido del template via Claude Haiku ───
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -453,19 +521,25 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
         continue;
       }
 
-      // Solo generamos para candidatos: sin web + móvil válido
-      if (lead.hasWebsite) {
-        console.log(`   ⏭️  ${lead.businessName} — tiene web (${lead.websiteUrl || 'sin URL'})`);
+      // Solo generamos para candidatos: sin web corporativa + teléfono válido
+      const hasRealWebsite = leadHasRealWebsite(lead);
+      if (hasRealWebsite) {
+        console.log(`   ⏭️  ${lead.businessName} — tiene web corporativa (${lead.websiteUrl || 'sin URL'})`);
         continue;
       }
 
-      if (!lead.phone) {
+      const candidatePhone = pickLeadPhone(lead);
+      if (!candidatePhone) {
         console.log(`   ⏭️  ${lead.businessName} — sin teléfono`);
         continue;
       }
 
-      const hasWA = validateWhatsApp(lead.phone, country);
+      const normalizedPhone = normalizePhoneForCountry(candidatePhone, country);
+      const hasWA = validateWhatsApp(normalizedPhone, country);
       await Lead.findByIdAndUpdate(leadId, {
+        phone: normalizedPhone,
+        hasWebsite: false,
+        websiteStatus: 'sin_web',
         hasWhatsApp: hasWA,
         hasMobile: hasWA,
         whatsAppValidatedAt: new Date(),
@@ -487,8 +561,60 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     }
   }
 
+  if (validLeadIds.length < limit) {
+    const missing = limit - validLeadIds.length;
+    console.log(`\n   🔎 Fallback DB: buscando hasta ${missing} candidatos ya scrapeados (sin web corporativa)...`);
+
+    const fallbackLeads = await Lead.find({
+      sector,
+      city,
+      country,
+      status: { $nin: ['web_live', 'email_sent', 'visited', 'contacted', 'client'] },
+      $or: [
+        { hasWebsite: false },
+        { websiteStatus: 'sin_web' },
+        { websiteUrl: null },
+      ],
+    })
+      .sort({ lastScrapedAt: -1 })
+      .limit(limit * 10)
+      .select('businessName phone websiteUrl hasWebsite websiteStatus rawScrapeData')
+      .lean();
+
+    for (const lead of fallbackLeads) {
+      if (validLeadIds.length >= limit) break;
+      const leadId = String((lead as any)._id);
+      if (validLeadSet.has(leadId)) continue;
+
+      const hasRealWebsite = leadHasRealWebsite(lead);
+      if (hasRealWebsite) continue;
+
+      const candidatePhone = pickLeadPhone(lead);
+      if (!candidatePhone) continue;
+
+      const normalizedPhone = normalizePhoneForCountry(candidatePhone, country);
+      const hasWA = validateWhatsApp(normalizedPhone, country);
+      if (!hasWA) continue;
+
+      await Lead.findByIdAndUpdate(leadId, {
+        phone: normalizedPhone,
+        hasWebsite: false,
+        websiteStatus: 'sin_web',
+        hasWhatsApp: true,
+        hasMobile: true,
+        whatsAppValidatedAt: new Date(),
+        isGenerationCandidate: true,
+        contactPriority: 'alta',
+      });
+
+      validLeadSet.add(leadId);
+      validLeadIds.push(leadId);
+      console.log(`   ✅ ${lead.businessName} — recuperado desde DB (${validLeadIds.length}/${limit})`);
+    }
+  }
+
   if (validLeadIds.length === 0) {
-    console.log('⚠️  No se encontraron candidatos sin web y con número móvil válido. Prueba otra ciudad.');
+    console.log('⚠️  No se encontraron candidatos sin web corporativa y con teléfono/WhatsApp válido. Prueba otra ciudad.');
     return [];
   }
 
