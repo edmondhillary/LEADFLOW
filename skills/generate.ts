@@ -19,6 +19,7 @@ dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import Anthropic from '@anthropic-ai/sdk';
 import { connectDB, Lead, PipelineRun, WebsiteContent } from '../src/lib/mongodb';
+import { notifyPipelineRun } from '../src/bot/telegram';
 import { runScraper } from './scraper/index';
 import { SECTORS, getSector, getTemplateName, getDesign } from '../src/config/sectors';
 import { getSectorImages } from '../src/lib/images';
@@ -611,6 +612,27 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
         `| candidatos=${args.candidateLeads} | webs=${args.generatedWebs} ` +
         `| coste_est=${estimatedCostUsd} USD | coste/web=${estimatedCostPerWebUsd} USD`,
       );
+
+      await notifyPipelineRun({
+        status: args.status,
+        sector,
+        city,
+        country,
+        limit,
+        ecoMode,
+        strictCityFilter,
+        apifyRuns: args.apifyRuns,
+        totalScraped: args.totalScraped,
+        skippedByGeo: args.skippedByGeo,
+        candidateLeads: args.candidateLeads,
+        generatedWebs: args.generatedWebs,
+        failedWebs: args.failedWebs,
+        estimatedCostUsd,
+        estimatedCostPerWebUsd,
+        durationMs: Math.max(0, finishedAt.getTime() - startedAt.getTime()),
+        notes: [...notes, ...(args.notes || [])].slice(0, 30),
+        error: args.error,
+      });
     } catch (err: any) {
       console.warn(`⚠️  No se pudo guardar telemetría del pipeline: ${err?.message || String(err)}`);
     }

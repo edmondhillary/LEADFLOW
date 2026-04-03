@@ -14,7 +14,7 @@ import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import TelegramBot from 'node-telegram-bot-api';
-import { connectDB, Lead } from '../lib/mongodb';
+import { connectDB, Lead, PipelineRun } from '../lib/mongodb';
 import { runPipeline } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
@@ -218,6 +218,48 @@ async function getStats() {
   return text;
 }
 
+function fmtUsd(value: number): string {
+  return `$${(value || 0).toFixed(4)}`;
+}
+
+async function getPipelineMetricsSummary() {
+  await connectDB();
+
+  const runs = await PipelineRun.find({})
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .select('status sector city country apifyRuns candidateLeads generatedWebs failedWebs estimatedCostUsd estimatedCostPerWebUsd notes createdAt')
+    .lean();
+
+  if (!runs.length) {
+    return '📭 No hay métricas de pipeline aún.';
+  }
+
+  let out = '📈 *Pipeline metrics (últimas ejecuciones)*\n\n';
+  let totalCost = 0;
+  let totalWebs = 0;
+
+  for (const run of runs as any[]) {
+    const st = run.status === 'ok' ? '✅' : run.status === 'partial' ? '⚠️' : '❌';
+    totalCost += Number(run.estimatedCostUsd || 0);
+    totalWebs += Number(run.generatedWebs || 0);
+
+    out += `${st} *${run.sector}/${run.city}/${run.country}*\n`;
+    out += `   apify:${run.apifyRuns || 0} · cand:${run.candidateLeads || 0} · webs:${run.generatedWebs || 0} · err:${run.failedWebs || 0}\n`;
+    out += `   coste:${fmtUsd(Number(run.estimatedCostUsd || 0))} · coste/web:${fmtUsd(Number(run.estimatedCostPerWebUsd || 0))}\n`;
+    if (run.notes?.length) {
+      out += `   notes: ${run.notes.slice(0, 3).join(', ')}\n`;
+    }
+    out += '\n';
+  }
+
+  const avgCostWeb = totalWebs > 0 ? totalCost / totalWebs : 0;
+  out += `💰 Total coste (últimas ${runs.length}): *${fmtUsd(totalCost)}*\n`;
+  out += `📉 Coste medio/web: *${fmtUsd(avgCostWeb)}*`;
+
+  return out;
+}
+
 // ─── Health check para Vercel y MongoDB ──────────────────────────────────────
 
 async function checkHealth(): Promise<string> {
@@ -255,7 +297,8 @@ const MAIN_KEYBOARD: TelegramBot.SendMessageOptions = {
       [{ text: '🚀 Generar webs' }, { text: '📊 Estadísticas' }],
       [{ text: '👁️ Leads activos' }, { text: '✅ Clientes' }],
       [{ text: '🏥 Health check' }, { text: '🧹 Cleanup' }],
-      [{ text: '💳 /stripe' }, { text: '❓ Ayuda' }],
+      [{ text: '📈 Coste pipeline' }, { text: '💳 /stripe' }],
+      [{ text: '❓ Ayuda' }],
     ],
     resize_keyboard: true,
   },
@@ -300,6 +343,12 @@ bot.onText(/\/health/, async (msg) => {
   await sendMsg(report, MAIN_KEYBOARD);
 });
 
+bot.onText(/\/metrics/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const report = await getPipelineMetricsSummary();
+  await sendMsg(report, MAIN_KEYBOARD);
+});
+
 // ─── Handler principal ────────────────────────────────────────────────────────
 
 bot.on('message', async (msg) => {
@@ -335,6 +384,12 @@ bot.on('message', async (msg) => {
     return;
   }
 
+  if (text === '📈 Coste pipeline' || text === 'Coste pipeline' || text === '/metrics') {
+    const report = await getPipelineMetricsSummary();
+    await sendMsg(report, MAIN_KEYBOARD);
+    return;
+  }
+
   if (text === '❓ Ayuda' || text === 'Ayuda') {
     await sendMsg(
       `*LeadFlow v3 — Comandos*\n\n` +
@@ -344,6 +399,7 @@ bot.on('message', async (msg) => {
       `*✅ Clientes* — Clientes que pagan\n` +
       `*🏥 Health check* — Estado de Vercel y MongoDB\n` +
       `*🧹 Cleanup* — Expirar leads de +48h\n` +
+      `*📈 Coste pipeline* / *\/metrics* — Coste por ejecución y coste/web\n` +
       `*💳 /stripe* — Generar link de pago personalizado\n\n` +
       `*Nota:* El WhatsApp lo envías tú manualmente desde los botones de cada lead.`,
       MAIN_KEYBOARD

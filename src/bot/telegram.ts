@@ -40,6 +40,80 @@ async function sendTelegramMessage(payload: SendMessagePayload): Promise<void> {
   }
 }
 
+type PipelineNotifyPayload = {
+  status: 'ok' | 'partial' | 'failed';
+  sector: string;
+  city: string;
+  country: string;
+  limit: number;
+  ecoMode: boolean;
+  strictCityFilter: boolean;
+  apifyRuns: number;
+  totalScraped: number;
+  skippedByGeo: number;
+  candidateLeads: number;
+  generatedWebs: number;
+  failedWebs: number;
+  estimatedCostUsd: number;
+  estimatedCostPerWebUsd: number;
+  durationMs: number;
+  notes?: string[];
+  error?: string;
+};
+
+function statusEmoji(status: PipelineNotifyPayload['status']): string {
+  if (status === 'ok') return '✅';
+  if (status === 'partial') return '⚠️';
+  return '❌';
+}
+
+function fmtUsd(value: number): string {
+  return `$${(value || 0).toFixed(4)}`;
+}
+
+export async function notifyPipelineRun(payload: PipelineNotifyPayload) {
+  const enabled = process.env.TELEGRAM_NOTIFY_PIPELINE_METRICS !== '0';
+  if (!enabled) return;
+
+  const lines = [
+    `📈 PIPELINE ${statusEmoji(payload.status)} ${payload.status.toUpperCase()}`,
+    '',
+    `🧭 ${payload.sector} · ${payload.city}, ${payload.country} · límite ${payload.limit}`,
+    `⚙️ ECO ${payload.ecoMode ? 'ON' : 'OFF'} | Filtro ciudad ${payload.strictCityFilter ? 'ON' : 'OFF'}`,
+    `⏱️ Duración: ${Math.round((payload.durationMs || 0) / 1000)}s`,
+    '',
+    `💸 Coste est.: ${fmtUsd(payload.estimatedCostUsd)} | Coste/web: ${fmtUsd(payload.estimatedCostPerWebUsd)}`,
+    `🔁 Apify runs: ${payload.apifyRuns} | Scraped: ${payload.totalScraped} | Filtrados geo: ${payload.skippedByGeo}`,
+    `🎯 Candidatos: ${payload.candidateLeads} | 🌐 Webs: ${payload.generatedWebs} | ❌ Errores: ${payload.failedWebs}`,
+  ];
+
+  if (payload.notes?.length) {
+    lines.push(`📝 Notes: ${payload.notes.slice(0, 5).join(', ')}`);
+  }
+  if (payload.error) {
+    lines.push(`🚨 Error: ${String(payload.error).slice(0, 240)}`);
+  }
+
+  await sendTelegramMessage({
+    chat_id: CHAT_ID || '',
+    text: lines.join('\n'),
+    disable_web_page_preview: true,
+  });
+
+  const alertThreshold = Number(process.env.TELEGRAM_COST_PER_WEB_ALERT_USD || 0.5);
+  if (payload.generatedWebs > 0 && payload.estimatedCostPerWebUsd >= alertThreshold) {
+    await sendTelegramMessage({
+      chat_id: CHAT_ID || '',
+      text:
+        `🚨 ALERTA COSTE/WEB\n\n` +
+        `${payload.sector} · ${payload.city}, ${payload.country}\n` +
+        `Coste/web: ${fmtUsd(payload.estimatedCostPerWebUsd)} (umbral ${fmtUsd(alertThreshold)})\n` +
+        `Revisa filtros/ciudad/cache para bajar gasto.`,
+      disable_web_page_preview: true,
+    });
+  }
+}
+
 export async function notifyServiceAlert(service: 'vercel' | 'mongodb', error: string) {
   await sendTelegramMessage({
     chat_id: CHAT_ID || '',
