@@ -18,7 +18,7 @@ import { existsSync } from 'fs';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import Anthropic from '@anthropic-ai/sdk';
-import { connectDB, Lead, WebsiteContent } from '../src/lib/mongodb';
+import { connectDB, Lead, PipelineRun, WebsiteContent } from '../src/lib/mongodb';
 import { runScraper } from './scraper/index';
 import { SECTORS, getSector, getTemplateName, getDesign } from '../src/config/sectors';
 import { getSectorImages } from '../src/lib/images';
@@ -166,6 +166,17 @@ function envInt(name: string, fallback: number): number {
   if (!raw) return fallback;
   const parsed = parseInt(raw, 10);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function envFloat(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function roundMoney(n: number): number {
+  return Math.round(n * 10000) / 10000;
 }
 
 function normalizeGeo(value: string): string {
@@ -508,6 +519,7 @@ function buildFallbackContent(lead: any) {
 
 export async function runPipeline(options: PipelineOptions): Promise<PipelineResult[]> {
   const { sector, city, country, limit } = options;
+  const startedAt = new Date();
 
   console.log(`\n🚀 Pipeline LeadFlow v3`);
   console.log(`   Sector: ${sector} | Ciudad: ${city} | País: ${country} | Límite: ${limit}`);
@@ -544,6 +556,65 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   const BATCH_SIZE = Math.min(Math.max(limit * batchMultiplier, limit), maxBatchPerRound);
   let round = 0;
   let totalScraped = 0;
+  let apifyRuns = 0;
+  let skippedByGeoTotal = 0;
+  const notes: string[] = [];
+
+  const persistTelemetry = async (args: {
+    status: 'ok' | 'partial' | 'failed';
+    generatedWebs: number;
+    failedWebs: number;
+    candidateLeads: number;
+    totalScraped: number;
+    error?: string;
+    apifyRuns: number;
+    skippedByGeo: number;
+    notes?: string[];
+  }) => {
+    try {
+      const finishedAt = new Date();
+      const perRunUsd = Math.max(0, envFloat('APIFY_COST_PER_RUN_USD', 0.06));
+      const perLeadUsd = Math.max(0, envFloat('APIFY_COST_PER_SCRAPED_LEAD_USD', 0.012));
+      const estimatedCostUsd = roundMoney(args.apifyRuns * perRunUsd + args.totalScraped * perLeadUsd);
+      const estimatedCostPerWebUsd = args.generatedWebs > 0
+        ? roundMoney(estimatedCostUsd / args.generatedWebs)
+        : roundMoney(estimatedCostUsd);
+
+      await PipelineRun.create({
+        startedAt,
+        finishedAt,
+        durationMs: Math.max(0, finishedAt.getTime() - startedAt.getTime()),
+        sector,
+        city,
+        country,
+        limit,
+        ecoMode,
+        strictCityFilter,
+        maxRounds,
+        batchSize: BATCH_SIZE,
+        apifyRuns: args.apifyRuns,
+        totalScraped: args.totalScraped,
+        skippedByGeo: args.skippedByGeo,
+        candidateLeads: args.candidateLeads,
+        generatedWebs: args.generatedWebs,
+        failedWebs: args.failedWebs,
+        estimatedCostUsd,
+        estimatedCostPerWebUsd,
+        costModel: { perRunUsd, perScrapedLeadUsd: perLeadUsd },
+        status: args.status,
+        error: args.error || null,
+        notes: [...notes, ...(args.notes || [])].slice(0, 30),
+      });
+
+      console.log(
+        `📈 Telemetría guardada | apify_runs=${args.apifyRuns} ` +
+        `| candidatos=${args.candidateLeads} | webs=${args.generatedWebs} ` +
+        `| coste_est=${estimatedCostUsd} USD | coste/web=${estimatedCostPerWebUsd} USD`,
+      );
+    } catch (err: any) {
+      console.warn(`⚠️  No se pudo guardar telemetría del pipeline: ${err?.message || String(err)}`);
+    }
+  };
 
   const enrichFromDb = async (maxAdds: number, label: string) => {
     if (maxAdds <= 0) return;
@@ -631,11 +702,27 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
         apiKey: process.env.APIFY_KEY || '',
       });
       batchIds = scraperResult.leadIds;
+      apifyRuns += Number(scraperResult?.meta?.apifyRuns || 0);
+      skippedByGeoTotal += Number(scraperResult?.meta?.skippedByGeo || 0);
       totalScraped += batchIds.length;
       console.log(`   Negocios guardados/actualizados en esta ronda: ${batchIds.length}`);
     } catch (err: any) {
       console.error(`❌ Error en scraper (ronda ${round}): ${err.message}`);
-      if (round === 1) throw new Error(`Scraping falló: ${err.message}`);
+      if (round === 1) {
+        const errorMsg = `Scraping falló: ${err.message}`;
+        notes.push(`error_round_${round}`);
+        await persistTelemetry({
+          status: 'failed',
+          generatedWebs: 0,
+          failedWebs: 0,
+          candidateLeads: validLeadIds.length,
+          totalScraped,
+          error: errorMsg,
+          apifyRuns,
+          skippedByGeo: skippedByGeoTotal,
+        });
+        throw new Error(errorMsg);
+      }
       break; // Si falla en rondas posteriores, usamos lo que tenemos
     }
 
@@ -702,6 +789,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
 
     if (ecoMode && roundCandidateAdds === 0 && validLeadIds.length < limit) {
       console.log('   🛑 Corte temprano ECO: esta ronda no produjo candidatos nuevos. Evitamos más scraping caro.');
+      notes.push(`early_stop_round_${round}`);
       break;
     }
   }
@@ -713,11 +801,22 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
 
   if (validLeadIds.length === 0) {
     console.log('⚠️  No se encontraron candidatos sin web corporativa y con teléfono/WhatsApp válido. Prueba otra ciudad.');
+    await persistTelemetry({
+      status: 'partial',
+      generatedWebs: 0,
+      failedWebs: 0,
+      candidateLeads: 0,
+      totalScraped,
+      apifyRuns,
+      skippedByGeo: skippedByGeoTotal,
+      notes: ['no_candidates'],
+    });
     return [];
   }
 
   if (validLeadIds.length < limit) {
     console.log(`⚠️  Solo se encontraron ${validLeadIds.length}/${limit} leads válidos tras ${round} rondas.`);
+    notes.push('partial_candidates');
   }
 
   scrapedLeadIds = validLeadIds;
@@ -755,6 +854,16 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     console.log(`   Errores: ${errors.length}`);
     for (const e of errors) console.log(`   ❌ ${e.businessName}: ${e.error}`);
   }
+
+  await persistTelemetry({
+    status: errors.length === 0 ? 'ok' : 'partial',
+    generatedWebs: ok.length,
+    failedWebs: errors.length,
+    candidateLeads: validLeadIds.length,
+    totalScraped,
+    apifyRuns,
+    skippedByGeo: skippedByGeoTotal,
+  });
 
   return results;
 }

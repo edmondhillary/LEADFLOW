@@ -245,7 +245,50 @@ const WebsiteContentSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// --- Pipeline Run Telemetry ---
+const PipelineRunSchema = new mongoose.Schema({
+  startedAt: { type: Date, required: true },
+  finishedAt: Date,
+  durationMs: Number,
+
+  sector: { type: String, required: true },
+  city: { type: String, required: true },
+  country: { type: String, required: true, enum: ['ES', 'AR', 'UY', 'US'] },
+  limit: { type: Number, required: true },
+
+  ecoMode: { type: Boolean, default: true },
+  strictCityFilter: { type: Boolean, default: true },
+  maxRounds: Number,
+  batchSize: Number,
+
+  apifyRuns: { type: Number, default: 0 },
+  totalScraped: { type: Number, default: 0 },
+  skippedByGeo: { type: Number, default: 0 },
+  candidateLeads: { type: Number, default: 0 },
+  generatedWebs: { type: Number, default: 0 },
+  failedWebs: { type: Number, default: 0 },
+
+  estimatedCostUsd: { type: Number, default: 0 },
+  estimatedCostPerWebUsd: { type: Number, default: 0 },
+  costModel: {
+    perRunUsd: { type: Number, default: 0 },
+    perScrapedLeadUsd: { type: Number, default: 0 },
+  },
+
+  status: {
+    type: String,
+    enum: ['ok', 'partial', 'failed'],
+    default: 'ok',
+  },
+  error: String,
+  notes: [String],
+}, { timestamps: true });
+
+PipelineRunSchema.index({ createdAt: -1 });
+PipelineRunSchema.index({ sector: 1, city: 1, country: 1, createdAt: -1 });
+
 // ==================== MODELOS ====================
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
 export const Competitor = mongoose.models.Competitor || mongoose.model('Competitor', CompetitorSchema);
 export const WebsiteContent = mongoose.models.WebsiteContent || mongoose.model('WebsiteContent', WebsiteContentSchema);
+export const PipelineRun = mongoose.models.PipelineRun || mongoose.model('PipelineRun', PipelineRunSchema);

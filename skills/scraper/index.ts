@@ -458,7 +458,19 @@ export async function runScraper(options: {
   if (strictCityFilter) console.log(`   Filtrados por ciudad objetivo: ${skippedByGeo}`);
   console.log(`   Sector: ${sector} | Ciudad: ${city} | País: ${country}`);
 
-  return { found, saved, leadIds: savedIds };
+  return {
+    found,
+    saved,
+    leadIds: savedIds,
+    meta: {
+      apifyRuns: 1,
+      effectiveLimit,
+      requestedLimit: limit,
+      strictCityFilter,
+      skippedByGeo,
+      sourceActor,
+    },
+  };
 }
 
 // Ejecución directa desde CLI

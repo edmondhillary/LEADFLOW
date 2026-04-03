@@ -16,7 +16,8 @@
     "list-leads": "tsx scripts/list-leads.ts",
     "send-test-wa": "tsx scripts/send-test-whatsapp.ts",
     "preview": "tsx scripts/preview-leads.ts",
-    "lint-ui": "tsx scripts/lint-ui.ts"
+    "lint-ui": "tsx scripts/lint-ui.ts",
+    "pipeline-metrics": "tsx scripts/pipeline-metrics.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
