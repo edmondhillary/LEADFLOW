@@ -178,6 +178,37 @@ function cleanForKey(value: string): string {
     .replace(/^-|-$/g, '');
 }
 
+function normalizeGeo(value: string): string {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function cityMatchesTarget(result: ApifyMapResult, targetCity: string): boolean {
+  const target = normalizeGeo(targetCity);
+  if (!target) return true;
+
+  const resultCity = normalizeGeo(result.city || '');
+  const resultAddress = normalizeGeo(result.address || '');
+
+  if (resultCity) {
+    if (resultCity === target) return true;
+    if (resultCity.includes(target) || target.includes(resultCity)) return true;
+    return false;
+  }
+
+  if (resultAddress) {
+    return resultAddress.includes(target);
+  }
+
+  // Si no hay señales geográficas, no descartamos.
+  return true;
+}
+
 function buildDedupeKey(
   result: ApifyMapResult,
   city: string,
@@ -265,6 +296,16 @@ export async function runScraper(options: {
 }) {
   const { sector, city, country, limit, apiKey } = options;
 
+  const ecoMode = process.env.SCRAPE_ECO_MODE !== '0';
+  const strictCityFilter = process.env.SCRAPE_STRICT_CITY
+    ? process.env.SCRAPE_STRICT_CITY === '1'
+    : ecoMode;
+  const maxPerQuery = Math.max(
+    1,
+    parseInt(process.env.SCRAPE_MAX_RESULTS_PER_QUERY || (ecoMode ? '80' : '200'), 10),
+  );
+  const effectiveLimit = Math.min(limit, maxPerQuery);
+
   getSector(sector); // valida que exista
   const term = getSearchTerm(sector, country);
   const query = `${term} ${city}`;
@@ -273,7 +314,8 @@ export async function runScraper(options: {
   const price = 25;
 
   console.log(`\n🔍 Buscando: "${query}"`);
-  console.log(`📍 País: ${country} | Sector: ${sector} | Límite: ${limit}\n`);
+  console.log(`📍 País: ${country} | Sector: ${sector} | Límite solicitado: ${limit} | Límite query: ${effectiveLimit}`);
+  console.log(`⚙️  Eco mode: ${ecoMode ? 'ON' : 'OFF'} | Filtro ciudad estricto: ${strictCityFilter ? 'ON' : 'OFF'}\n`);
 
   await connectDB();
 
@@ -290,8 +332,9 @@ export async function runScraper(options: {
   let withoutWeb = 0;
   let withMobile = 0;
   let withoutMobile = 0;
+  let skippedByGeo = 0;
 
-  const { items: results, actorId: sourceActor } = await searchGoogleMapsWithApify(query, apiKey, country, limit);
+  const { items: results, actorId: sourceActor } = await searchGoogleMapsWithApify(query, apiKey, country, effectiveLimit);
   if (results.length === 0) {
     console.log('No hay resultados en Apify para esta búsqueda');
   }
@@ -301,6 +344,10 @@ export async function runScraper(options: {
     if (!result?.title) continue;
     if (result.isAdvertisement) continue;
     if (result.permanentlyClosed || result.temporarilyClosed) continue;
+    if (strictCityFilter && !cityMatchesTarget(result, city)) {
+      skippedByGeo++;
+      continue;
+    }
 
     found++;
 
@@ -408,6 +455,7 @@ export async function runScraper(options: {
   console.log(`   Leads guardados/actualizados únicos: ${saved}`);
   console.log(`   Con web: ${withWeb} | Sin web: ${withoutWeb}`);
   console.log(`   Con móvil: ${withMobile} | Sin móvil: ${withoutMobile}`);
+  if (strictCityFilter) console.log(`   Filtrados por ciudad objetivo: ${skippedByGeo}`);
   console.log(`   Sector: ${sector} | Ciudad: ${city} | País: ${country}`);
 
   return { found, saved, leadIds: savedIds };

@@ -161,6 +161,48 @@ function normalizePhoneForCountry(phone: string, country: string): string {
   return clean.startsWith('+') ? clean : '+' + clean;
 }
 
+function envInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeGeo(value: string): string {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function leadMatchesTargetCity(lead: any, targetCity: string): boolean {
+  const target = normalizeGeo(targetCity);
+  if (!target) return true;
+
+  const raw = (lead.rawScrapeData || {}) as any;
+  const cityCandidates = [lead.city, raw.city, raw?.normalized?.city];
+  const addressCandidates = [lead.address, raw.address, raw.street];
+
+  for (const city of cityCandidates) {
+    const c = normalizeGeo(String(city || ''));
+    if (!c) continue;
+    if (c === target || c.includes(target) || target.includes(c)) return true;
+    return false;
+  }
+
+  for (const address of addressCandidates) {
+    const a = normalizeGeo(String(address || ''));
+    if (!a) continue;
+    if (a.includes(target)) return true;
+  }
+
+  // Sin señales de ubicación: no descartamos
+  return true;
+}
+
 // ─── Inyectar datos reales en el contenido del template via Claude Haiku ───
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -479,17 +521,104 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   // PASO 1: Scraping
   console.log(`\n🔍 PASO 1 — Scraping Google Maps...`);
   let scrapedLeadIds: string[] = [];
+
+  const ecoMode = process.env.SCRAPE_ECO_MODE !== '0';
+  const strictCityFilter = process.env.SCRAPE_STRICT_CITY
+    ? process.env.SCRAPE_STRICT_CITY === '1'
+    : ecoMode;
+  const maxRounds = Math.max(1, envInt('SCRAPE_MAX_ROUNDS', ecoMode ? 2 : 5));
+  const batchMultiplier = Math.max(1, envInt('SCRAPE_BATCH_MULTIPLIER', ecoMode ? 2 : 4));
+  const maxBatchPerRound = Math.max(limit, envInt('SCRAPE_MAX_BATCH_PER_ROUND', ecoMode ? 80 : 200));
+  const queryCacheHours = Math.max(0, envInt('SCRAPE_QUERY_CACHE_HOURS', ecoMode ? 24 : 0));
+
+  console.log(
+    `⚙️  Modo coste: ${ecoMode ? 'ECO' : 'NORMAL'} | ` +
+    `rondas máx: ${maxRounds} | batch x${batchMultiplier} (cap ${maxBatchPerRound}) | ` +
+    `cache: ${queryCacheHours}h | filtro ciudad: ${strictCityFilter ? 'ON' : 'OFF'}`,
+  );
   // PASOS 1+2 COMBINADOS: scraping + validación WhatsApp en loop
   // Sigue buscando hasta tener `limit` leads con WhatsApp, o hasta MAX_SCRAPE_ROUNDS intentos.
   console.log(`\n📱 PASOS 1+2 — Scraping + validación WhatsApp (objetivo: ${limit} leads)...`);
   const validLeadIds: string[] = [];
   const validLeadSet = new Set<string>();
-  const MAX_ROUNDS = 5;        // máximo 5 rondas de scraping (evita bucle infinito)
-  const BATCH_SIZE = limit * 4; // pedimos más porque ahora guardamos todos (con/sin web)
+  const BATCH_SIZE = Math.min(Math.max(limit * batchMultiplier, limit), maxBatchPerRound);
   let round = 0;
   let totalScraped = 0;
 
-  while (validLeadIds.length < limit && round < MAX_ROUNDS) {
+  const enrichFromDb = async (maxAdds: number, label: string) => {
+    if (maxAdds <= 0) return;
+    console.log(`\n   🔎 ${label}: buscando hasta ${maxAdds} candidatos en DB...`);
+    let added = 0;
+
+    const fallbackLeads = await Lead.find({
+      sector,
+      city,
+      country,
+      status: { $nin: ['web_live', 'email_sent', 'visited', 'contacted', 'client'] },
+      $or: [
+        { hasWebsite: false },
+        { websiteStatus: 'sin_web' },
+        { websiteUrl: null },
+      ],
+    })
+      .sort({ lastScrapedAt: -1 })
+      .limit(Math.max(limit * 10, 20))
+      .select('businessName phone websiteUrl hasWebsite websiteStatus rawScrapeData address city')
+      .lean();
+
+    for (const lead of fallbackLeads) {
+      if (validLeadIds.length >= limit) break;
+      const leadId = String((lead as any)._id);
+      if (validLeadSet.has(leadId)) continue;
+      if (strictCityFilter && !leadMatchesTargetCity(lead, city)) continue;
+
+      const hasRealWebsite = leadHasRealWebsite(lead);
+      if (hasRealWebsite) continue;
+
+      const candidatePhone = pickLeadPhone(lead);
+      if (!candidatePhone) continue;
+
+      const normalizedPhone = normalizePhoneForCountry(candidatePhone, country);
+      const hasWA = validateWhatsApp(normalizedPhone, country);
+      if (!hasWA) continue;
+
+      await Lead.findByIdAndUpdate(leadId, {
+        phone: normalizedPhone,
+        hasWebsite: false,
+        websiteStatus: 'sin_web',
+        hasWhatsApp: true,
+        hasMobile: true,
+        whatsAppValidatedAt: new Date(),
+        isGenerationCandidate: true,
+        contactPriority: 'alta',
+      });
+
+      validLeadSet.add(leadId);
+      validLeadIds.push(leadId);
+      added++;
+      console.log(`   ✅ ${lead.businessName} — recuperado desde DB (${validLeadIds.length}/${limit})`);
+      if (added >= maxAdds) break;
+    }
+  };
+
+  if (queryCacheHours > 0) {
+    const since = new Date(Date.now() - queryCacheHours * 60 * 60 * 1000);
+    const freshPool = await Lead.countDocuments({
+      sector,
+      city,
+      country,
+      lastScrapedAt: { $gte: since },
+      status: { $nin: ['web_live', 'email_sent', 'visited', 'contacted', 'client'] },
+      $or: [{ hasWebsite: false }, { websiteStatus: 'sin_web' }, { websiteUrl: null }],
+    });
+
+    if (freshPool > 0) {
+      console.log(`\n   ♻️  Cache local detectada: ${freshPool} leads recientes (< ${queryCacheHours}h).`);
+      await enrichFromDb(limit, 'Pre-carga');
+    }
+  }
+
+  while (validLeadIds.length < limit && round < maxRounds) {
     round++;
     const needed = limit - validLeadIds.length;
     console.log(`\n   🔄 Ronda ${round}: buscando ${BATCH_SIZE} negocios (necesitamos ${needed} más)...`);
@@ -516,10 +645,15 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     }
 
     // Validar WhatsApp para cada lead de esta ronda
+    let roundCandidateAdds = 0;
     for (const leadId of batchIds) {
       if (validLeadIds.length >= limit) break;
       const lead = await Lead.findById(leadId);
       if (!lead) continue;
+      if (strictCityFilter && !leadMatchesTargetCity(lead, city)) {
+        console.log(`   ⏭️  ${lead.businessName} — fuera de ciudad objetivo (${city})`);
+        continue;
+      }
 
       if (['web_live', 'email_sent', 'visited', 'contacted', 'client'].includes(lead.status)) {
         console.log(`   🔄 ${lead.businessName} — ya procesado (${lead.status}), se omite`);
@@ -558,64 +692,23 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
         if (!validLeadSet.has(leadId)) {
           validLeadSet.add(leadId);
           validLeadIds.push(leadId);
+          roundCandidateAdds++;
           console.log(`   ✅ ${lead.businessName} — WhatsApp OK (${validLeadIds.length}/${limit})`);
         }
       } else {
         console.log(`   ⚠️  ${lead.businessName} — Sin móvil válido, descartado`);
       }
     }
+
+    if (ecoMode && roundCandidateAdds === 0 && validLeadIds.length < limit) {
+      console.log('   🛑 Corte temprano ECO: esta ronda no produjo candidatos nuevos. Evitamos más scraping caro.');
+      break;
+    }
   }
 
   if (validLeadIds.length < limit) {
     const missing = limit - validLeadIds.length;
-    console.log(`\n   🔎 Fallback DB: buscando hasta ${missing} candidatos ya scrapeados (sin web corporativa)...`);
-
-    const fallbackLeads = await Lead.find({
-      sector,
-      city,
-      country,
-      status: { $nin: ['web_live', 'email_sent', 'visited', 'contacted', 'client'] },
-      $or: [
-        { hasWebsite: false },
-        { websiteStatus: 'sin_web' },
-        { websiteUrl: null },
-      ],
-    })
-      .sort({ lastScrapedAt: -1 })
-      .limit(limit * 10)
-      .select('businessName phone websiteUrl hasWebsite websiteStatus rawScrapeData')
-      .lean();
-
-    for (const lead of fallbackLeads) {
-      if (validLeadIds.length >= limit) break;
-      const leadId = String((lead as any)._id);
-      if (validLeadSet.has(leadId)) continue;
-
-      const hasRealWebsite = leadHasRealWebsite(lead);
-      if (hasRealWebsite) continue;
-
-      const candidatePhone = pickLeadPhone(lead);
-      if (!candidatePhone) continue;
-
-      const normalizedPhone = normalizePhoneForCountry(candidatePhone, country);
-      const hasWA = validateWhatsApp(normalizedPhone, country);
-      if (!hasWA) continue;
-
-      await Lead.findByIdAndUpdate(leadId, {
-        phone: normalizedPhone,
-        hasWebsite: false,
-        websiteStatus: 'sin_web',
-        hasWhatsApp: true,
-        hasMobile: true,
-        whatsAppValidatedAt: new Date(),
-        isGenerationCandidate: true,
-        contactPriority: 'alta',
-      });
-
-      validLeadSet.add(leadId);
-      validLeadIds.push(leadId);
-      console.log(`   ✅ ${lead.businessName} — recuperado desde DB (${validLeadIds.length}/${limit})`);
-    }
+    await enrichFromDb(missing, 'Fallback DB');
   }
 
   if (validLeadIds.length === 0) {
