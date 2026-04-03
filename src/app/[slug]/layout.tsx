@@ -48,6 +48,8 @@ export default async function BusinessLayout({ params, children }: Props) {
   if (!lead || lead.status === 'expired') notFound();
 
   const overrides = await getLeadOverrides(slug);
+  const copyCity = overrides?.city || lead.city;
+  const templateFallbackImage = getSectorImages(lead.sector).hero;
   const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
     ? lead.templateUsed
     : getTemplateName(lead.sector);
@@ -71,6 +73,80 @@ export default async function BusinessLayout({ params, children }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){
+            var city=${JSON.stringify(copyCity || '')};
+            var fallbackImg=${JSON.stringify(templateFallbackImage || '')};
+            if(!city&& !fallbackImg) return;
+
+            function replaceCityTokens(input){
+              if(!input || !city) return input;
+              return String(input)
+                .replace(/\\bMADRID\\b/g, city.toUpperCase())
+                .replace(/\\bMadrid\\b/g, city)
+                .replace(/\\bBuenos Aires\\b/g, city)
+                .replace(/\\bRecoleta\\b/g, city);
+            }
+
+            function patchTextNodes(){
+              if(!city) return;
+              var walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+              var node;
+              while((node=walker.nextNode())){
+                var parent=node.parentElement;
+                if(!parent) continue;
+                var tag=(parent.tagName||'').toLowerCase();
+                if(tag==='script'||tag==='style'||tag==='noscript') continue;
+                var original=node.nodeValue||'';
+                var next=replaceCityTokens(original);
+                if(next!==original) node.nodeValue=next;
+              }
+            }
+
+            function patchAttributes(){
+              var attrs=['alt','title','aria-label','placeholder'];
+              var els=document.querySelectorAll('*');
+              for(var i=0;i<els.length;i++){
+                var el=els[i];
+                for(var j=0;j<attrs.length;j++){
+                  var a=attrs[j];
+                  var val=el.getAttribute(a);
+                  if(!val) continue;
+                  var next=replaceCityTokens(val);
+                  if(next!==val) el.setAttribute(a,next);
+                }
+              }
+            }
+
+            function installImageFallback(){
+              if(!fallbackImg) return;
+              document.addEventListener('error', function(e){
+                var t=e.target;
+                if(!t || t.tagName!=='IMG') return;
+                if(t.dataset && t.dataset.fallbackApplied==='1') return;
+                if(t.dataset) t.dataset.fallbackApplied='1';
+                if(t.getAttribute('src')!==fallbackImg) t.setAttribute('src', fallbackImg);
+              }, true);
+            }
+
+            patchTextNodes();
+            patchAttributes();
+            installImageFallback();
+
+            var __cityPatchTimer;
+            var observer=new MutationObserver(function(){
+              clearTimeout(__cityPatchTimer);
+              __cityPatchTimer=setTimeout(function(){
+                patchTextNodes();
+                patchAttributes();
+              }, 40);
+            });
+            observer.observe(document.body, { childList:true, subtree:true, characterData:true });
+          })();`,
+        }}
+      />
 
       <div
         id="urgency-banner"

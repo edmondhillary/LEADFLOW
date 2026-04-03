@@ -102,6 +102,81 @@ async function sendMsgHtml(html: string, opts?: TelegramBot.SendMessageOptions) 
   return bot.sendMessage(CHAT_ID, html, { parse_mode: 'HTML', ...opts });
 }
 
+function extractImageUrls(html: string, baseUrl: string): string[] {
+  const urls: string[] = [];
+  const seen = new Set<string>();
+  const re = /<img[^>]+src=["']([^"']+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    const raw = (m[1] || '').trim();
+    if (!raw || raw.startsWith('data:') || raw.startsWith('blob:')) continue;
+    if (raw.startsWith('/api/track/')) continue;
+    let abs = raw;
+    if (raw.startsWith('/')) abs = `${baseUrl}${raw}`;
+    if (!/^https?:\/\//i.test(abs)) continue;
+    if (!seen.has(abs)) {
+      seen.add(abs);
+      urls.push(abs);
+    }
+  }
+  return urls;
+}
+
+async function urlIsReachable(url: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    let res = await fetch(url, { method: 'HEAD', signal: controller.signal, redirect: 'follow' });
+    if (res.status === 405 || res.status === 403) {
+      res = await fetch(url, { method: 'GET', signal: controller.signal, redirect: 'follow' });
+    }
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function verifyLeadImageHealth(lead: any): Promise<{ ok: boolean; fixed: boolean; broken: number }> {
+  const pageUrl = `${BASE_URL}/${lead.slug}`;
+  try {
+    const res = await fetch(pageUrl, { redirect: 'follow' });
+    if (!res.ok) return { ok: false, fixed: false, broken: 1 };
+    const html = await res.text();
+    const images = extractImageUrls(html, BASE_URL).slice(0, 25);
+    if (images.length === 0) return { ok: true, fixed: false, broken: 0 };
+
+    const checks = await Promise.all(images.map((u) => urlIsReachable(u)));
+    const broken = checks.filter((ok) => !ok).length;
+    if (broken === 0) return { ok: true, fixed: false, broken: 0 };
+
+    // Auto-fix: si la imagen del dueño está caída, desactivamos imageUrl para forzar fallback del template.
+    const rawImage = lead?.rawScrapeData?.imageUrl || lead?.rawScrapeData?.normalized?.imageUrl;
+    if (rawImage) {
+      await Lead.findByIdAndUpdate(lead._id, {
+        $set: {
+          'rawScrapeData.imageUrl': null,
+          'rawScrapeData.normalized.imageUrl': null,
+        },
+      });
+
+      const retry = await fetch(pageUrl, { redirect: 'follow' });
+      if (retry.ok) {
+        const retryHtml = await retry.text();
+        const retryImages = extractImageUrls(retryHtml, BASE_URL).slice(0, 25);
+        const retryChecks = await Promise.all(retryImages.map((u) => urlIsReachable(u)));
+        const retryBroken = retryChecks.filter((ok) => !ok).length;
+        return { ok: retryBroken === 0, fixed: true, broken: retryBroken };
+      }
+    }
+
+    return { ok: false, fixed: false, broken };
+  } catch {
+    return { ok: false, fixed: false, broken: 1 };
+  }
+}
+
 async function getStats() {
   await connectDB();
   const stats = await Lead.aggregate([
@@ -456,7 +531,7 @@ bot.on('message', async (msg) => {
     runPipeline({
       sector:            session.sector!,
       city:              session.city!,
-      country:           session.country! as 'ES' | 'AR' | 'UY',
+      country:           session.country! as 'ES' | 'AR' | 'UY' | 'US',
       limit:             session.limit!,
       skipDesignScraper: true,   // v3: usamos templates directos
       skipWhatsApp:      true,   // v3: WhatsApp manual desde el bot
@@ -492,7 +567,24 @@ bot.on('message', async (msg) => {
         // Card por cada web
         for (const r of ok.slice(0, 15) as any[]) {
           await connectDB();
-          const lead = await Lead.findById(r.leadId);
+          let lead = await Lead.findById(r.leadId);
+          if (!lead) continue;
+
+          const health = await verifyLeadImageHealth(lead);
+          if (!health.ok) {
+            await sendMsg(
+              `⚠️ *Preflight bloqueado*\n\n` +
+              `La web de *${lead.businessName}* tiene imágenes caídas (${health.broken}).\n` +
+              `No se envía hasta corregir assets.`
+            );
+            continue;
+          }
+
+          if (health.fixed) {
+            lead = await Lead.findById(r.leadId);
+            await sendMsg(`🛠️ Assets corregidos automáticamente en *${lead?.businessName}* (fallback de template activado).`);
+          }
+
           if (lead) await sendLeadCard(lead);
         }
         if (ok.length > 15) {
