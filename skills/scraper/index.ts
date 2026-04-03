@@ -1,31 +1,136 @@
 /**
  * SKILL 1: LeadFlow Scraper
  *
- * Encuentra negocios locales SIN web en Google Maps usando SerpAPI.
+ * Encuentra negocios locales en Google Maps usando Apify.
  * Guarda los leads en MongoDB con status 'scraped'.
  *
  * Uso: npx tsx skills/scraper/index.ts --sector fontanero --city Madrid --country ES --limit 10
  */
 
+import * as dotenv from 'dotenv';
+import { resolve } from 'path';
+dotenv.config({ path: resolve(process.cwd(), '.env.local') });
+
 import { connectDB, Lead } from '../../src/lib/mongodb';
 import { SECTORS, getSector, getSearchTerm } from '../../src/config/sectors';
 
-interface SerpApiMapResult {
+interface ApifyMapResult {
   title: string;
-  place_id?: string;
-  place_id_search?: string;
-  provider_id?: string;
+  price?: string;
+  categoryName?: string;
+  categories?: string[];
   address?: string;
-  phone?: string;
+  city?: string;
+  street?: string;
+  postalCode?: string;
+  state?: string;
+  countryCode?: string;
   website?: string;
-  rating?: number;
-  reviews?: number;
-  reviews_original?: string;
-  type?: string;
-  links?: { website?: string; directions?: string };
-  hours?: string;
-  description?: string;
-  gps_coordinates?: { latitude: number; longitude: number };
+  phone?: string;
+  phoneUnformatted?: string;
+  location?: { lat: number; lng: number };
+  totalScore?: number;
+  reviewsCount?: number;
+  placeId?: string;
+  cid?: string;
+  fid?: string;
+  openingHours?: Array<{ day: string; hours: string }>;
+  additionalInfo?: Record<string, unknown>;
+  imageUrl?: string;
+  imagesCount?: number;
+  url?: string;
+  rank?: number;
+  isAdvertisement?: boolean;
+  permanentlyClosed?: boolean;
+  temporarilyClosed?: boolean;
+  scrapedAt?: string;
+}
+
+function apifyActorPathId(actorId: string): string {
+  if (!actorId) return 'apify~google-maps-scraper';
+  if (actorId.includes('~')) return actorId;
+  return actorId.replace('/', '~');
+}
+
+function apifyActorCandidates(): string[] {
+  const fromEnv = process.env.APIFY_GOOGLE_MAPS_ACTOR_ID || '';
+  const candidates = [
+    fromEnv,
+    'apify/google-maps-scraper',
+    'compass/google-maps-extractor',
+    'compass/crawler-google-places',
+  ]
+    .map(apifyActorPathId)
+    .filter(Boolean);
+
+  return [...new Set(candidates)];
+}
+
+function apifyLanguage(country: string): string {
+  if (country === 'ES' || country === 'AR' || country === 'UY') return 'es';
+  return 'en';
+}
+
+function apifyCountryCode(country: string): string {
+  return (country || 'ES').toLowerCase();
+}
+
+async function searchGoogleMapsWithApify(
+  query: string,
+  apiKey: string,
+  country: string,
+  limit: number,
+): Promise<{ items: ApifyMapResult[]; actorId: string }> {
+  const input = {
+    searchStringsArray: [query],
+    maxCrawledPlacesPerSearch: Math.max(limit, 1),
+    language: apifyLanguage(country),
+    countryCode: apifyCountryCode(country),
+  };
+
+  const attempted: string[] = [];
+  for (const actorId of apifyActorCandidates()) {
+    attempted.push(actorId);
+    const runResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}&waitForFinish=180`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (runResponse.status === 404) {
+      continue;
+    }
+
+    if (!runResponse.ok) {
+      throw new Error(`Apify run error (${actorId}): ${runResponse.status} ${runResponse.statusText}`);
+    }
+
+    const runPayload = await runResponse.json();
+    const runData = runPayload?.data || runPayload;
+    const datasetId = runData?.defaultDatasetId;
+    if (!datasetId) {
+      throw new Error(`Apify run (${actorId}) sin defaultDatasetId`);
+    }
+
+    const itemsUrl = new URL(`https://api.apify.com/v2/datasets/${datasetId}/items`);
+    itemsUrl.searchParams.set('token', apiKey);
+    itemsUrl.searchParams.set('clean', 'true');
+    itemsUrl.searchParams.set('format', 'json');
+    itemsUrl.searchParams.set('limit', String(Math.max(limit, 1)));
+
+    const itemsResponse = await fetch(itemsUrl.toString());
+    if (!itemsResponse.ok) {
+      throw new Error(`Apify dataset error (${actorId}): ${itemsResponse.status} ${itemsResponse.statusText}`);
+    }
+
+    const items = await itemsResponse.json();
+    return {
+      items: Array.isArray(items) ? items as ApifyMapResult[] : [],
+      actorId,
+    };
+  }
+
+  throw new Error(`No se encontró actor de Google Maps en Apify. Probados: ${attempted.join(', ')}. Configura APIFY_GOOGLE_MAPS_ACTOR_ID en .env.local`);
 }
 
 const NON_BUSINESS_WEBSITE_HOSTS = [
@@ -74,13 +179,14 @@ function cleanForKey(value: string): string {
 }
 
 function buildDedupeKey(
-  result: SerpApiMapResult,
+  result: ApifyMapResult,
   city: string,
   country: string,
   sector: string,
 ): string {
-  if (result.place_id) return `gmaps:place:${result.place_id}`;
-  if (result.provider_id) return `gmaps:provider:${result.provider_id}`;
+  if (result.placeId) return `gmaps:place:${result.placeId}`;
+  if (result.cid) return `gmaps:cid:${result.cid}`;
+  if (result.fid) return `gmaps:fid:${result.fid}`;
   const title = cleanForKey(result.title);
   const addr = cleanForKey(result.address || 'sin-direccion');
   return `gmaps:fallback:${country}:${cleanForKey(city)}:${cleanForKey(sector)}:${title}:${addr}`;
@@ -113,13 +219,18 @@ function isMobileNumber(phone: string | undefined, country: string): boolean {
     // Uruguay móviles: empiezan por 09
     return /^09/.test(national) && national.length === 9;
   }
-  return false; // Si no reconocemos el país, descartamos
+  if (country === 'US') {
+    let national = digits;
+    if (national.startsWith('1') && national.length === 11) national = national.slice(1);
+    return national.length === 10;
+  }
+  return digits.length >= 8; // fallback conservador para países no soportados aún
 }
 
 // Normaliza teléfono a formato internacional para Twilio/WhatsApp
 function normalizePhone(phone: string, country: string): string {
   const clean = phone.replace(/[\s\-().]/g, '');
-  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598' };
+  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598', US: '+1' };
   const prefix = prefixes[country] || '';
 
   if (clean.startsWith('+')) return clean;
@@ -129,6 +240,8 @@ function normalizePhone(phone: string, country: string): string {
   if (country === 'AR') return prefix + clean;
   if (country === 'UY' && clean.startsWith('598')) return '+' + clean;
   if (country === 'UY') return prefix + clean;
+  if (country === 'US' && clean.startsWith('1')) return '+' + clean;
+  if (country === 'US') return prefix + clean;
   return clean.startsWith('+') ? clean : '+' + clean;
 }
 
@@ -143,56 +256,10 @@ function generateSlug(businessName: string, city: string, sector: string): strin
   return `${clean(businessName)}-${clean(city)}-${clean(sector)}`;
 }
 
-async function searchGoogleMaps(
-  query: string,
-  apiKey: string,
-  start: number = 0
-): Promise<SerpApiMapResult[]> {
-  const params = new URLSearchParams({
-    engine: 'google_maps',
-    q: query,
-    type: 'search',
-    api_key: apiKey,
-    hl: 'es',
-    start: start.toString(),
-  });
-
-  const response = await fetch(`https://serpapi.com/search?${params}`);
-  if (!response.ok) {
-    throw new Error(`SerpAPI error: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.local_results || [];
-}
-
-async function getBusinessDetails(
-  placeId: string,
-  apiKey: string
-): Promise<{ phone?: string; website?: string; place?: any }> {
-  try {
-    const params = new URLSearchParams({
-      engine: 'google_maps',
-      place_id: placeId,
-      api_key: apiKey,
-    });
-    const response = await fetch(`https://serpapi.com/search?${params}`);
-    const data = await response.json();
-    const place = data.place_results || {};
-    return {
-      phone: place.phone,
-      website: place.website,
-      place,
-    };
-  } catch {
-    return {};
-  }
-}
-
 export async function runScraper(options: {
   sector: string;
   city: string;
-  country: 'ES' | 'AR' | 'UY';
+  country: 'ES' | 'AR' | 'UY' | 'US';
   limit: number;
   apiKey: string;
 }) {
@@ -201,7 +268,7 @@ export async function runScraper(options: {
   getSector(sector); // valida que exista
   const term = getSearchTerm(sector, country);
   const query = `${term} ${city}`;
-  const locale = country === 'ES' ? 'es-ES' : 'es-AR';
+  const locale = country === 'ES' ? 'es-ES' : country === 'US' ? 'en-US' : 'es-AR';
   const currency = country === 'ES' ? 'EUR' : 'USD';
   const price = 25;
 
@@ -210,9 +277,12 @@ export async function runScraper(options: {
 
   await connectDB();
 
+  if (!apiKey) {
+    throw new Error('Falta APIFY_KEY para ejecutar scraper');
+  }
+
   let found = 0;
   let saved = 0;
-  let start = 0;
   const savedIds: string[] = [];
   const seenThisRun = new Set<string>();
 
@@ -221,119 +291,116 @@ export async function runScraper(options: {
   let withMobile = 0;
   let withoutMobile = 0;
 
-  while (saved < limit) {
-    const results = await searchGoogleMaps(query, apiKey, start);
-    if (results.length === 0) {
-      console.log('No hay más resultados en Google Maps');
-      break;
-    }
+  const { items: results, actorId: sourceActor } = await searchGoogleMapsWithApify(query, apiKey, country, limit);
+  if (results.length === 0) {
+    console.log('No hay resultados en Apify para esta búsqueda');
+  }
 
-    for (const result of results) {
-      if (saved >= limit) break;
-      found++;
+  for (const result of results) {
+    if (saved >= limit) break;
+    if (!result?.title) continue;
+    if (result.isAdvertisement) continue;
+    if (result.permanentlyClosed || result.temporarilyClosed) continue;
 
-      // Obtenemos detalles si hay place_id
-      let phone = result.phone;
-      let detailPlace: any = null;
-      let website = result.website || result.links?.website || '';
+    found++;
 
-      if (result.place_id) {
-        const details = await getBusinessDetails(result.place_id, apiKey);
-        if (!phone) phone = details.phone;
-        detailPlace = details.place || null;
-        website = website || details.website || detailPlace?.website || '';
+    const phone = result.phoneUnformatted || result.phone;
+    const website = result.website || '';
+    const slug = generateSlug(result.title, city, sector);
+    const dedupeKey = buildDedupeKey(result, city, country, sector);
+
+    const rawWebsite = website?.trim() || '';
+    const hasWebsite = isBusinessWebsite(rawWebsite);
+    const isMobile = isMobileNumber(phone, country);
+    const websiteStatus = hasWebsite ? 'con_web' : 'sin_web';
+
+    if (hasWebsite) withWeb++; else withoutWeb++;
+    if (isMobile) withMobile++; else withoutMobile++;
+
+    const normalizedPhone = phone ? normalizePhone(phone, country) : undefined;
+    const providerId = result.cid || result.fid;
+    const queryOr: any[] = [{ dedupeKey }, { slug }];
+    if (result.placeId) queryOr.push({ 'source.placeId': result.placeId });
+    if (providerId) queryOr.push({ 'source.providerId': providerId });
+    const exists = await Lead.findOne({ $or: queryOr }).select('_id');
+
+    // Guardar o actualizar lead sin duplicar
+    try {
+      const setData: any = {
+        businessName: result.title,
+        sector,
+        city,
+        country,
+        address: result.address || result.street || null,
+        googleMapsUrl: result.url || null,
+        locale,
+        currency,
+        price,
+        reviewCount: result.reviewsCount || 0,
+        reviewRating: result.totalScore || 0,
+        hasWebsite,
+        websiteStatus,
+        websiteUrl: hasWebsite ? rawWebsite : null,
+        websiteCheckedAt: new Date(),
+        hasMobile: isMobile,
+        hasWhatsApp: isMobile,
+        whatsAppValidatedAt: new Date(),
+        isGenerationCandidate: !hasWebsite && isMobile,
+        contactPriority: !hasWebsite && isMobile ? 'alta' : !hasWebsite ? 'media' : 'baja',
+        source: {
+          engine: 'google_maps_apify',
+          placeId: result.placeId,
+          providerId,
+        },
+        dedupeKey,
+        rawScrapeData: {
+          ...result,
+          phoneResolved: phone || null,
+          websiteResolved: rawWebsite || null,
+          websiteDiscardedAsNonCorporate: rawWebsite && !hasWebsite ? rawWebsite : null,
+          normalized: {
+            openingHours: result.openingHours || null,
+            additionalInfo: result.additionalInfo || null,
+            categories: result.categories || (result.categoryName ? [result.categoryName] : []),
+            imageUrl: result.imageUrl || null,
+            imagesCount: result.imagesCount || 0,
+            coords: result.location || null,
+            sourceActor,
+          },
+        },
+        lastScrapedAt: new Date(),
+      };
+      if (normalizedPhone) setData.phone = normalizedPhone;
+
+      const lead = await Lead.findOneAndUpdate(
+        { $or: queryOr },
+        {
+          $set: setData,
+          $setOnInsert: {
+            slug,
+            status: 'scraped',
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+      );
+
+      if (lead && !seenThisRun.has(String(lead._id))) {
+        seenThisRun.add(String(lead._id));
+        saved++;
+        savedIds.push(String(lead._id));
       }
 
-      const slug = generateSlug(result.title, city, sector);
-      const dedupeKey = buildDedupeKey(result, city, country, sector);
-
-      const rawWebsite = website?.trim() || '';
-      const hasWebsite = isBusinessWebsite(rawWebsite);
-      const isMobile = isMobileNumber(phone, country);
-      const websiteStatus = hasWebsite ? 'con_web' : 'sin_web';
-
-      if (hasWebsite) withWeb++; else withoutWeb++;
-      if (isMobile) withMobile++; else withoutMobile++;
-
-      const normalizedPhone = phone ? normalizePhone(phone, country) : undefined;
-      const queryOr: any[] = [{ dedupeKey }, { slug }];
-      if (result.place_id) queryOr.push({ 'source.placeId': result.place_id });
-      if (result.provider_id) queryOr.push({ 'source.providerId': result.provider_id });
-      const exists = await Lead.findOne({ $or: queryOr }).select('_id');
-
-      // Guardar o actualizar lead sin duplicar
-      try {
-        const setData: any = {
-          businessName: result.title,
-          sector,
-          city,
-          country,
-          address: result.address || null,
-          googleMapsUrl: result.links?.directions || result.place_id_search || null,
-          locale,
-          currency,
-          price,
-          reviewCount: result.reviews || 0,
-          reviewRating: result.rating || 0,
-          hasWebsite,
-          websiteStatus,
-          websiteUrl: hasWebsite ? rawWebsite : null,
-          websiteCheckedAt: new Date(),
-          hasMobile: isMobile,
-          hasWhatsApp: isMobile,
-          whatsAppValidatedAt: new Date(),
-          isGenerationCandidate: !hasWebsite && isMobile,
-          contactPriority: !hasWebsite && isMobile ? 'alta' : !hasWebsite ? 'media' : 'baja',
-          source: {
-            engine: 'google_maps',
-            placeId: result.place_id,
-            providerId: result.provider_id,
-          },
-          dedupeKey,
-          rawScrapeData: {
-            ...result,
-            websiteResolved: rawWebsite || null,
-            websiteDiscardedAsNonCorporate: rawWebsite && !hasWebsite ? rawWebsite : null,
-            details: detailPlace,
-          },
-          lastScrapedAt: new Date(),
-        };
-        if (normalizedPhone) setData.phone = normalizedPhone;
-
-        const lead = await Lead.findOneAndUpdate(
-          { $or: queryOr },
-          {
-            $set: setData,
-            $setOnInsert: {
-              slug,
-              status: 'scraped',
-            },
-          },
-          { upsert: true, new: true, setDefaultsOnInsert: true },
-        );
-
-        if (lead && !seenThisRun.has(String(lead._id))) {
-          seenThisRun.add(String(lead._id));
-          saved++;
-          savedIds.push(String(lead._id));
-        }
-
-        console.log(`✅ [${saved}/${limit}] ${exists ? 'Actualizado' : 'Guardado'}: ${result.title}`);
-        console.log(`   🌐 ${hasWebsite ? 'CON WEB' : 'SIN WEB'}${rawWebsite ? ` (${rawWebsite})` : ''}`);
-        if (rawWebsite && !hasWebsite) {
-          console.log(`   ℹ️  URL descartada como web corporativa: ${rawWebsite}`);
-        }
-        if (phone) console.log(`   📞 ${phone}`);
-        if (result.address) console.log(`   📍 ${result.address}`);
-
-      } catch (err: any) {
-        console.error(`❌ Error guardando ${result.title}:`, err.message);
+      console.log(`✅ [${saved}/${limit}] ${exists ? 'Actualizado' : 'Guardado'}: ${result.title}`);
+      console.log(`   🌐 ${hasWebsite ? 'CON WEB' : 'SIN WEB'}${rawWebsite ? ` (${rawWebsite})` : ''}`);
+      if (rawWebsite && !hasWebsite) {
+        console.log(`   ℹ️  URL descartada como web corporativa: ${rawWebsite}`);
       }
-    }
+      if (phone) console.log(`   📞 ${phone}`);
+      if (result.address) console.log(`   📍 ${result.address}`);
 
-    start += 20; // Siguiente página de resultados
-    // Pequeña pausa para no saturar la API
-    await new Promise(r => setTimeout(r, 500));
+    } catch (err: any) {
+      console.error(`❌ Error guardando ${result.title}:`, err.message);
+    }
   }
 
   console.log(`\n📊 RESUMEN:`);
@@ -357,13 +424,13 @@ if (require.main === module) {
   const options = {
     sector:  getArg('sector', 'fontanero'),
     city:    getArg('city', 'Madrid'),
-    country: (getArg('country', 'ES') as 'ES' | 'AR' | 'UY'),
+    country: (getArg('country', 'ES') as 'ES' | 'AR' | 'UY' | 'US'),
     limit:   parseInt(getArg('limit', '10')),
-    apiKey:  process.env.SERPAPI_KEY || '',
+    apiKey:  process.env.APIFY_KEY || '',
   };
 
   if (!options.apiKey) {
-    console.error('❌ Falta SERPAPI_KEY en .env.local');
+    console.error('❌ Falta APIFY_KEY en .env.local');
     process.exit(1);
   }
 

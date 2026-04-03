@@ -28,7 +28,7 @@ import { getSectorImages } from '../src/lib/images';
 export interface PipelineOptions {
   sector: string;
   city: string;
-  country: 'ES' | 'AR' | 'UY';
+  country: 'ES' | 'AR' | 'UY' | 'US';
   limit: number;
   skipDesignScraper?: boolean;
   skipWhatsApp?: boolean;
@@ -53,7 +53,9 @@ function randomBetween(min: number, max: number) {
 }
 
 function getLocale(country: string): 'es-ES' | 'es-AR' {
-  return country === 'ES' ? 'es-ES' : 'es-AR';
+  if (country === 'ES') return 'es-ES';
+  if (country === 'US') return 'es-AR';
+  return 'es-AR';
 }
 
 function getCurrency(country: string): 'EUR' | 'USD' {
@@ -130,20 +132,21 @@ function leadHasRealWebsite(lead: any): boolean {
     raw.websiteResolved,
     raw.website,
     raw?.links?.website,
+    raw?.normalized?.website,
   ];
   return candidates.some((url) => isBusinessWebsite(url));
 }
 
 function pickLeadPhone(lead: any): string | undefined {
   const raw = (lead.rawScrapeData || {}) as any;
-  const candidates = [lead.phone, raw.phone, raw?.details?.phone, raw?.place?.phone];
+  const candidates = [lead.phone, raw.phoneUnformatted, raw.phone, raw?.details?.phone, raw?.place?.phone, raw?.normalized?.phone];
   const hit = candidates.find((p) => typeof p === 'string' && p.trim().length > 0);
   return hit ? String(hit).trim() : undefined;
 }
 
 function normalizePhoneForCountry(phone: string, country: string): string {
   const clean = phone.replace(/[\s\-().]/g, '');
-  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598' };
+  const prefixes: Record<string, string> = { ES: '+34', AR: '+54', UY: '+598', US: '+1' };
   const prefix = prefixes[country] || '';
 
   if (clean.startsWith('+')) return clean;
@@ -153,6 +156,8 @@ function normalizePhoneForCountry(phone: string, country: string): string {
   if (country === 'AR') return prefix + clean;
   if (country === 'UY' && clean.startsWith('598')) return '+' + clean;
   if (country === 'UY') return prefix + clean;
+  if (country === 'US' && clean.startsWith('1')) return '+' + clean;
+  if (country === 'US') return prefix + clean;
   return clean.startsWith('+') ? clean : '+' + clean;
 }
 
@@ -175,13 +180,13 @@ DATOS REALES DEL NEGOCIO (scraped de Google Maps):
 - Nombre: ${lead.businessName}
 - Sector: ${lead.sector}
 - Ciudad: ${lead.city}
-- País: ${lead.country === 'ES' ? 'España' : lead.country === 'AR' ? 'Argentina' : 'Uruguay'}
+- País: ${lead.country === 'ES' ? 'España' : lead.country === 'AR' ? 'Argentina' : lead.country === 'UY' ? 'Uruguay' : lead.country}
 - Teléfono: ${lead.phone || 'No disponible'}
 - Dirección: ${lead.address || lead.city}
 - Reseñas Google: ${reviewCount} reseñas, ${reviewRating} estrellas
-${lead.rawScrapeData?.categories ? `- Categorías: ${Array.isArray(lead.rawScrapeData.categories) ? lead.rawScrapeData.categories.join(', ') : lead.rawScrapeData.categories}` : ''}
+${lead.rawScrapeData?.categories ? `- Categorías: ${Array.isArray(lead.rawScrapeData.categories) ? lead.rawScrapeData.categories.join(', ') : lead.rawScrapeData.categories}` : lead.rawScrapeData?.categoryName ? `- Categoría principal: ${lead.rawScrapeData.categoryName}` : ''}
 ${lead.rawScrapeData?.description ? `- Descripción Google: ${lead.rawScrapeData.description}` : ''}
-${lead.rawScrapeData?.hours ? `- Horario: ${lead.rawScrapeData.hours}` : ''}
+${lead.rawScrapeData?.hours ? `- Horario: ${lead.rawScrapeData.hours}` : lead.rawScrapeData?.openingHours ? `- Horario: ${lead.rawScrapeData.openingHours.map((h: any) => `${h.day}: ${h.hours}`).join(' | ')}` : ''}
 
 IMPORTANTE: ${toneNote}
 IMPORTANTE: TODO el contenido debe quedar en español natural. No uses inglés (excepto nombres propios/marca).
@@ -494,7 +499,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
       const scraperResult = await runScraper({
         sector, city, country,
         limit: BATCH_SIZE,
-        apiKey: process.env.SERPAPI_KEY || '',
+        apiKey: process.env.APIFY_KEY || '',
       });
       batchIds = scraperResult.leadIds;
       totalScraped += batchIds.length;
@@ -545,8 +550,8 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
         whatsAppValidatedAt: new Date(),
         isGenerationCandidate: hasWA,
         contactPriority: hasWA ? 'alta' : 'media',
-        reviewCount: (lead.rawScrapeData as any)?.reviews ?? randomBetween(40, 100),
-        reviewRating: (lead.rawScrapeData as any)?.rating ?? parseFloat((4 + Math.random()).toFixed(1)),
+        reviewCount: (lead.rawScrapeData as any)?.reviewsCount ?? (lead.rawScrapeData as any)?.reviews ?? randomBetween(40, 100),
+        reviewRating: (lead.rawScrapeData as any)?.totalScore ?? (lead.rawScrapeData as any)?.rating ?? parseFloat((4 + Math.random()).toFixed(1)),
       });
 
       if (hasWA) {
@@ -672,7 +677,7 @@ if (require.main === module) {
 
   const sector  = getArg('sector', 'fontanero');
   const city    = getArg('city', 'Madrid');
-  const country = (getArg('country', 'ES') as 'ES' | 'AR' | 'UY');
+  const country = (getArg('country', 'ES') as 'ES' | 'AR' | 'UY' | 'US');
   const limit   = parseInt(getArg('limit', '3'));
 
   runPipeline({ sector, city, country, limit })

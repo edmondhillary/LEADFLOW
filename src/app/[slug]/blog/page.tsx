@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getSectorImages, unsplash } from '@/lib/images';
 import { getLeadOverrides } from '@/lib/lead-template-data';
 import { hasTemplate, loadTemplateSubpage } from '@/lib/template-registry';
+import { shouldUseOverrideV2 } from '@/lib/override-rollout';
 import { getTemplateName } from '@/config/sectors';
 
 export const revalidate = 3600;
@@ -134,7 +135,8 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
   const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
     ? lead.templateUsed
     : getTemplateName(lead.sector);
-  const TemplateBlog = overrides ? await loadTemplateSubpage(templateName, 'blog') : null;
+  const useOverrideV2 = shouldUseOverrideV2('blog');
+  const TemplateBlog = (!useOverrideV2 && overrides) ? await loadTemplateSubpage(templateName, 'blog') : null;
   if (TemplateBlog) {
     return <TemplateBlog overrides={overrides || undefined} />;
   }
@@ -143,6 +145,11 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
   const posts: any[] = content?.pages?.blog || [];
   const design = content?.design || {};
   const images = getSectorImages(lead.sector);
+
+  const businessName = overrides?.businessName || lead.businessName;
+  const city = overrides?.city || lead.city;
+  const ownerImage = overrides?.assets?.blogImage || overrides?.assets?.ownerImage || '';
+  const heroImage = ownerImage || images.blog;
 
   const primary = design.primaryColor || '#2563eb';
   const primaryDark = design.primaryDark || '#1d4ed8';
@@ -158,12 +165,12 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
         aria-label="Cabecera blog"
       >
         <div className="absolute inset-0">
-          <img
-            src={images.blog}
-            alt={`Blog de ${lead.sector} — ${lead.businessName}`}
-            className="w-full h-full object-cover"
-            width="1920"
-            height="350"
+            <img
+              src={heroImage}
+              alt={`Blog de ${lead.sector} — ${businessName}`}
+              className="w-full h-full object-cover"
+              width="1920"
+              height="350"
           />
           <div
             className="absolute inset-0"
@@ -176,7 +183,7 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
             Consejos y guías
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            Blog de {lead.sector} en {lead.city}
+            Blog de {lead.sector} en {city}
           </h1>
         </div>
       </section>
@@ -195,7 +202,7 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
               Próximamente
             </h2>
             <p className="text-gray-500 mb-8">
-              Estamos preparando artículos con consejos sobre {lead.sector} en {lead.city}. Vuelve pronto.
+              Estamos preparando artículos con consejos sobre {lead.sector} en {city}. Vuelve pronto.
             </p>
             <a
               href={`/${slug}/contacto`}
@@ -219,7 +226,7 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
                 {/* Image */}
                 <div className="relative h-56 sm:h-64 lg:h-auto overflow-hidden">
                   <img
-                    src={getBlogImage(lead.sector, 0)}
+                    src={ownerImage || getBlogImage(lead.sector, 0)}
                     alt={featuredPost.title}
                     className="w-full h-full object-cover"
                     width="800"
@@ -292,7 +299,7 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={getBlogImage(lead.sector, i + 1)}
+                        src={ownerImage || getBlogImage(lead.sector, i + 1)}
                         alt={post.title}
                         className="w-full h-full object-cover"
                         width="800"

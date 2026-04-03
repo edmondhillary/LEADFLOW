@@ -4,6 +4,7 @@ import { getTemplateName } from '@/config/sectors';
 import { getLeadOverrides } from '@/lib/lead-template-data';
 import { connectDB, Lead, WebsiteContent } from '@/lib/mongodb';
 import { hasTemplate, loadTemplateBlogPost } from '@/lib/template-registry';
+import { shouldUseOverrideV2 } from '@/lib/override-rollout';
 
 export const revalidate = 3600;
 
@@ -19,7 +20,8 @@ export default async function LeadBlogPostPage({ params }: Props) {
   const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
     ? lead.templateUsed
     : getTemplateName(lead.sector);
-  const TemplateBlogPost = await loadTemplateBlogPost(templateName);
+  const useOverrideV2 = shouldUseOverrideV2('blogPost');
+  const TemplateBlogPost = useOverrideV2 ? null : await loadTemplateBlogPost(templateName);
   const overrides = await getLeadOverrides(slug);
 
   if (TemplateBlogPost) {

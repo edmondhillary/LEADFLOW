@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getSectorImages } from '@/lib/images';
 import { getLeadOverrides } from '@/lib/lead-template-data';
 import { hasTemplate, loadTemplateSubpage } from '@/lib/template-registry';
+import { shouldUseOverrideV2 } from '@/lib/override-rollout';
 import { getTemplateName } from '@/config/sectors';
 
 export const revalidate = 3600;
@@ -66,7 +67,8 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
   const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
     ? lead.templateUsed
     : getTemplateName(lead.sector);
-  const TemplateContacto = overrides ? await loadTemplateSubpage(templateName, 'contacto') : null;
+  const useOverrideV2 = shouldUseOverrideV2('contacto');
+  const TemplateContacto = (!useOverrideV2 && overrides) ? await loadTemplateSubpage(templateName, 'contacto') : null;
   if (TemplateContacto) {
     return <TemplateContacto overrides={overrides || undefined} />;
   }
@@ -76,18 +78,31 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
   const design = content?.design || {};
   const images = getSectorImages(lead.sector);
 
+  const businessName = overrides?.businessName || lead.businessName;
+  const city = overrides?.city || lead.city;
+  const phone = overrides?.phone || lead.phone || '';
+  const phoneIntl = overrides?.phoneIntl || lead.phone || '';
+  const email = overrides?.email || lead.email || '';
+  const address = overrides?.address || lead.address || city;
+  const mapQuery = overrides?.contact?.mapQuery || contacto?.mapQuery || `${businessName} ${city}`;
+  const mapDirections = overrides?.mapDirections || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+  const ownerImage = overrides?.assets?.heroImage || overrides?.assets?.ownerImage || '';
+  const heroImage = ownerImage || images.hero;
+  const formFields = overrides?.contact?.formFields || contacto?.formFields || ['Nombre', 'Teléfono', 'Servicio', 'Mensaje'];
+
   const primary = design.primaryColor || '#2563eb';
   const primaryDark = design.primaryDark || '#1d4ed8';
 
-  const schedule = content?.schedule || {
-    weekdays: 'Lunes a Viernes: 8:00 - 20:00',
-    saturday: 'Sábados: 9:00 - 14:00',
-    emergency: 'Urgencias: 24 horas',
-  };
+  const scheduleLines = overrides?.openingHours?.length
+    ? overrides.openingHours
+    : [
+        'Lunes a Viernes: 8:00 - 20:00',
+        'Sábados: 9:00 - 14:00',
+      ];
 
-  const whatsappNumber = lead.phone?.replace(/\D/g, '') || '';
+  const whatsappNumber = (phoneIntl || phone).replace(/\D/g, '') || '';
   const whatsappMsg = encodeURIComponent(
-    `Hola, me gustaría solicitar información sobre sus servicios en ${lead.city}.`
+    overrides?.contact?.whatsappPrefill || `Hola, me gustaría solicitar información sobre sus servicios en ${city}.`
   );
 
   return (
@@ -98,12 +113,12 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
         aria-label="Cabecera contacto"
       >
         <div className="absolute inset-0">
-          <img
-            src={images.hero}
-            alt={`Contacta con ${lead.businessName}`}
-            className="w-full h-full object-cover"
-            width="1920"
-            height="350"
+            <img
+              src={heroImage}
+              alt={`Contacta con ${businessName}`}
+              className="w-full h-full object-cover"
+              width="1920"
+              height="350"
           />
           <div
             className="absolute inset-0"
@@ -115,9 +130,9 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
           <p className="text-white/80 text-sm font-medium uppercase tracking-widest mb-2">
             Estamos a tu disposición
           </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            {contacto?.title || 'Contacta con nosotros'}
-          </h1>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                {overrides?.contact?.title || contacto?.title || `Contacta con ${businessName}`}
+              </h1>
         </div>
       </section>
 
@@ -131,10 +146,9 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Envíanos un mensaje
               </h2>
-              <p className="text-gray-500 mb-8">
-                {contacto?.subtitle ||
-                  `Cuéntanos qué necesitas y te respondemos en menos de 2 horas.`}
-              </p>
+                <p className="text-gray-500 mb-8">
+                  {overrides?.contact?.subtitle || contacto?.subtitle || `Cuéntanos qué necesitas y te respondemos en menos de 2 horas.`}
+                </p>
 
               {/* NOTE: This form is static (demo). Real implementation needs API route. */}
               <form
@@ -144,9 +158,9 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               >
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Nombre completo
-                    </label>
+                      <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      {formFields[0] || 'Nombre'}
+                      </label>
                     <input
                       id="contact-name"
                       type="text"
@@ -158,9 +172,9 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                     />
                   </div>
                   <div>
-                    <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Teléfono
-                    </label>
+                      <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      {formFields[1] || 'Teléfono'}
+                      </label>
                     <input
                       id="contact-phone"
                       type="tel"
@@ -188,7 +202,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
 
                 <div>
                   <label htmlFor="contact-service" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Tipo de servicio
+                    {formFields[2] || 'Servicio'}
                   </label>
                   <select
                     id="contact-service"
@@ -207,7 +221,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
 
                 <div>
                   <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Mensaje
+                    {formFields[3] || 'Mensaje'}
                   </label>
                   <textarea
                     id="contact-message"
@@ -245,9 +259,9 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                   Contacto directo
                 </h2>
                 <div className="space-y-4">
-                  {lead.phone && (
+                  {phone && (
                     <a
-                      href={`tel:${lead.phone}`}
+                      href={`tel:${phoneIntl || phone}`}
                       className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                       style={{ ['--tw-ring-color' as any]: primary }}
                     >
@@ -259,14 +273,14 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 uppercase tracking-wide">Teléfono</div>
-                        <div className="font-semibold text-gray-900">{lead.phone}</div>
+                        <div className="font-semibold text-gray-900">{phone}</div>
                       </div>
                     </a>
                   )}
 
-                  {lead.email && (
+                  {email && (
                     <a
-                      href={`mailto:${lead.email}`}
+                      href={`mailto:${email}`}
                       className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       <div
@@ -277,12 +291,12 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 uppercase tracking-wide">Email</div>
-                        <div className="font-semibold text-gray-900 break-all">{lead.email}</div>
+                        <div className="font-semibold text-gray-900 break-all">{email}</div>
                       </div>
                     </a>
                   )}
 
-                  <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-200">
+                  <a href={mapDirections} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm">
                     <div
                       className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: `${primary}15`, color: primary }}
@@ -292,10 +306,10 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                     <div>
                       <div className="text-xs text-gray-400 uppercase tracking-wide">Ubicación</div>
                       <div className="font-semibold text-gray-900">
-                        {lead.address || lead.city}
+                        {address}
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
               </div>
 
@@ -309,22 +323,12 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                   Horario de atención
                 </h3>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  {schedule.weekdays && (
-                    <li className="flex justify-between">
-                      <span className="text-gray-500">Lun – Vie</span>
-                      <span className="font-medium text-gray-800">
-                        {schedule.weekdays.split(':')[1]?.trim() || '8:00 – 20:00'}
-                      </span>
+                  {scheduleLines.map((line, i) => (
+                    <li className="flex justify-between gap-4" key={`${line}-${i}`}>
+                      <span className="text-gray-500">{line.split(':')[0]}</span>
+                      <span className="font-medium text-gray-800 text-right">{line.split(':').slice(1).join(':').trim() || 'Consultar'}</span>
                     </li>
-                  )}
-                  {schedule.saturday && (
-                    <li className="flex justify-between">
-                      <span className="text-gray-500">Sábado</span>
-                      <span className="font-medium text-gray-800">
-                        {schedule.saturday.split(':')[1]?.trim() || '9:00 – 14:00'}
-                      </span>
-                    </li>
-                  )}
+                  ))}
                   <li className="flex justify-between pt-2 border-t border-gray-200 mt-2">
                     <span className="text-gray-500">Urgencias</span>
                     <span className="font-medium" style={{ color: primary }}>24h</span>
@@ -333,13 +337,13 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               </div>
 
               {/* WhatsApp CTA */}
-              {lead.phone && (
+              {phone && (
                 <a
                   href={`https://wa.me/${whatsappNumber}?text=${whatsappMsg}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
-                  aria-label={`Contactar por WhatsApp con ${lead.businessName}`}
+                  aria-label={`Contactar por WhatsApp con ${businessName}`}
                 >
                   <WhatsAppIcon />
                   Escribir por WhatsApp
@@ -351,7 +355,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                 <span className="flex-shrink-0 mt-0.5" style={{ color: primary }}>
                   <MessageCircleIcon />
                 </span>
-                Respondemos en menos de 2 horas en horario laboral. Para urgencias, disponibilidad 24h.
+                {overrides?.contact?.responsePromise || 'Respondemos en menos de 2 horas en horario laboral. Para urgencias, disponibilidad 24h.'}
               </div>
             </div>
           </div>
@@ -362,13 +366,13 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
       {process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY && (
         <section aria-label="Ubicación en el mapa" className="h-72 sm:h-96">
           <iframe
-            title={`Ubicación de ${lead.businessName} en ${lead.city}`}
+            title={`Ubicación de ${businessName} en ${city}`}
             width="100%"
             height="100%"
             style={{ border: 0, display: 'block' }}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&q=${encodeURIComponent(contacto?.mapQuery || `${lead.businessName} ${lead.city}`)}&language=es`}
+            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&q=${encodeURIComponent(mapQuery)}&language=${overrides?.locale === 'en-US' ? 'en' : 'es'}`}
           />
         </section>
       )}
@@ -384,10 +388,10 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               <MapPinIcon />
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">
-              Servicio en {lead.city} y alrededores
+              Servicio en {city} y alrededores
             </h3>
             <p className="text-gray-500 text-sm">
-              Cubrimos toda la zona de {lead.city}. Consulta si llegamos a tu ubicación.
+              Cubrimos toda la zona de {city}. Consulta si llegamos a tu ubicación.
             </p>
           </div>
         </section>
@@ -404,7 +408,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               { icon: <PhoneIcon />, text: 'Respuesta en 2h' },
               { icon: <CheckCircle />,  text: 'Presupuesto gratis' },
               { icon: <ClockIcon />,  text: 'Urgencias 24h' },
-              { icon: <MapPinIcon />, text: lead.city },
+              { icon: <MapPinIcon />, text: city },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 <span style={{ color: primary }}>{item.icon}</span>

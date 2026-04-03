@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getSectorImages } from '@/lib/images';
 import { getLeadOverrides } from '@/lib/lead-template-data';
 import { hasTemplate, loadTemplateSubpage } from '@/lib/template-registry';
+import { shouldUseOverrideV2 } from '@/lib/override-rollout';
 import { getTemplateName } from '@/config/sectors';
 
 export const revalidate = 3600;
@@ -88,7 +89,8 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
   const templateName = lead.templateUsed && hasTemplate(lead.templateUsed)
     ? lead.templateUsed
     : getTemplateName(lead.sector);
-  const TemplateNosotros = overrides ? await loadTemplateSubpage(templateName, 'nosotros') : null;
+  const useOverrideV2 = shouldUseOverrideV2('nosotros');
+  const TemplateNosotros = (!useOverrideV2 && overrides) ? await loadTemplateSubpage(templateName, 'nosotros') : null;
   if (TemplateNosotros) {
     return <TemplateNosotros overrides={overrides || undefined} />;
   }
@@ -98,10 +100,21 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
   const design = content?.design || {};
   const images = getSectorImages(lead.sector);
 
+  const businessName = overrides?.businessName || lead.businessName;
+  const city = overrides?.city || lead.city;
+  const about = overrides?.about;
+  const ownerImage = overrides?.assets?.aboutImage || overrides?.assets?.ownerImage || '';
+  const aboutImage = ownerImage || images.about;
+  const yearsExperience = about?.yearsExperience || nosotros?.yearsExperience || 10;
+  const story = about?.story || nosotros?.story;
+  const mission = about?.mission || nosotros?.mission;
+  const phoneIntl = overrides?.phoneIntl || lead.phone || '';
+  const phone = overrides?.phone || lead.phone || '';
+
   const primary = design.primaryColor || '#2563eb';
   const primaryDark = design.primaryDark || '#1d4ed8';
 
-  const values: any[] = nosotros?.values || [
+  const values: any[] = about?.values || nosotros?.values || [
     { title: 'Calidad', description: 'Utilizamos los mejores materiales y técnicas para asegurar resultados duraderos.' },
     { title: 'Compromiso', description: 'Cumplimos plazos y presupuestos sin sorpresas. Nuestra palabra vale.' },
     { title: 'Equipo', description: 'Profesionales certificados con formación continua y experiencia contrastada.' },
@@ -116,12 +129,12 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
         aria-label="Cabecera sobre nosotros"
       >
         <div className="absolute inset-0">
-          <img
-            src={images.about}
-            alt={`Equipo de ${lead.businessName} en ${lead.city}`}
-            className="w-full h-full object-cover"
-            width="1920"
-            height="400"
+            <img
+              src={aboutImage}
+              alt={`Equipo de ${businessName} en ${city}`}
+              className="w-full h-full object-cover"
+              width="1920"
+              height="400"
           />
           <div
             className="absolute inset-0"
@@ -133,9 +146,9 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
           <p className="text-white/80 text-sm font-medium uppercase tracking-widest mb-2">
             Conoce a nuestro equipo
           </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            {nosotros?.title || `Sobre ${lead.businessName}`}
-          </h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+              {about?.title || nosotros?.title || `Sobre ${businessName}`}
+            </h1>
         </div>
       </section>
 
@@ -149,14 +162,13 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
                 Nuestra historia
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
-                <p>
-                  {nosotros?.story ||
-                    `${lead.businessName} nació de la pasión por hacer bien las cosas. Con más de ${nosotros?.yearsExperience || '10'} años sirviendo a los clientes de ${lead.city} y la zona, hemos construido una reputación basada en la confianza y los resultados.`}
-                </p>
-                {nosotros?.mission && (
-                  <p>{nosotros.mission}</p>
+                  <p>
+                    {story || `${businessName} nació de la pasión por hacer bien las cosas. Con más de ${yearsExperience} años sirviendo a los clientes de ${city} y la zona, hemos construido una reputación basada en la confianza y los resultados.`}
+                  </p>
+                {mission && (
+                  <p>{mission}</p>
                 )}
-                {!nosotros?.mission && (
+                {!mission && (
                   <p>
                     Cada proyecto, grande o pequeño, lo tratamos con el mismo nivel de dedicación y profesionalidad. Nuestro objetivo es que quedes 100% satisfecho con el resultado.
                   </p>
@@ -166,10 +178,11 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
               {/* Highlights */}
               <ul className="mt-8 space-y-3" role="list">
                 {[
-                  `Más de ${nosotros?.yearsExperience || '10'} años de experiencia en ${lead.city}`,
+                  `Más de ${yearsExperience} años de experiencia en ${city}`,
                   'Presupuesto cerrado, sin sorpresas',
                   'Garantía en todos los trabajos',
                   'Disponibles para emergencias',
+                  ...(about?.highlights || []),
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-gray-700">
                     <span style={{ color: primary }} className="flex-shrink-0">
@@ -185,8 +198,8 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
             <div className="relative">
               <div className="rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src={images.about}
-                  alt={`Instalaciones de ${lead.businessName}`}
+                  src={aboutImage}
+                  alt={`Instalaciones de ${businessName}`}
                   className="w-full h-full object-cover"
                   width="800"
                   height="600"
@@ -199,7 +212,7 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
                 style={{ background: `linear-gradient(135deg, ${primary} 0%, ${primaryDark} 100%)` }}
               >
                 <div className="text-4xl font-bold leading-none">
-                  +{nosotros?.yearsExperience || '10'}
+                  +{yearsExperience}
                 </div>
                 <div className="text-white/80 text-sm mt-1">años de<br/>experiencia</div>
               </div>
@@ -210,7 +223,7 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
                   {[...Array(5)].map((_, i) => <Star key={i} />)}
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-gray-900">5.0</div>
+                  <div className="text-xs font-bold text-gray-900">{Number(overrides?.reviewRating || lead.reviewRating || 5).toFixed(1)}</div>
                   <div className="text-xs text-gray-400">Google</div>
                 </div>
               </div>
@@ -228,8 +241,8 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             {[
-              { value: `+${content?.stats?.clientsServed || '200'}`, label: 'Clientes satisfechos' },
-              { value: `+${nosotros?.yearsExperience || '10'}`, label: 'Años de experiencia' },
+              { value: `+${content?.stats?.clientsServed || overrides?.reviewCount || '200'}`, label: 'Clientes satisfechos' },
+              { value: `+${yearsExperience}`, label: 'Años de experiencia' },
               { value: `+${content?.stats?.projectsDone || '500'}`, label: 'Trabajos realizados' },
               { value: '100%', label: 'Satisfacción garantizada' },
             ].map((s, i) => (
@@ -359,13 +372,13 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
             >
               Contactar ahora
             </a>
-            {lead.phone && (
+            {phone && (
               <a
-                href={`tel:${lead.phone}`}
+                href={`tel:${phoneIntl || phone}`}
                 className="inline-flex items-center justify-center gap-2 border-2 border-white/50 text-white font-bold py-3 px-8 rounded-xl hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <Phone />
-                {lead.phone}
+                {phone}
               </a>
             )}
           </div>

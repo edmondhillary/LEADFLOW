@@ -51,7 +51,7 @@ const LeadSchema = new mongoose.Schema({
   businessName: { type: String, required: true },
   sector: { type: String, required: true },
   city: { type: String, required: true },
-  country: { type: String, required: true, enum: ['ES', 'AR', 'UY'] },
+  country: { type: String, required: true, enum: ['ES', 'AR', 'UY', 'US'] },
   phone: String,
   email: String,
   address: String,
