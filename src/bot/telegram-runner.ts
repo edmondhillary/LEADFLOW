@@ -111,7 +111,13 @@ function extractImageUrls(html: string, baseUrl: string): string[] {
     const raw = (m[1] || '').trim();
     if (!raw || raw.startsWith('data:') || raw.startsWith('blob:')) continue;
     if (raw.startsWith('/api/track/')) continue;
-    let abs = raw;
+    const decoded = raw
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
+    let abs = decoded;
     if (raw.startsWith('/')) abs = `${baseUrl}${raw}`;
     if (!/^https?:\/\//i.test(abs)) continue;
     if (!seen.has(abs)) {
