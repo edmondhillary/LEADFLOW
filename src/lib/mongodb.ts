@@ -92,6 +92,9 @@ const LeadSchema = new mongoose.Schema({
   // Tracking
   createdAt: { type: Date, default: Date.now },
   webLiveAt: Date,
+  trackingArmedAt: Date,
+  trackingLastFingerprint: String,
+  trackingLastCountedAt: Date,
   firstVisit: Date,
   lastVisit: Date,
   visitCount: { type: Number, default: 0 },
