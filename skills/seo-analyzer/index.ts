@@ -2,12 +2,16 @@
  * SKILL 2: LeadFlow SEO Analyzer
  *
  * Analiza el competidor TOP de Google Maps (local, no publicidad, no grandes marcas).
- * Usa SerpAPI para encontrarlo y Playwright para extraer su arquitectura web.
+ * Usa Apify para encontrarlo y Playwright para extraer su arquitectura web.
  * También extrae sus reseñas de Google para inspirar los testimonios del lead.
  * Guarda el análisis en MongoDB (colección Competitor) y lo reutiliza si ya existe.
  *
  * Uso: npx tsx skills/seo-analyzer/index.ts --sector fontanero --city Madrid --country ES
  */
+
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { connectDB, Competitor } from '../../src/lib/mongodb';
 
@@ -24,6 +28,96 @@ interface CompetitorData {
   toneOfVoice: string;
   recommendedStructure: object;
   reviews: string[];
+}
+
+interface ApifyMapResult {
+  title?: string;
+  website?: string;
+  rank?: number;
+  reviewsCount?: number;
+  totalScore?: number;
+  reviews?: Array<{ text?: string; snippet?: string; reviewText?: string; rating?: number }>;
+  reviewsTags?: string[];
+}
+
+function apifyActorPathId(actorId: string): string {
+  if (!actorId) return 'apify~google-maps-scraper';
+  if (actorId.includes('~')) return actorId;
+  return actorId.replace('/', '~');
+}
+
+function apifyActorCandidates(): string[] {
+  const fromEnv = process.env.APIFY_GOOGLE_MAPS_ACTOR_ID || '';
+  const candidates = [
+    fromEnv,
+    'compass/crawler-google-places',
+    'compass/google-maps-extractor',
+    'apify/google-maps-scraper',
+  ]
+    .map(apifyActorPathId)
+    .filter(Boolean);
+  return [...new Set(candidates)];
+}
+
+function apifyLanguage(country: string): string {
+  return country === 'US' ? 'en' : 'es';
+}
+
+function apifyCountryCode(country: string): string {
+  return (country || 'ES').toLowerCase();
+}
+
+async function searchGoogleMapsWithApify(
+  query: string,
+  apiKey: string,
+  country: string,
+  limit: number,
+): Promise<ApifyMapResult[]> {
+  const input = {
+    searchStringsArray: [query],
+    maxCrawledPlacesPerSearch: Math.max(limit, 1),
+    language: apifyLanguage(country),
+    countryCode: apifyCountryCode(country),
+  };
+
+  const attempted: string[] = [];
+  for (const actorId of apifyActorCandidates()) {
+    attempted.push(actorId);
+
+    const runResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}&waitForFinish=180`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (runResponse.status === 404) continue;
+    if (!runResponse.ok) {
+      throw new Error(`Apify run error (${actorId}): ${runResponse.status} ${runResponse.statusText}`);
+    }
+
+    const runPayload = await runResponse.json();
+    const runData = runPayload?.data || runPayload;
+    const datasetId = runData?.defaultDatasetId;
+    if (!datasetId) {
+      throw new Error(`Apify run (${actorId}) sin defaultDatasetId`);
+    }
+
+    const itemsUrl = new URL(`https://api.apify.com/v2/datasets/${datasetId}/items`);
+    itemsUrl.searchParams.set('token', apiKey);
+    itemsUrl.searchParams.set('clean', 'true');
+    itemsUrl.searchParams.set('format', 'json');
+    itemsUrl.searchParams.set('limit', String(Math.max(limit, 1)));
+
+    const itemsResponse = await fetch(itemsUrl.toString());
+    if (!itemsResponse.ok) {
+      throw new Error(`Apify dataset error (${actorId}): ${itemsResponse.status} ${itemsResponse.statusText}`);
+    }
+
+    const items = await itemsResponse.json();
+    return Array.isArray(items) ? (items as ApifyMapResult[]) : [];
+  }
+
+  throw new Error(`No se encontró actor de Google Maps en Apify. Probados: ${attempted.join(', ')}`);
 }
 
 async function findTopCompetitor(
@@ -47,19 +141,6 @@ async function findTopCompetitor(
 
   console.log(`🔍 Buscando competidor top: "${query}"`);
 
-  // Búsqueda orgánica en Google (no Maps) para encontrar el #1 local con web
-  const params = new URLSearchParams({
-    engine: 'google',
-    q: query,
-    api_key: apiKey,
-    hl: 'es',
-    gl: country.toLowerCase(),
-    num: '20',
-  });
-
-  const response = await fetch(`https://serpapi.com/search?${params}`);
-  const data = await response.json();
-
   // Filtramos: solo resultados orgánicos locales, excluimos directorios y grandes marcas
   const EXCLUDED_DOMAINS = [
     'youtube.com', 'youtu.be',
@@ -71,10 +152,13 @@ async function findTopCompetitor(
     'google.com', 'maps.google', 'goo.gl',
   ];
 
-  const organicResults = data.organic_results || [];
+  const mapsResults = await searchGoogleMapsWithApify(query, apiKey, country, 20);
+  const withWebsite = mapsResults
+    .filter((r) => typeof r.website === 'string' && r.website.startsWith('http'))
+    .sort((a, b) => (Number(a.rank || 999) - Number(b.rank || 999)) || (Number(b.reviewsCount || 0) - Number(a.reviewsCount || 0)));
 
-  for (const result of organicResults) {
-    const url: string = result.link || '';
+  for (const result of withWebsite) {
+    const url: string = result.website || '';
     const isExcluded = EXCLUDED_DOMAINS.some(domain => url.includes(domain));
     if (!isExcluded && url.startsWith('http')) {
       console.log(`✅ Competidor encontrado: ${url}`);
@@ -88,41 +172,29 @@ async function findTopCompetitor(
 async function getGoogleReviews(
   sector: string,
   city: string,
+  country: string,
   apiKey: string
 ): Promise<string[]> {
   try {
-    const params = new URLSearchParams({
-      engine: 'google_maps',
-      q: `${sector} ${city}`,
-      type: 'search',
-      api_key: apiKey,
-      hl: 'es',
-    });
+    const mapsResults = await searchGoogleMapsWithApify(`${sector} ${city}`, apiKey, country, 10);
+    const snippets: string[] = [];
 
-    const response = await fetch(`https://serpapi.com/search?${params}`);
-    const data = await response.json();
-    const results = data.local_results || [];
+    for (const place of mapsResults) {
+      const reviewsArr = Array.isArray(place.reviews) ? place.reviews : [];
+      for (const review of reviewsArr) {
+        const txt = (review?.snippet || review?.text || review?.reviewText || '').trim();
+        const rating = Number(review?.rating || 0);
+        if (txt.length > 30 && (rating === 0 || rating >= 4)) snippets.push(txt);
+      }
 
-    // Cogemos el primero que tenga place_id y buenas reviews
-    const top = results.find((r: any) => r.place_id && r.reviews > 10);
-    if (!top) return [];
+      const tags = Array.isArray(place.reviewsTags) ? place.reviewsTags : [];
+      for (const t of tags) {
+        const txt = String(t || '').trim();
+        if (txt.length > 30) snippets.push(txt);
+      }
+    }
 
-    // Obtenemos las reviews de ese negocio
-    const reviewParams = new URLSearchParams({
-      engine: 'google_maps_reviews',
-      place_id: top.place_id,
-      api_key: apiKey,
-      hl: 'es',
-    });
-
-    const reviewResponse = await fetch(`https://serpapi.com/search?${reviewParams}`);
-    const reviewData = await reviewResponse.json();
-    const reviews = reviewData.reviews || [];
-
-    return reviews
-      .filter((r: any) => r.rating >= 4 && r.snippet && r.snippet.length > 30)
-      .slice(0, 6)
-      .map((r: any) => r.snippet);
+    return [...new Set(snippets)].slice(0, 6);
 
   } catch (err) {
     console.warn('⚠️ No se pudieron obtener reseñas de Google Maps');
@@ -251,7 +323,7 @@ function detectTone(data: Partial<CompetitorData>): string {
 export async function runSeoAnalyzer(options: {
   sector: string;
   city: string;
-  country: 'ES' | 'AR' | 'UY';
+  country: 'ES' | 'AR' | 'UY' | 'US';
   apiKey: string;
   forceRefresh?: boolean;
 }): Promise<CompetitorData | null> {
@@ -284,7 +356,7 @@ export async function runSeoAnalyzer(options: {
 
   // Obtener reseñas de Google Maps
   console.log('⭐ Obteniendo reseñas de Google Maps...');
-  const reviews = await getGoogleReviews(sector, city, apiKey);
+  const reviews = await getGoogleReviews(sector, city, country, apiKey);
 
   // Extraer keywords del meta
   const keywords = [
@@ -334,13 +406,13 @@ if (require.main === module) {
   const options = {
     sector:  getArg('sector', 'fontanero'),
     city:    getArg('city', 'Madrid'),
-    country: (getArg('country', 'ES') as 'ES' | 'AR' | 'UY'),
-    apiKey:  process.env.SERPAPI_KEY || '',
+    country: (getArg('country', 'ES') as 'ES' | 'AR' | 'UY' | 'US'),
+    apiKey:  process.env.APIFY_KEY || '',
     forceRefresh: args.includes('--force'),
   };
 
   if (!options.apiKey) {
-    console.error('❌ Falta SERPAPI_KEY en .env.local');
+    console.error('❌ Falta APIFY_KEY en .env.local');
     process.exit(1);
   }
 

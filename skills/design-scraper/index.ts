@@ -111,7 +111,7 @@ DesignReferenceSchema.index({ sector: 1, city: 1, country: 1 });
 const DesignReference = mongoose.models.DesignReference
   || mongoose.model('DesignReference', DesignReferenceSchema);
 
-// ─── SerpAPI: encontrar top 3 webs del sector ──────────────────────────────
+// ─── Apify: encontrar top 3 webs del sector ──────────────────────────────
 const EXCLUDED_DOMAINS = [
   'youtube.com', 'youtu.be', 'google.com', 'maps.google', 'goo.gl',
   'yelp.com', 'tripadvisor', 'facebook.com', 'instagram.com',
@@ -121,11 +121,97 @@ const EXCLUDED_DOMAINS = [
   'milanuncios', 'idealista', 'fotocasa', 'segundamano',
 ];
 
+interface ApifyMapResult {
+  website?: string;
+  rank?: number;
+  reviewsCount?: number;
+}
+
+function apifyActorPathId(actorId: string): string {
+  if (!actorId) return 'apify~google-maps-scraper';
+  if (actorId.includes('~')) return actorId;
+  return actorId.replace('/', '~');
+}
+
+function apifyActorCandidates(): string[] {
+  const fromEnv = process.env.APIFY_GOOGLE_MAPS_ACTOR_ID || '';
+  const candidates = [
+    fromEnv,
+    'compass/crawler-google-places',
+    'compass/google-maps-extractor',
+    'apify/google-maps-scraper',
+  ]
+    .map(apifyActorPathId)
+    .filter(Boolean);
+  return [...new Set(candidates)];
+}
+
+function apifyLanguage(country: string): string {
+  return country === 'US' ? 'en' : 'es';
+}
+
+function apifyCountryCode(country: string): string {
+  return (country || 'ES').toLowerCase();
+}
+
+async function searchGoogleMapsWithApify(
+  query: string,
+  apiKey: string,
+  country: string,
+  limit: number,
+): Promise<ApifyMapResult[]> {
+  const input = {
+    searchStringsArray: [query],
+    maxCrawledPlacesPerSearch: Math.max(limit, 1),
+    language: apifyLanguage(country),
+    countryCode: apifyCountryCode(country),
+  };
+
+  const attempted: string[] = [];
+  for (const actorId of apifyActorCandidates()) {
+    attempted.push(actorId);
+
+    const runResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}&waitForFinish=180`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (runResponse.status === 404) continue;
+    if (!runResponse.ok) {
+      throw new Error(`Apify run error (${actorId}): ${runResponse.status} ${runResponse.statusText}`);
+    }
+
+    const runPayload = await runResponse.json();
+    const runData = runPayload?.data || runPayload;
+    const datasetId = runData?.defaultDatasetId;
+    if (!datasetId) {
+      throw new Error(`Apify run (${actorId}) sin defaultDatasetId`);
+    }
+
+    const itemsUrl = new URL(`https://api.apify.com/v2/datasets/${datasetId}/items`);
+    itemsUrl.searchParams.set('token', apiKey);
+    itemsUrl.searchParams.set('clean', 'true');
+    itemsUrl.searchParams.set('format', 'json');
+    itemsUrl.searchParams.set('limit', String(Math.max(limit, 1)));
+
+    const itemsResponse = await fetch(itemsUrl.toString());
+    if (!itemsResponse.ok) {
+      throw new Error(`Apify dataset error (${actorId}): ${itemsResponse.status} ${itemsResponse.statusText}`);
+    }
+
+    const items = await itemsResponse.json();
+    return Array.isArray(items) ? (items as ApifyMapResult[]) : [];
+  }
+
+  throw new Error(`No se encontró actor de Google Maps en Apify. Probados: ${attempted.join(', ')}`);
+}
+
 async function findTopCompetitorUrls(
   sector: string, city: string, country: string, limit = 3
 ): Promise<string[]> {
-  const apiKey = process.env.SERPAPI_KEY || process.env.SERPAPI_API_KEY;
-  if (!apiKey) throw new Error('Falta SERPAPI_KEY');
+  const apiKey = process.env.APIFY_KEY;
+  if (!apiKey) throw new Error('Falta APIFY_KEY');
 
   const SECTOR_TERMS: Record<string, Record<string, string>> = {
     fontanero:    { ES: 'fontanero', AR: 'plomero', UY: 'plomero' },
@@ -142,24 +228,17 @@ async function findTopCompetitorUrls(
 
   console.log(`🔍 Buscando top ${limit} webs: "${query}"`);
 
-  const params = new URLSearchParams({
-    engine: 'google',
-    q: query,
-    api_key: apiKey,
-    hl: 'es',
-    gl: country.toLowerCase(),
-    num: '20',
-  });
-
-  const res = await fetch(`https://serpapi.com/search?${params}`);
-  const data = await res.json();
-  const organic = data.organic_results || [];
-
+  const mapsResults = await searchGoogleMapsWithApify(query, apiKey, country, 20);
   const urls: string[] = [];
-  for (const r of organic) {
-    const url: string = r.link || '';
+
+  const ordered = mapsResults
+    .filter((r) => typeof r.website === 'string' && r.website.startsWith('http'))
+    .sort((a, b) => (Number(a.rank || 999) - Number(b.rank || 999)) || (Number(b.reviewsCount || 0) - Number(a.reviewsCount || 0)));
+
+  for (const r of ordered) {
+    const url: string = r.website || '';
     const excluded = EXCLUDED_DOMAINS.some(d => url.includes(d));
-    if (!excluded && url.startsWith('http') && urls.length < limit) {
+    if (!excluded && url.startsWith('http') && urls.length < limit && !urls.includes(url)) {
       urls.push(url);
     }
   }
@@ -185,184 +264,92 @@ async function scrapeDesign(url: string, position: number) {
 
     const loadTime = Date.now() - startTime;
 
-    // Extraer todo el diseño de una vez con evaluate
-    // NOTE: var __name polyfill needed because esbuild injects __name() calls
-    // inside page.evaluate when keepNames=true, but browser context lacks it.
-    const design = await page.evaluate(() => {
-      /* eslint-disable no-var */
-      // @ts-ignore — polyfill for esbuild __name helper (not available in browser)
-      var __name = (fn: any) => fn; // eslint-disable-line @typescript-eslint/no-unused-vars
-      /* eslint-enable no-var */
+    const html = await page.content();
+    const textBlob = html.toLowerCase();
 
-      function getCS(el: Element, prop: string) {
-        return window.getComputedStyle(el).getPropertyValue(prop);
-      }
+    const navItems = (await page.locator('nav a, header a').allTextContents())
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0 && t.length < 30)
+      .slice(0, 8);
 
-      // ── Colores ──────────────────────────────────────────────────────
-      const body = document.body;
-      const allButtons = Array.from(document.querySelectorAll('button, a.btn, .button, [class*="btn"], a[class*="cta"]'));
-      const ctaEl = allButtons[0];
-      const h1 = document.querySelector('h1');
-      const links = Array.from(document.querySelectorAll('a')).slice(0, 10);
+    const metaTitle = await page.title();
+    const metaDescLocator = page.locator('meta[name="description"]');
+    const metaDesc = (await metaDescLocator.count()) > 0
+      ? ((await metaDescLocator.first().getAttribute('content')) || '')
+      : '';
+    const hasSchema = html.includes('application/ld+json');
 
-      // Encontrar colores más usados
-      const colorMap: { [k: string]: number } = {};
-      const allEls = document.querySelectorAll('section, div, header, footer, main');
-      allEls.forEach(function(el) {
-        const bg = getCS(el, 'background-color');
-        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-          colorMap[bg] = (colorMap[bg] || 0) + 1;
-        }
-      });
+    const ctaHandles = await page.locator('a[href*="contact"], button, .btn, .cta, [class*="button"], [class*="cta"]').elementHandles();
+    const ctas = [] as Array<{ text: string; style: string; position: string }>;
+    for (const handle of ctaHandles.slice(0, 5)) {
+      const txt = ((await handle.textContent()) || '').trim().slice(0, 40);
+      if (!txt) continue;
+      ctas.push({ text: txt, style: 'solid', position: 'section-end' });
+    }
 
-      const sortedColors = Object.entries(colorMap).sort((a, b) => b[1] - a[1]);
-      const linkColor = links.length > 0 ? getCS(links[0], 'color') : '';
+    const sectionKeywords: Record<string, string[]> = {
+      hero: ['hero', 'banner', 'jumbotron', 'masthead', 'portada'],
+      services: ['servicio', 'service', 'feature', 'what-we'],
+      about: ['about', 'nosotros', 'quienes', 'historia'],
+      testimonials: ['testimoni', 'review', 'opinion', 'reseña', 'cliente'],
+      contact: ['contact', 'contacto', 'formulario'],
+      pricing: ['precio', 'price', 'pricing', 'tarifa'],
+      gallery: ['galeria', 'gallery', 'portfolio', 'proyecto'],
+      cta: ['call-to-action', 'presupuesto', 'empezar'],
+      faq: ['faq', 'pregunta', 'question'],
+      footer: ['footer', 'pie'],
+    };
 
-      const colors = {
-        primary: linkColor || (h1 ? getCS(h1, 'color') : '#2563eb'),
-        secondary: sortedColors[1]?.[0] || '#1e40af',
-        accent: ctaEl ? getCS(ctaEl, 'background-color') : '#f59e0b',
-        background: getCS(body, 'background-color') || '#ffffff',
-        text: getCS(body, 'color') || '#1f2937',
-        cta: ctaEl ? getCS(ctaEl, 'background-color') : '#2563eb',
-        ctaText: ctaEl ? getCS(ctaEl, 'color') : '#ffffff',
-      };
+    const sections: string[] = [];
+    for (const [name, keywords] of Object.entries(sectionKeywords)) {
+      if (keywords.some((kw) => textBlob.includes(kw))) sections.push(name);
+    }
 
-      // ── Tipografía ───────────────────────────────────────────────────
-      const h1El = document.querySelector('h1');
-      const h2El = document.querySelector('h2');
-      const pEl = document.querySelector('p');
+    const sectionPatterns = sections.map((name) => ({
+      name,
+      hasBackground: true,
+      layout: name === 'services' ? 'grid' : 'list',
+      itemCount: name === 'services' ? 3 : 1,
+    }));
 
-      const typography = {
-        headingFont: h1El ? getCS(h1El, 'font-family').split(',')[0].replace(/['"]/g, '') : 'Inter',
-        bodyFont: pEl ? getCS(pEl, 'font-family').split(',')[0].replace(/['"]/g, '') : 'Inter',
-        h1Size: h1El ? getCS(h1El, 'font-size') : '48px',
-        h2Size: h2El ? getCS(h2El, 'font-size') : '32px',
-        bodySize: pEl ? getCS(pEl, 'font-size') : '16px',
-        lineHeight: pEl ? getCS(pEl, 'line-height') : '1.6',
-      };
+    const h1Text = ((await page.locator('h1').first().textContent()) || '').trim();
+    const h2Text = ((await page.locator('h2').first().textContent()) || '').trim();
+    const pText = ((await page.locator('p').first().textContent()) || '').trim();
 
-      // ── Secciones y layout ───────────────────────────────────────────
-      const sectionEls = document.querySelectorAll('section, [class*="section"], [class*="block"]');
-      const sections: string[] = [];
-      const sectionPatterns: { name: string; hasBackground: boolean; layout: string; itemCount: number }[] = [];
-
-      const SECTION_KEYWORDS = {
-        hero: ['hero', 'banner', 'jumbotron', 'masthead', 'portada', 'header-main'],
-        services: ['servicio', 'service', 'feature', 'what-we', 'caracteristica'],
-        about: ['about', 'nosotros', 'quienes', 'quien', 'historia'],
-        testimonials: ['testimoni', 'review', 'opinion', 'resena', 'cliente'],
-        contact: ['contact', 'contacto', 'formulario', 'form'],
-        pricing: ['precio', 'price', 'pricing', 'plan', 'tarifa'],
-        gallery: ['galeria', 'gallery', 'portfolio', 'proyecto', 'trabajo'],
-        cta: ['cta', 'call-to-action', 'action', 'empezar', 'presupuesto'],
-        faq: ['faq', 'pregunta', 'question'],
-        footer: ['footer', 'pie'],
-      } as { [k: string]: string[] };
-
-      sectionEls.forEach(function(sec) {
-        const text = (sec.className + ' ' + sec.id + ' ' + (sec.textContent || '').slice(0, 200)).toLowerCase();
-        let sectionName = 'unknown';
-        const keys = Object.keys(SECTION_KEYWORDS);
-        for (let ki = 0; ki < keys.length; ki++) {
-          const name = keys[ki];
-          const keywords = SECTION_KEYWORDS[name];
-          if (keywords.some(function(kw) { return text.includes(kw); })) {
-            sectionName = name;
-            break;
-          }
-        }
-        if (sectionName !== 'unknown' && !sections.includes(sectionName)) {
-          sections.push(sectionName);
-          const children = sec.querySelectorAll(':scope > div, :scope > article, :scope > li');
-          const bg = getCS(sec, 'background-color');
-          sectionPatterns.push({
-            name: sectionName,
-            hasBackground: bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent',
-            layout: children.length >= 3 ? 'grid' : children.length >= 2 ? 'cards' : 'list',
-            itemCount: children.length,
-          });
-        }
-      });
-
-      // ── Hero pattern ─────────────────────────────────────────────────
-      const heroSection = document.querySelector('[class*="hero"], [class*="banner"], header + section, main > section:first-child');
-      let heroPattern = 'centered';
-      if (heroSection) {
-        const imgs = heroSection.querySelectorAll('img');
-        const videos = heroSection.querySelectorAll('video');
-        const bgImg = getCS(heroSection, 'background-image');
-        if (videos.length > 0) heroPattern = 'video-bg';
-        else if (bgImg !== 'none') heroPattern = 'full-bg';
-        else if (imgs.length > 0) {
-          const cs = getCS(heroSection, 'display');
-          heroPattern = cs === 'flex' || cs === 'grid' ? 'image-right' : 'split';
-        }
-      }
-
-      // ── Navegación ───────────────────────────────────────────────────
-      const nav = document.querySelector('nav, [class*="nav"], header');
-      const navLinks = nav ? Array.from(nav.querySelectorAll('a')).map(a => a.textContent?.trim() || '').filter(t => t.length > 0 && t.length < 30) : [];
-      const isSticky = nav ? ['fixed', 'sticky'].includes(getCS(nav, 'position')) : false;
-
-      // ── Grid columns (servicios) ─────────────────────────────────────
-      const servicesSection = document.querySelector('[class*="servicio"], [class*="service"], [class*="feature"]');
-      let gridCols = 3;
-      if (servicesSection) {
-        const gridStyle = getCS(servicesSection, 'grid-template-columns');
-        if (gridStyle) {
-          gridCols = gridStyle.split(' ').length;
-        }
-      }
-
-      // ── CTAs ─────────────────────────────────────────────────────────
-      const ctaData = allButtons.slice(0, 5).map(function(btn) {
-        const bg = getCS(btn, 'background-color');
-        const border = getCS(btn, 'border');
-        let style = 'solid';
-        if (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') {
-          style = border && border !== 'none' ? 'outline' : 'ghost';
-        }
-
-        let pos = 'section-end';
-        const parent = btn.closest('header, nav, [class*="hero"], [class*="banner"], footer, section');
-        if (parent) {
-          const tag = parent.tagName.toLowerCase();
-          const cls = (parent.className || '').toLowerCase();
-          if (tag === 'header' || tag === 'nav' || cls.includes('nav')) pos = 'nav';
-          else if (cls.includes('hero') || cls.includes('banner')) pos = 'hero';
-          else if (tag === 'footer') pos = 'footer';
-        }
-
-        return {
-          text: ((btn.textContent || '').trim()).slice(0, 40),
-          style,
-          position: pos,
-        };
-      });
-
-      // ── Spacing ──────────────────────────────────────────────────────
-      const firstSection = sectionEls[0];
-      const container = document.querySelector('.container, [class*="container"], [class*="wrapper"], main > div');
-
-      const spacing = {
-        sectionPadding: firstSection ? getCS(firstSection, 'padding-top') : '64px',
+    const design = {
+      colors: {
+        primary: '#2563eb',
+        secondary: '#1e40af',
+        accent: '#f59e0b',
+        background: '#ffffff',
+        text: '#1f2937',
+        cta: '#2563eb',
+        ctaText: '#ffffff',
+      },
+      typography: {
+        headingFont: 'Inter',
+        bodyFont: 'Inter',
+        h1Size: h1Text.length > 40 ? '40px' : '48px',
+        h2Size: h2Text.length > 40 ? '28px' : '32px',
+        bodySize: pText.length > 120 ? '15px' : '16px',
+        lineHeight: '1.6',
+      },
+      sections,
+      sectionPatterns,
+      heroPattern: html.includes('<video') ? 'video-bg' : html.includes('<img') ? 'split' : 'centered',
+      navItems,
+      hasStickynav: /sticky|fixed/.test(textBlob),
+      gridColumns: sections.includes('services') ? 3 : 2,
+      ctas,
+      spacing: {
+        sectionPadding: '64px',
         cardGap: '24px',
-        containerMaxWidth: container ? getCS(container, 'max-width') : '1200px',
-      };
-
-      // ── Meta ─────────────────────────────────────────────────────────
-      const metaTitle = document.title || '';
-      const metaDescEl = document.querySelector('meta[name="description"]');
-      const metaDesc = metaDescEl?.getAttribute('content') || '';
-      const hasSchema = !!document.querySelector('script[type="application/ld+json"]');
-
-      return {
-        colors, typography, sections, sectionPatterns, heroPattern,
-        navItems: navLinks.slice(0, 8), hasStickynav: isSticky, gridColumns: gridCols,
-        ctas: ctaData, spacing, metaTitle, metaDesc, hasSchema,
-      };
-    });
+        containerMaxWidth: '1200px',
+      },
+      metaTitle,
+      metaDesc,
+      hasSchema,
+    };
 
     await browser.close();
 
@@ -509,8 +496,9 @@ if (require.main === module) {
   const sector = getArg('sector', 'electricista');
   const city = getArg('city', 'Valencia');
   const country = getArg('country', 'ES');
+  const forceRefresh = args.includes('--force');
 
-  runDesignScraper({ sector, city, country })
+  runDesignScraper({ sector, city, country, forceRefresh })
     .then(result => {
       if (result) {
         console.log('\n📊 Consenso de diseño:');
