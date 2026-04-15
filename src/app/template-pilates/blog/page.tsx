@@ -4,7 +4,7 @@ import { blogPosts, images } from '../data';
 export default function BlogPage(props: any = {}) {
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-pilates';
-  const categories = ['All', 'Method', 'Beginners', 'Breathwork', 'Wellness', 'Anatomy'];
+  const categories = ['Todos', 'Método', 'Principiantes', 'Respiración', 'Bienestar', 'Anatomía'];
   const featuredPost = blogPosts.find(p => p.featured);
   const gridPosts = blogPosts.filter(p => !p.featured).slice(0, 4);
 
@@ -16,19 +16,19 @@ export default function BlogPage(props: any = {}) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-7">
             <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '16px' }}>
-              The Kinetic Journal
+              Nuestro blog
             </span>
             <h1
               className="text-4xl md:text-6xl lg:text-7xl"
               style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.1 }}
             >
-              Notes on<br />
-              <span style={{ fontStyle: 'italic', color: '#536257' }}>movement & practice.</span>
+              Notas sobre<br />
+              <span style={{ fontStyle: 'italic', color: '#536257' }}>movimiento y práctica.</span>
             </h1>
           </div>
           <div className="lg:col-span-5 pb-2">
             <p style={{ fontSize: '15px', color: '#5c605c', lineHeight: 1.7, maxWidth: '400px' }}>
-              Essays, insights, and practical guides from the instructors at Kinetic Gallery — exploring pilates, breath, and the art of inhabiting your body.
+              Artículos, reflexiones y guías prácticas de nuestros instructores — explorando pilates, respiración y el arte de habitar tu cuerpo.
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function BlogPage(props: any = {}) {
               </p>
               <div className="flex items-center justify-between">
                 <span style={{ fontSize: '11px', color: '#5c605c', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                  {featuredPost.readTime} read
+                  {featuredPost.readTime} de lectura
                 </span>
                 <Link
                   href={`/template-pilates/blog/${featuredPost.slug}`}
@@ -119,7 +119,7 @@ export default function BlogPage(props: any = {}) {
       {/* ===== 4-CARD GRID ===== */}
       <section className="px-6 md:px-8 max-w-[1920px] mx-auto mb-24">
         <div className="mb-10">
-          <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '8px' }}>Recent Articles</span>
+          <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '8px' }}>Artículos recientes</span>
           <div style={{ width: '40px', height: '2px', backgroundColor: '#536257' }} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -173,21 +173,21 @@ export default function BlogPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#f4f4f0' }}>
         <div className="max-w-2xl mx-auto text-center">
           <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>
-            The Kinetic Letter
+            Nuestro boletín
           </span>
           <h2
             className="text-3xl md:text-4xl mb-4"
             style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}
           >
-            Movement notes, <span style={{ fontStyle: 'italic' }}>monthly.</span>
+            Notas de movimiento, <span style={{ fontStyle: 'italic' }}>cada mes.</span>
           </h2>
           <p style={{ fontSize: '14px', color: '#5c605c', lineHeight: 1.7, marginBottom: '32px' }}>
-            Class schedule updates, new articles, practitioner tips, and studio news. No noise — just signal.
+            Actualizaciones de horarios, nuevos artículos, consejos de práctica y novedades del estudio. Sin ruido — solo lo importante.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
-              placeholder="your@email.com"
+              placeholder="tu@email.com"
               className="flex-1 py-3 px-4 text-sm"
               style={{ backgroundColor: '#ffffff', border: '1px solid rgba(175,179,174,0.4)', outline: 'none', color: '#2f3430', borderRadius: '8px' }}
               readOnly
@@ -211,7 +211,7 @@ export default function BlogPage(props: any = {}) {
             </button>
           </div>
           <p className="mt-4" style={{ fontSize: '11px', color: '#afb3ae' }}>
-            No spam. Unsubscribe anytime.
+            Sin spam. Cancela cuando quieras.
           </p>
         </div>
       </section>

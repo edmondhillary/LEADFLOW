@@ -135,7 +135,7 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
             </nav>
           </div>
           <div>
-            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Connect</h4>
+            <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Contacto</h4>
             <div style={{ fontSize: '12px', color: '#5c605c', lineHeight: 2 }}>
               <p>{business_.email}</p>
               <p>{business_.phone}</p>
@@ -144,11 +144,11 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
           </div>
           <div>
             <h4 style={{ fontSize: '11px', fontWeight: 700, color: '#2f3430', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '20px' }}>Boletín</h4>
-            <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.7, marginBottom: '16px' }}>Movement notes, class updates and studio news — delivered monthly.</p>
+            <p style={{ fontSize: '12px', color: '#5c605c', lineHeight: 1.7, marginBottom: '16px' }}>Novedades del estudio, horarios y consejos de movimiento — cada mes en tu correo.</p>
             <div className="flex gap-2">
               <input
                 type="email"
-                placeholder="your@email.com"
+                placeholder="tu@email.com"
                 className="flex-1 py-2 px-3 text-sm"
                 style={{ backgroundColor: '#ffffff', border: '1px solid rgba(175,179,174,0.4)', outline: 'none', color: '#2f3430', borderRadius: '4px' }}
                 readOnly
@@ -156,7 +156,7 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
               <button
                 style={{ backgroundColor: '#536257', color: '#ebfced', fontSize: '10px', fontWeight: 600, padding: '8px 16px', border: 'none', cursor: 'pointer', borderRadius: '9999px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
               >
-                Join
+                Suscribir
               </button>
             </div>
           </div>
@@ -173,7 +173,7 @@ const navLinks = Array.isArray(nav) ? nav.map((n: any) => ({ ...n, href: n.href.
             </a>
           </p>
           <p style={{ fontSize: '10px', color: '#5c605c', textTransform: 'uppercase', letterSpacing: '0.15em', fontStyle: 'italic' }}>
-            Austin, Texas
+            {business_.city}, {business_.state}
           </p>
         </div>
       </footer>

@@ -355,7 +355,7 @@ Devuelve ÚNICAMENTE el JSON válido, sin markdown ni explicaciones.`;
 
 // ─── Procesar un lead individual ───────────────────────────────────────────
 
-async function processSingleLead(leadId: string): Promise<PipelineResult> {
+export async function processSingleLead(leadId: string): Promise<PipelineResult> {
   const lead = await Lead.findById(leadId);
   if (!lead) throw new Error(`Lead no encontrado: ${leadId}`);
 
@@ -574,8 +574,8 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   }) => {
     try {
       const finishedAt = new Date();
-      const perRunUsd = Math.max(0, envFloat('APIFY_COST_PER_RUN_USD', 0.06));
-      const perLeadUsd = Math.max(0, envFloat('APIFY_COST_PER_SCRAPED_LEAD_USD', 0.012));
+      const perRunUsd = Math.max(0, envFloat('APIFY_COST_PER_RUN_USD', 0.40));
+      const perLeadUsd = Math.max(0, envFloat('APIFY_COST_PER_SCRAPED_LEAD_USD', 0));
       const estimatedCostUsd = roundMoney(args.apifyRuns * perRunUsd + args.totalScraped * perLeadUsd);
       const estimatedCostPerWebUsd = args.generatedWebs > 0
         ? roundMoney(estimatedCostUsd / args.generatedWebs)

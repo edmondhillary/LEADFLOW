@@ -90,7 +90,7 @@ export default function HomePage(props: any = {}) {
             <div>
               <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestra práctica</span>
               <h2 className="text-3xl md:text-5xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.15 }}>
-                Every body, every <span style={{ fontStyle: 'italic' }}>intention.</span>
+                Cada cuerpo, cada <span style={{ fontStyle: 'italic' }}>intención.</span>
               </h2>
             </div>
             <Link
@@ -191,10 +191,10 @@ export default function HomePage(props: any = {}) {
           {/* Content col */}
           <div className="md:col-span-7 md:pl-12">
             <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>
-              The Kinetic Philosophy
+              Nuestra filosofía
             </span>
             <h2 className="text-3xl md:text-5xl mb-10" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.15 }}>
-              Where movement becomes <span style={{ fontStyle: 'italic' }}>mastery.</span>
+              Donde el movimiento se convierte en <span style={{ fontStyle: 'italic' }}>maestría.</span>
             </h2>
 
             <div className="flex flex-col gap-8">
@@ -221,9 +221,9 @@ export default function HomePage(props: any = {}) {
       <section className="py-20 md:py-32 px-6 md:px-8" style={{ backgroundColor: '#faf9f6' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="mb-12">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>The Space</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>El espacio</span>
             <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-              A studio calibrated for <span style={{ fontStyle: 'italic' }}>focus.</span>
+              Un estudio diseñado para la <span style={{ fontStyle: 'italic' }}>concentración.</span>
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ height: '600px' }}>
@@ -245,9 +245,9 @@ export default function HomePage(props: any = {}) {
       <section className="py-20 md:py-32 px-6 md:px-8" style={{ backgroundColor: '#f4f4f0' }}>
         <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
           <div className="md:col-span-4">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Client Experiences</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Experiencias de clientes</span>
             <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.2 }}>
-              What our clients say.
+              Lo que dicen nuestros clientes.
             </h2>
             {/* Giant quote mark */}
             <div className="mt-8 hidden md:block" style={{ fontFamily: "'Noto Serif', serif", fontSize: '120px', fontWeight: 300, color: '#d6e7d8', lineHeight: 1 }}>&ldquo;</div>
@@ -293,16 +293,16 @@ export default function HomePage(props: any = {}) {
       >
         <div className="max-w-3xl mx-auto">
           <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(235,252,237,0.65)', display: 'block', marginBottom: '20px' }}>
-            Begin Today
+            Empieza hoy
           </span>
           <h2
             className="text-4xl md:text-6xl mb-8"
             style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, fontStyle: 'italic', color: '#ebfced', lineHeight: 1.15 }}
           >
-            Your practice starts here.
+            Tu práctica empieza aquí.
           </h2>
           <p className="text-base md:text-lg mb-12 max-w-xl mx-auto" style={{ color: 'rgba(235,252,237,0.75)', lineHeight: 1.7 }}>
-            Introductory sessions are $25. No experience required. All equipment provided. Austin&rsquo;s most intentional pilates studio is ready for you.
+            Clase de prueba por solo 15&euro;. Sin experiencia previa necesaria. Todo el equipamiento incluido. El estudio de pilates que estabas buscando.
           </p>
           <Link
             href={`${base}/contacto`}

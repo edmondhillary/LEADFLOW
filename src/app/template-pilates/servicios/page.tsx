@@ -4,8 +4,8 @@ import { classes, schedule, pricing, instructors, images } from '../data';
 export default function ServiciosPage(props: any = {}) {
   const ov = props.overrides as any;
   const baseHref = ov?.baseHref || '/template-pilates';
-  const classChips = ['All Classes', 'Reformer', 'Mat', 'Private', 'Breathwork', 'Beginner', 'Advanced'];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  const classChips = ['Todas', 'Reformer', 'Suelo', 'Privada', 'Respiración', 'Principiante', 'Avanzado'];
+  const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
 
   return (
     <main style={{ fontFamily: "'Manrope', sans-serif" }}>
@@ -14,18 +14,18 @@ export default function ServiciosPage(props: any = {}) {
       <section className="px-6 md:px-8 max-w-[1920px] mx-auto mb-16 md:mb-24 pt-8 md:pt-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '16px' }}>Our Classes</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '16px' }}>Nuestras clases</span>
             <h1
               className="text-4xl md:text-6xl lg:text-7xl"
               style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.1, letterSpacing: '-0.02em' }}
             >
-              Movement for every<br />
-              <span style={{ fontStyle: 'italic', color: '#536257' }}>body and intention.</span>
+              Movimiento para cada<br />
+              <span style={{ fontStyle: 'italic', color: '#536257' }}>cuerpo e intención.</span>
             </h1>
           </div>
           <div className="lg:col-span-4 pb-2">
             <p className="max-w-sm" style={{ fontSize: '15px', color: '#5c605c', lineHeight: 1.7 }}>
-              From introductory mat work to advanced Cadillac sessions, every class at Kinetic Gallery is taught with precision and care.
+              Desde clases de suelo para principiantes hasta sesiones avanzadas de Cadillac, cada clase se imparte con precisión y cuidado.
             </p>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function ServiciosPage(props: any = {}) {
                     className="inline-block mt-4 transition-all"
                     style={{ fontSize: '11px', fontWeight: 600, color: '#536257', textTransform: 'uppercase', letterSpacing: '0.1em', textDecoration: 'none', borderBottom: '1px solid #536257', paddingBottom: '2px' }}
                   >
-                    Book This Class
+                    Reservar clase
                   </Link>
                 </div>
               </div>
@@ -105,9 +105,9 @@ export default function ServiciosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#f4f4f0' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="mb-12">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Weekly Schedule</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Horario semanal</span>
             <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-              5 days a week, <span style={{ fontStyle: 'italic' }}>always available.</span>
+              5 días a la semana, <span style={{ fontStyle: 'italic' }}>siempre disponible.</span>
             </h2>
           </div>
 
@@ -120,7 +120,7 @@ export default function ServiciosPage(props: any = {}) {
                     className="text-left px-6 py-4"
                     style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#2f3430', borderBottom: '1px solid rgba(175,179,174,0.2)' }}
                   >
-                    Class
+                    Clase
                   </th>
                   {days.map(d => (
                     <th
@@ -158,7 +158,7 @@ export default function ServiciosPage(props: any = {}) {
           </div>
 
           <p className="mt-6" style={{ fontSize: '12px', color: '#5c605c' }}>
-            All times are Central Time. Private sessions available by appointment — contact us for availability.
+            Sesiones privadas disponibles con cita previa — contáctanos para consultar disponibilidad.
           </p>
         </div>
       </section>
@@ -167,9 +167,9 @@ export default function ServiciosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#faf9f6' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="text-center mb-16">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Pricing</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Precios</span>
             <h2 className="text-3xl md:text-5xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-              Simple, <span style={{ fontStyle: 'italic' }}>transparent.</span>
+              Simple y <span style={{ fontStyle: 'italic' }}>transparente.</span>
             </h2>
           </div>
 
@@ -236,9 +236,9 @@ export default function ServiciosPage(props: any = {}) {
         <div className="max-w-[1920px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
-              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Your Instructors</span>
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestros instructores</span>
               <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-                Expert guidance, <span style={{ fontStyle: 'italic' }}>every session.</span>
+                Guía experta en cada <span style={{ fontStyle: 'italic' }}>sesión.</span>
               </h2>
             </div>
             <Link
@@ -282,10 +282,10 @@ export default function ServiciosPage(props: any = {}) {
             className="text-3xl md:text-5xl mb-6"
             style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, fontStyle: 'italic', color: '#ebfced' }}
           >
-            Ready to begin?
+            ¿Lista para empezar?
           </h2>
           <p style={{ fontSize: '15px', color: 'rgba(235,252,237,0.75)', lineHeight: 1.7, marginBottom: '32px' }}>
-            Book your first session today. Intro class is $25 — all equipment included.
+            Reserva tu primera sesión hoy. Clase de prueba por 15€ — todo el equipamiento incluido.
           </p>
           <Link
             href={`${baseHref}/contacto`}

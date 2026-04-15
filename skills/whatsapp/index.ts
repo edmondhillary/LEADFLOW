@@ -15,24 +15,25 @@ const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
 const TWILIO_FROM = process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886'; // Sandbox Twilio
 const TEST_NUMBER = process.env.TWILIO_TEST_NUMBER; // Tu número personal para probar
 
+const SENDER_NAME = process.env.WHATSAPP_SENDER_NAME || 'Edu';
+const BRAND_NAME = process.env.WHATSAPP_BRAND_NAME || 'NEXIFY';
+
 function getWhatsAppCopy(country: string) {
   if (country === 'AR' || country === 'UY') {
     return (businessName: string, webUrl: string) =>
-      `¡Hola! 👋 Somos LeadFlow.\n\n` +
-      `Buscamos *${businessName}* en Google Maps y vimos que no tenés página web. ` +
-      `¡Te preparamos una demo gratuita!\n\n` +
+      `Hola!! Soy ${SENDER_NAME} de ${BRAND_NAME}. Nos tomamos el atrevimiento de crear una página web profesional para *${businessName}*. Podés verla acá:\n\n` +
       `👉 ${webUrl}\n\n` +
-      `⏰ Solo disponible *48 horas*\n\n` +
-      `¿Te interesa tener tu web por solo $25/mes? Respondé este mensaje 😊`;
+      `El servicio completo tiene un costo de $25/mes (hosting aparte ~$3,50/mes).\n\n` +
+      `Avisame si te interesa! Solo tendríamos que retocar un par de cosas y fotos a tu gusto y ya lo podrías unir a tu ficha de Google Maps.\n\n` +
+      `Un saludo! 😊`;
   }
 
   return (businessName: string, webUrl: string) =>
-    `¡Hola! 👋 Somos LeadFlow.\n\n` +
-    `Buscamos *${businessName}* en Google Maps y vimos que no tienes página web. ` +
-    `¡Te hemos preparado una demo gratuita!\n\n` +
+    `Hola!! Soy ${SENDER_NAME} de ${BRAND_NAME}. Nos hemos tomado el atrevimiento de crear una página web profesional para *${businessName}*. Puede verla aquí:\n\n` +
     `👉 ${webUrl}\n\n` +
-    `⏰ Solo disponible *48 horas*\n\n` +
-    `¿Te interesa tener tu web por solo 25€/mes? Responde este mensaje 😊`;
+    `El servicio completo tiene un coste de 25€/mes (hosting aparte ~3,50€/mes).\n\n` +
+    `Avísame si le interesa! Solo tendríamos que retocar un par de cosas y fotos a tu gusto y ya lo podrías unir a tu ficha de Google Maps.\n\n` +
+    `Un saludo! 😊`;
 }
 
 async function sendTwilioWhatsApp(to: string, message: string): Promise<boolean> {

@@ -1,30 +1,30 @@
 /**
  * TEMPLATE PILATES — Data Config
  *
- * Kinetic Gallery Pilates Estudio — Austin, Texas
- * All content, images, colors and text come from here.
+ * Todo el contenido, imágenes, colores y textos del template.
+ * 100% en español para mercado España.
  */
 
 export const business = {
   name: 'KINETIC GALLERY',
   fullName: 'Kinetic Gallery Pilates Estudio',
-  tagline: 'Movement Artistry',
-  phone: '+1 555 888 0192',
-  phoneIntl: '+15558880192',
-  whatsapp: '15558880192',
-  email: 'hello@kineticgallery.com',
-  address: '124 Serenity Lane, Austin, TX 78701',
-  city: 'Austin',
-  state: 'Texas',
+  tagline: 'El arte del movimiento',
+  phone: '+34 600 000 000',
+  phoneIntl: '+34600000000',
+  whatsapp: '34600000000',
+  email: 'info@kineticgallery.com',
+  address: 'Calle Ejemplo 124, Madrid',
+  city: 'Madrid',
+  state: 'España',
   foundedYear: 2024,
-  quote: '"El mind, when housed within a healthful body, possesses a glorious sense of power."',
+  quote: '"La mente, cuando habita un cuerpo sano, posee un glorioso sentido de poder."',
 };
 
 export const nav = [
   { href: '/template-pilates', label: 'Inicio', icon: 'home' },
   { href: '/template-pilates/servicios', label: 'Servicios', icon: 'self_improvement' },
   { href: '/template-pilates/nosotros', label: 'Nosotros', icon: 'groups' },
-  { href: '/template-pilates/blog', label: 'Journal', icon: 'article' },
+  { href: '/template-pilates/blog', label: 'Blog', icon: 'article' },
   { href: '/template-pilates/contacto', label: 'Reservar', icon: 'calendar_today' },
 ];
 
@@ -49,51 +49,51 @@ export const images = {
 };
 
 export const hero = {
-  badge: 'Est. 2024 • Movement Artistry',
+  badge: 'Est. 2024 · El arte del movimiento',
   titleLine1: 'Pilates Estudio —',
-  titleLine2: 'Strength, Posture,',
-  titleItalic: 'Austin',
-  titleLine3: 'Mobility',
-  subtitle: 'A sanctuary para intentional movement. Expert pilates instruction in an atmospherically calibrated estudio space — where form meets function, y practice becomes artistry.',
+  titleLine2: 'Fuerza, Postura,',
+  titleItalic: 'Madrid',
+  titleLine3: 'Movilidad',
+  subtitle: 'Un espacio dedicado al movimiento consciente. Clases de pilates con instructores expertos en un estudio diseñado para que cada sesión sea transformadora.',
   ctaPrimary: 'Reservar sesión',
-  ctaSecondary: 'Explore Classes',
+  ctaSecondary: 'Ver clases',
 };
 
 export const classes = [
   {
-    name: 'Reformer Collective',
-    desc: 'Small group reformer sesiones designed para dynamic resistance training y deep postural alignment. Maximum 6 participants per sesión.',
-    tag: 'Group · Reformer',
+    name: 'Reformer Grupal',
+    desc: 'Sesiones en grupo reducido con máquina reformer. Entrenamiento de resistencia dinámica y alineación postural profunda. Máximo 6 participantes por sesión.',
+    tag: 'Grupal · Reformer',
     image: 'reformer',
   },
   {
-    name: 'Private Estudio',
-    desc: 'One-on-one instruction tailored to tu body, goals, y movement patterns. El most transformative pilates experience disponible.',
-    tag: 'Private · All Equipment',
+    name: 'Sesión Privada',
+    desc: 'Clase individual adaptada a tu cuerpo, objetivos y patrones de movimiento. La experiencia de pilates más transformadora.',
+    tag: 'Privada · Todo el equipamiento',
     image: 'privateSession',
   },
   {
     name: 'Mat Sculpt',
-    desc: 'Classical mat pilates con a contemporary edge. Build core strength, flexibility y body awareness using only tu own bodyweight.',
-    tag: 'Group · Mat',
+    desc: 'Pilates clásico de suelo con un enfoque contemporáneo. Desarrolla fuerza del core, flexibilidad y conciencia corporal usando solo tu propio peso.',
+    tag: 'Grupal · Suelo',
     image: 'matClass',
   },
   {
-    name: 'Introductory Series',
-    desc: 'A 4-sesión foundational program designed para those nuevo to pilates. Aprender el principles, terminology, y essential movements.',
-    tag: 'Beginner · Mixed',
+    name: 'Curso de Iniciación',
+    desc: 'Programa de 4 sesiones diseñado para quienes se inician en pilates. Aprende los principios, la terminología y los movimientos esenciales.',
+    tag: 'Principiantes · Mixto',
     image: 'studioLobby',
   },
   {
-    name: 'Cadillac Advanced',
-    desc: 'Para experienced practitioners listo to challenge range of motion, strength, y coordination on el Cadillac apparatus.',
-    tag: 'Advanced · Cadillac',
+    name: 'Cadillac Avanzado',
+    desc: 'Para practicantes experimentados que buscan desafiar su rango de movimiento, fuerza y coordinación en el aparato Cadillac.',
+    tag: 'Avanzado · Cadillac',
     image: 'reformer',
   },
   {
-    name: 'Breathwork',
-    desc: 'Somatic breath practice integrated con gentle pilates movement. Cultivate presence, reduce tension, y reset el nervous system.',
-    tag: 'Wellness · Breathwork',
+    name: 'Respiración Consciente',
+    desc: 'Práctica de respiración somática integrada con movimiento suave de pilates. Cultiva presencia, reduce tensión y resetea el sistema nervioso.',
+    tag: 'Bienestar · Respiración',
     image: 'studioLobby',
   },
 ];
@@ -101,132 +101,132 @@ export const classes = [
 export const philosophy = [
   {
     num: '01',
-    title: 'Expert Pedagogy',
-    desc: 'Every instructor at Kinetic Gallery holds advanced certification y undergoes continuous education. Nosotros teach el method as it was intended — precise, principled, y deeply attentive.',
+    title: 'Instrucción experta',
+    desc: 'Cada instructor cuenta con certificación avanzada y formación continua. Enseñamos el método tal como fue concebido: preciso, con principios y con una atención profunda al detalle.',
   },
   {
     num: '02',
-    title: 'Atmospheric Calibration',
-    desc: 'El estudio environment is designed to facilitate focus y ease. Lighting, acoustics, scent y spatial flow are all considered elements of yNuestra práctica.',
+    title: 'Espacio diseñado para ti',
+    desc: 'El entorno del estudio está diseñado para facilitar la concentración y el bienestar. Iluminación, acústica, aromas y distribución espacial son elementos cuidados de nuestra práctica.',
   },
   {
     num: '03',
-    title: 'Inclusive Rigor',
-    desc: 'Pilates belongs to every body. Nosotros hold el technical standard high while ensuring every client feels met exactly where they are in their movement journey.',
+    title: 'Rigor inclusivo',
+    desc: 'El pilates es para todos los cuerpos. Mantenemos un alto estándar técnico asegurando que cada cliente se sienta acompañado exactamente donde se encuentra en su proceso.',
   },
 ];
 
 export const instructors = [
   {
-    name: 'Sarah Chen',
-    role: 'Head Instructor',
-    bio: 'Sarah brings over a decade of classical pilates training to every sesión. Certified through el Pilates Method Alliance y trained under master teachers in Nuevo York y London, her teaching is precise, intuitive, y deeply encouraging.',
-    specialty: 'Reformer · Classical Method · Rehabilitation',
+    name: 'Laura García',
+    role: 'Instructora Principal',
+    bio: 'Laura aporta más de una década de formación en pilates clásico a cada sesión. Certificada por la Pilates Method Alliance y formada con maestros en Madrid y Barcelona, su enseñanza es precisa, intuitiva y profundamente motivadora.',
+    specialty: 'Reformer · Método clásico · Rehabilitación',
     image: 'studioMain',
   },
   {
-    name: 'Marcus Webb',
-    role: 'Reformer Specialist',
-    bio: 'Marcus holds dual certifications in pilates y functional movement. His background in dance y biomechanics informs a teaching style that is both technically exacting y creatively alive.',
-    specialty: 'Reformer · Cadillac · Movement Analysis',
+    name: 'Carlos Martínez',
+    role: 'Especialista en Reformer',
+    bio: 'Carlos cuenta con doble certificación en pilates y movimiento funcional. Su formación en danza y biomecánica aporta un estilo de enseñanza técnicamente exigente y creativamente dinámico.',
+    specialty: 'Reformer · Cadillac · Análisis del movimiento',
     image: 'instructorHands',
   },
 ];
 
 export const pricing = [
   {
-    name: 'Intro Class',
-    price: '$25',
-    desc: 'Tu primero class — any format, any instructor. El mejor way to experience Kinetic Gallery.',
-    features: ['Single class', 'Any format', 'Equipment included', 'Nuevo clients only'],
-    cta: 'Reservar Intro',
+    name: 'Clase de Prueba',
+    price: '15€',
+    desc: 'Tu primera clase en cualquier formato y con cualquier instructor. La mejor forma de conocer nuestro estudio.',
+    features: ['Una clase', 'Cualquier formato', 'Equipamiento incluido', 'Solo nuevos clientes'],
+    cta: 'Reservar Prueba',
     highlight: false,
   },
   {
-    name: 'Single Sesión',
-    price: '$45',
-    desc: 'One sesión, completo acceso. Reformer, mat, breathwork — choose what calls to tú.',
-    features: ['Single class', 'All formats disponible', 'Equipment included', 'Valid 30 days'],
+    name: 'Sesión Individual',
+    price: '25€',
+    desc: 'Una sesión con acceso completo. Reformer, suelo, respiración — elige lo que más te apetezca.',
+    features: ['Una clase', 'Todos los formatos', 'Equipamiento incluido', 'Válida 30 días'],
     cta: 'Reservar Sesión',
     highlight: true,
   },
   {
-    name: 'Mensual Unlimited',
-    price: '$180',
-    desc: 'Unlimited group classes para 30 days. El most cost-effective way to build a consistent practice.',
-    features: ['Unlimited group classes', 'All formats included', 'Priority booking', 'Community acceso'],
-    cta: 'Get Unlimited',
+    name: 'Bono Mensual',
+    price: '99€/mes',
+    desc: 'Clases grupales ilimitadas durante 30 días. La forma más rentable de construir una práctica constante.',
+    features: ['Clases grupales ilimitadas', 'Todos los formatos', 'Reserva prioritaria', 'Acceso a la comunidad'],
+    cta: 'Conseguir Bono',
     highlight: false,
   },
 ];
 
 export const schedule = [
-  { class: 'Reformer Collective', mon: '7:00am', tue: '9:00am', wed: '7:00am', thu: '9:00am', fri: '7:00am' },
-  { class: 'Mat Sculpt', mon: '9:00am', tue: '—', wed: '9:00am', thu: '—', fri: '9:00am' },
-  { class: 'Breathwork', mon: '—', tue: '7:00am', wed: '—', thu: '7:00am', fri: '—' },
-  { class: 'Cadillac Advanced', mon: '6:00pm', tue: '—', wed: '6:00pm', thu: '—', fri: '5:00pm' },
-  { class: 'Reformer Collective', mon: '—', tue: '6:00pm', wed: '—', thu: '6:00pm', fri: '—' },
-  { class: 'Private Estudio', mon: 'By Appt', tue: 'By Appt', wed: 'By Appt', thu: 'By Appt', fri: 'By Appt' },
+  { class: 'Reformer Grupal', mon: '7:00', tue: '9:00', wed: '7:00', thu: '9:00', fri: '7:00' },
+  { class: 'Mat Sculpt', mon: '9:00', tue: '—', wed: '9:00', thu: '—', fri: '9:00' },
+  { class: 'Respiración', mon: '—', tue: '7:00', wed: '—', thu: '7:00', fri: '—' },
+  { class: 'Cadillac Avanzado', mon: '18:00', tue: '—', wed: '18:00', thu: '—', fri: '17:00' },
+  { class: 'Reformer Grupal', mon: '—', tue: '18:00', wed: '—', thu: '18:00', fri: '—' },
+  { class: 'Sesión Privada', mon: 'Cita previa', tue: 'Cita previa', wed: 'Cita previa', thu: 'Cita previa', fri: 'Cita previa' },
 ];
 
 export const testimonials = [
   {
-    name: 'Elena Park',
-    role: 'Client since 2024',
-    text: 'Kinetic Gallery changed el way I inhabit my body. Sarah has an extraordinary ability to see exactly what needs attention y guía tú there without tú even realizing el work happening.',
+    name: 'Elena Ruiz',
+    role: 'Clienta desde 2024',
+    text: 'Este estudio cambió la forma en que habito mi cuerpo. Laura tiene una capacidad extraordinaria para ver exactamente qué necesita atención y guiarte sin que te des cuenta del trabajo que estás haciendo.',
     rating: 5,
   },
   {
-    name: 'James Whitfield',
-    role: 'Reformer Collective, 3×/week',
-    text: 'I came in con chronic back pain y left con a practice. Marcus understands el body as a system — every cue is intelligent, every sequence purposeful. This estudio is exceptional.',
+    name: 'Javier Moreno',
+    role: 'Reformer Grupal, 3 veces/semana',
+    text: 'Llegué con dolor crónico de espalda y me fui con una práctica. Carlos entiende el cuerpo como un sistema — cada indicación es inteligente, cada secuencia tiene un propósito. Este estudio es excepcional.',
     rating: 5,
   },
 ];
 
 export const blogPosts = [
   {
-    slug: 'reformer-benefits',
-    title: 'Why el Reformer Changes Everything.',
-    category: 'Method',
+    slug: 'beneficios-reformer',
+    title: 'Por qué el Reformer lo cambia todo.',
+    category: 'Método',
     readTime: '7 min',
-    excerpt: 'El spring-loaded resistance of el reformer does something mat work cannot — it meets tu body where it is y builds desde there. A deep dive into why this apparatus is foundational.',
+    excerpt: 'La resistencia con muelles del reformer hace algo que el trabajo en suelo no puede: se adapta a tu cuerpo y construye desde ahí. Un análisis profundo de por qué este aparato es fundamental.',
     featured: true,
     image: 'blogDestacado',
   },
   {
-    slug: 'pilates-for-beginners',
-    title: 'Starting Pilates: What No One Tells Tú.',
-    category: 'Beginners',
+    slug: 'pilates-para-principiantes',
+    title: 'Empezar Pilates: lo que nadie te cuenta.',
+    category: 'Principiantes',
     readTime: '5 min',
-    excerpt: 'El primero class feels unfamiliar. El vocabulary is nuevo, el movements subtle. Here is what to expect y how to arrive prepared.',
+    excerpt: 'La primera clase se siente diferente. El vocabulario es nuevo, los movimientos sutiles. Esto es lo que puedes esperar y cómo llegar preparado.',
     featured: false,
     image: 'blog1',
   },
   {
-    slug: 'breathwork-integration',
-    title: 'Breath as el Primero Movement.',
-    category: 'Breathwork',
+    slug: 'respiracion-en-pilates',
+    title: 'La respiración como primer movimiento.',
+    category: 'Respiración',
     readTime: '6 min',
-    excerpt: 'Joseph Pilates called breath el "internal shower." Understanding el mechanics of pilates breathing transforms every exercise desde isolated effort to integrated movement.',
+    excerpt: 'Joseph Pilates llamó a la respiración "la ducha interna". Entender la mecánica de la respiración en pilates transforma cada ejercicio en movimiento integrado.',
     featured: false,
     image: 'blog2',
   },
   {
-    slug: 'posture-and-practice',
-    title: 'El Posture Problem: A Estudio Perspective.',
-    category: 'Wellness',
+    slug: 'postura-y-practica',
+    title: 'El problema postural: una perspectiva desde el estudio.',
+    category: 'Bienestar',
     readTime: '8 min',
-    excerpt: 'Moderno life compresses us forward. Pilates restores el length, lift y lateral awareness that screens y sedentary habits erode.',
+    excerpt: 'La vida moderna nos comprime hacia adelante. El pilates restaura la longitud, la elevación y la conciencia lateral que las pantallas y el sedentarismo erosionan.',
     featured: false,
     image: 'blog3',
   },
   {
-    slug: 'core-strength-decoded',
-    title: 'Core Strength Is Not Nosotros Crunches.',
-    category: 'Anatomy',
+    slug: 'fuerza-del-core',
+    title: 'La fuerza del core no son abdominales.',
+    category: 'Anatomía',
     readTime: '9 min',
-    excerpt: 'El powerhouse — pelvis, lower back, hips y abdomen — is el organizational center of pilates. Understanding it changes how tú train, mudanza, y live.',
+    excerpt: 'El powerhouse — pelvis, zona lumbar, caderas y abdomen — es el centro organizador del pilates. Entenderlo cambia cómo entrenas, te mueves y vives.',
     featured: false,
     image: 'blog4',
   },
@@ -234,26 +234,26 @@ export const blogPosts = [
 
 export const contacto = {
   badge: 'Reservar sesión',
-  title: 'Begin YNuestra práctica.',
-  subtitle: 'Whether tú are nuevo to movement or refining a lifelong practice, nosotros have a class, a time, y an instructor para tú.',
-  formTitle: 'Solicitar a Sesión',
-  formSubtitle: 'Tell us what tú are looking para. Nosotros will confirm tu booking within 24 horario.',
-  serviceOptions: ['Reformer Collective', 'Mat Sculpt', 'Private Estudio', 'Introductory Series', 'Breathwork', 'Cadillac Advanced'],
-  schedule: 'Lunes to Viernes / 6:00am to 8:00pm',
-  responseTime: 'Within 24 Horario',
+  title: 'Tu práctica empieza aquí.',
+  subtitle: 'Ya seas nuevo en el movimiento o estés perfeccionando una práctica de años, tenemos una clase, un horario y un instructor para ti.',
+  formTitle: 'Solicitar una sesión',
+  formSubtitle: 'Cuéntanos qué buscas. Confirmaremos tu reserva en menos de 24 horas.',
+  serviceOptions: ['Reformer Grupal', 'Mat Sculpt', 'Sesión Privada', 'Curso de Iniciación', 'Respiración Consciente', 'Cadillac Avanzado'],
+  schedule: 'Lunes a viernes / 7:00 a 20:00',
+  responseTime: 'En menos de 24 horas',
 };
 
 export const about = {
-  badge: 'Est. 2024 — Austin, Texas',
-  heroTitle: 'A estudio built para bodies that want to mudanza well.',
-  heroSubtitle: 'Kinetic Gallery was founded on el conviction that pilates is one of el most intelligent forms of physical training disponible. Nosotros built this space to reflect that belief — in every detail.',
-  mission: 'Nuestro mission is to make expert pilates instruction accessible, atmospherically beautiful, y genuinely transformative para every client who walks through nuestro door.',
+  badge: 'Est. 2024 — Madrid, España',
+  heroTitle: 'Un estudio creado para cuerpos que quieren moverse bien.',
+  heroSubtitle: 'Nuestro estudio nació de la convicción de que el pilates es una de las formas más inteligentes de entrenamiento físico. Construimos este espacio para reflejar esa creencia — en cada detalle.',
+  mission: 'Nuestra misión es hacer que la instrucción experta de pilates sea accesible, estéticamente inspiradora y genuinamente transformadora para cada cliente que cruza nuestra puerta.',
   values: philosophy,
   credentials: [
-    'Pilates Method Alliance Certified Instructors',
-    'Continuing Education — 20+ horario/year per instructor',
-    'Balanced Body Certified Estudio',
-    'BASI Pilates Trained Faculty',
-    'CPR / Primero Aid Certified Staff',
+    'Instructores certificados por la Pilates Method Alliance',
+    'Formación continua — más de 20 horas/año por instructor',
+    'Estudio certificado Balanced Body',
+    'Profesorado con formación BASI Pilates',
+    'Personal certificado en primeros auxilios y RCP',
   ],
 };

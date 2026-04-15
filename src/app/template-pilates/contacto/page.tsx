@@ -55,8 +55,8 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
               className="text-4xl md:text-6xl lg:text-7xl"
               style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.1, letterSpacing: '-0.02em' }}
             >
-              Begin your<br />
-              <span style={{ fontStyle: 'italic', color: '#536257' }}>practice.</span>
+              Empieza tu<br />
+              <span style={{ fontStyle: 'italic', color: '#536257' }}>práctica.</span>
             </h1>
           </div>
           <div className="lg:col-span-4 pb-2">
@@ -94,8 +94,8 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
               >
                 <span style={{ fontSize: '20px', flexShrink: 0 }}>✓</span>
                 <div>
-                  <p style={{ fontWeight: 600, color: '#536257', marginBottom: '4px' }}>Session request received!</p>
-                  <p style={{ fontSize: '13px', color: '#5c605c' }}>We will confirm your booking within 24 hours.</p>
+                  <p style={{ fontWeight: 600, color: '#536257', marginBottom: '4px' }}>¡Solicitud de sesión recibida!</p>
+                  <p style={{ fontSize: '13px', color: '#5c605c' }}>Confirmaremos tu reserva en menos de 24 horas.</p>
                 </div>
               </div>
             )}
@@ -106,7 +106,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                   <label
                     style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', display: 'block', marginBottom: '8px' }}
                   >
-                    Full Name
+                    Nombre completo
                   </label>
                   <input
                     type="text"
@@ -114,7 +114,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    placeholder="Your full name"
+                    placeholder="Tu nombre completo"
                     className="w-full py-3 text-sm"
                     style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(83,98,87,0.25)', outline: 'none', color: '#2f3430' }}
                   />
@@ -144,14 +144,14 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                   <label
                     style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', display: 'block', marginBottom: '8px' }}
                   >
-                    Teléfono (optional)
+                    Teléfono (opcional)
                   </label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+34 600 000 000"
                     autoComplete="tel"
                     className="w-full py-3 text-sm"
                     style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(83,98,87,0.25)', outline: 'none', color: '#2f3430' }}
@@ -161,7 +161,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                   <label
                     style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', display: 'block', marginBottom: '8px' }}
                   >
-                    Class Type
+                    Tipo de clase
                   </label>
                   <select
                     name="classType"
@@ -171,7 +171,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                     className="w-full py-3 text-sm appearance-none"
                     style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(83,98,87,0.25)', outline: 'none', color: formData.classType ? '#2f3430' : '#afb3ae' }}
                   >
-                    <option value="">Select a class...</option>
+                    <option value="">Selecciona una clase...</option>
                     {contacto.serviceOptions.map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
@@ -183,14 +183,14 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                 <label
                   style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', display: 'block', marginBottom: '8px' }}
                 >
-                  Message (optional)
+                  Mensaje (opcional)
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  placeholder="Tell us about your experience level, any injuries, or what you're hoping to achieve..."
+                  placeholder="Cuéntanos sobre tu nivel de experiencia, lesiones o qué te gustaría conseguir..."
                   className="w-full py-3 text-sm resize-none"
                   style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(83,98,87,0.25)', outline: 'none', color: '#2f3430' }}
                 />
@@ -202,7 +202,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                   className="transition-all active:scale-[0.98]"
                   style={{ backgroundColor: '#536257', color: '#ebfced', padding: '16px 48px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', border: 'none', cursor: 'pointer', borderRadius: '9999px' }}
                 >
-                  Request Session
+                  Solicitar sesión
                 </button>
               </div>
             </form>
@@ -217,7 +217,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                 className="text-xl md:text-2xl mb-6"
                 style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}
               >
-                Estudio Information
+                Información del estudio
               </h3>
               <div className="space-y-5">
                 <div className="flex items-start gap-4">
@@ -242,7 +242,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
             <div className="w-full overflow-hidden rounded-xl" style={{ height: '280px' }}>
               <img
                 src={images.contactMap}
-                alt="Kinetic Gallery location"
+                alt="Ubicación del estudio"
                 className="w-full h-full object-cover grayscale opacity-80 hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -253,26 +253,26 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
               style={{ backgroundColor: '#f4f4f0', border: '1px solid rgba(175,179,174,0.15)' }}
             >
               <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>
-                Availability
+                Disponibilidad
               </span>
               <h4
                 className="text-xl mb-4"
                 style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, fontStyle: 'italic', color: '#2f3430' }}
               >
-                Estudio Horario
+                Horario del estudio
               </h4>
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: '#5c605c' }}>Schedule:</span>
+                  <span style={{ color: '#5c605c' }}>Horario:</span>
                   <span style={{ color: '#2f3430', fontWeight: 600 }}>{contacto.schedule}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: '#5c605c' }}>Response Time:</span>
+                  <span style={{ color: '#5c605c' }}>Tiempo de respuesta:</span>
                   <span style={{ color: '#2f3430', fontWeight: 600 }}>{contacto.responseTime}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: '#5c605c' }}>Intro Class:</span>
-                  <span style={{ color: '#536257', fontWeight: 600 }}>$25</span>
+                  <span style={{ color: '#5c605c' }}>Clase de prueba:</span>
+                  <span style={{ color: '#536257', fontWeight: 600 }}>15€</span>
                 </div>
               </div>
               <a
@@ -282,7 +282,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                 className="flex items-center gap-2 w-fit transition-colors"
                 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700, color: '#536257', textDecoration: 'none', borderBottom: '2px solid #d6e7d8', paddingBottom: '2px' }}
               >
-                Message on WhatsApp
+                Escribir por WhatsApp
               </a>
             </div>
 
@@ -301,7 +301,7 @@ const mapLink = ov?.mapDirections || `https://www.google.com/maps/search/?api=1&
                 className="flex items-center justify-between px-5 py-4 rounded-xl transition-colors hover:bg-[#edeeea]"
                 style={{ border: '1px solid rgba(175,179,174,0.25)', textDecoration: 'none', color: '#2f3430' }}
               >
-                <span style={{ fontSize: '13px', fontWeight: 500 }}>Meet the Instructors</span>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Conoce a los instructores</span>
                 <span style={{ color: '#536257', fontSize: '18px' }}>→</span>
               </Link>
             </div>

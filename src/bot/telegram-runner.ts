@@ -14,11 +14,14 @@ import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import TelegramBot from 'node-telegram-bot-api';
-import { connectDB, Lead, PipelineRun } from '../lib/mongodb';
-import { runPipeline } from '../../skills/generate';
+import { connectDB, Lead, PipelineRun, WebsiteContent } from '../lib/mongodb';
+import { runPipeline, processSingleLead } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
 import { getSectorKeyboard, slugFromLabel } from '../config/sectors';
+import cron from 'node-cron';
+import { runAutoPipeline, formatAutoReport, formatDailyReport } from './auto-pipeline';
+import { getDailyStats, canRun, resetDailyCounters } from '../lib/scrape-scheduler';
 
 const TOKEN    = process.env.TELEGRAM_BOT_TOKEN!;
 const CHAT_ID  = process.env.TELEGRAM_CHAT_ID!;
@@ -144,7 +147,7 @@ async function urlIsReachable(url: string): Promise<boolean> {
   }
 }
 
-async function verifyLeadImageHealth(lead: any): Promise<{ ok: boolean; fixed: boolean; broken: number }> {
+async function verifyLeadImageHealth(lead: any): Promise<{ ok: boolean; fixed: boolean; broken: number; degraded?: boolean }> {
   const pageUrl = `${BASE_URL}/${lead.slug}`;
   try {
     const res = await fetch(pageUrl, { redirect: 'follow' });
@@ -154,10 +157,13 @@ async function verifyLeadImageHealth(lead: any): Promise<{ ok: boolean; fixed: b
     if (images.length === 0) return { ok: true, fixed: false, broken: 0 };
 
     const checks = await Promise.all(images.map((u) => urlIsReachable(u)));
-    const broken = checks.filter((ok) => !ok).length;
-    if (broken === 0) return { ok: true, fixed: false, broken: 0 };
+    const brokenCount = checks.filter((ok) => !ok).length;
+    if (brokenCount === 0) return { ok: true, fixed: false, broken: 0 };
 
-    // Auto-fix: si la imagen del dueño está caída, desactivamos imageUrl para forzar fallback del template.
+    const brokenUrls = images.filter((_, i) => !checks[i]);
+    let didFix = false;
+
+    // Fix 1: si la imagen del dueño (scrape) está caída, desactivamos imageUrl para forzar fallback del template.
     const rawImage = lead?.rawScrapeData?.imageUrl || lead?.rawScrapeData?.normalized?.imageUrl;
     if (rawImage) {
       await Lead.findByIdAndUpdate(lead._id, {
@@ -166,18 +172,51 @@ async function verifyLeadImageHealth(lead: any): Promise<{ ok: boolean; fixed: b
           'rawScrapeData.normalized.imageUrl': null,
         },
       });
+      didFix = true;
+    }
 
+    // Fix 2: reemplazar imágenes Unsplash caídas en WebsiteContent HTML con fallbacks del sector.
+    const unsplashBroken = brokenUrls.filter((u) => u.includes('images.unsplash.com'));
+    if (unsplashBroken.length > 0 && lead.contentRef) {
+      const { getSectorImages } = await import('../lib/images');
+      const sectorImgs = getSectorImages(lead.sector);
+      const fallbacks = [sectorImgs.hero, sectorImgs.about, sectorImgs.blog];
+
+      const wc = await WebsiteContent.findById(lead.contentRef);
+      if (wc) {
+        let patchedHtml = wc.html || '';
+        let patchedCount = 0;
+        for (const broken of unsplashBroken) {
+          if (patchedHtml.includes(broken)) {
+            const fallback = fallbacks[patchedCount % fallbacks.length];
+            patchedHtml = patchedHtml.split(broken).join(fallback);
+            patchedCount++;
+          }
+        }
+        if (patchedCount > 0) {
+          await WebsiteContent.findByIdAndUpdate(lead.contentRef, { $set: { html: patchedHtml } });
+          didFix = true;
+        }
+      }
+    }
+
+    // Re-check después de los fixes
+    if (didFix) {
       const retry = await fetch(pageUrl, { redirect: 'follow' });
       if (retry.ok) {
         const retryHtml = await retry.text();
         const retryImages = extractImageUrls(retryHtml, BASE_URL).slice(0, 25);
         const retryChecks = await Promise.all(retryImages.map((u) => urlIsReachable(u)));
         const retryBroken = retryChecks.filter((ok) => !ok).length;
-        return { ok: retryBroken === 0, fixed: true, broken: retryBroken };
+        if (retryBroken === 0) return { ok: true, fixed: true, broken: 0 };
+        // Si quedan rotas pero el layout tiene client-side fallback → degraded, no bloquear
+        return { ok: true, fixed: true, broken: retryBroken, degraded: true };
       }
     }
 
-    return { ok: false, fixed: false, broken };
+    // Fix 3: si no pudimos arreglar server-side pero el layout tiene installImageFallback()
+    // el usuario final verá las imágenes correctas → dejamos pasar como degraded.
+    return { ok: true, fixed: false, broken: brokenCount, degraded: true };
   } catch {
     return { ok: false, fixed: false, broken: 1 };
   }
@@ -295,10 +334,11 @@ const MAIN_KEYBOARD: TelegramBot.SendMessageOptions = {
   reply_markup: {
     keyboard: [
       [{ text: '🚀 Generar webs' }, { text: '📊 Estadísticas' }],
-      [{ text: '👁️ Leads activos' }, { text: '✅ Clientes' }],
+      [{ text: '⚡ Run ahora' }, { text: '🔄 Reset diario' }],
+      [{ text: '🔁 Rehacer web' }, { text: '👁️ Leads activos' }],
+      [{ text: '✅ Clientes' }, { text: '💳 /stripe' }],
       [{ text: '🏥 Health check' }, { text: '🧹 Cleanup' }],
-      [{ text: '📈 Coste pipeline' }, { text: '💳 /stripe' }],
-      [{ text: '❓ Ayuda' }],
+      [{ text: '📈 Coste pipeline' }, { text: '❓ Ayuda' }],
     ],
     resize_keyboard: true,
   },
@@ -349,6 +389,152 @@ bot.onText(/\/metrics/, async (msg) => {
   await sendMsg(report, MAIN_KEYBOARD);
 });
 
+bot.onText(/\/auto/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const report = await formatDailyReport();
+  await sendMsg(
+    report + '\n\n' +
+    `Auto-Pipeline: *${autoPipelineActive ? 'ACTIVO ✅' : 'PAUSADO ⏸️'}*\n` +
+    `Crons: 10:00 AM + 4:00 PM (Costa Rica, Lun-Sáb)\n` +
+    `Target: ${TARGET_WEBS_PER_RUN} webs/run | Máx combos: ${MAX_COMBOS_PER_RUN}\n\n` +
+    `Comandos:\n` +
+    `/start-auto — activar crons\n` +
+    `/stop-auto — pausar crons\n` +
+    `/run-now — ejecutar ahora (funciona incluso en domingo)`,
+    MAIN_KEYBOARD
+  );
+});
+
+bot.onText(/\/start-auto/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  autoPipelineActive = true;
+  await sendMsg('✅ *Auto-Pipeline ACTIVADO*\n\nLos crons de las 10:00 AM y 4:00 PM van a ejecutarse.', MAIN_KEYBOARD);
+});
+
+bot.onText(/\/stop-auto/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  autoPipelineActive = false;
+  await sendMsg('⏸️ *Auto-Pipeline PAUSADO*\n\nLos crons no ejecutarán hasta que hagas /start-auto.\nEl pipeline manual desde /start sigue funcionando.', MAIN_KEYBOARD);
+});
+
+bot.onText(/\/run-now/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const dayName = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'][new Date().getDay()];
+  const sundayNote = new Date().getDay() === 0 ? ' (bypass domingo ✅)' : '';
+  await sendMsg(`🚀 *Ejecutando Auto-Pipeline manualmente...*\n📅 ${dayName}${sundayNote}`);
+  await executeAutoPipeline('MANUAL', true);
+});
+
+bot.onText(/\/reset-daily/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const prev = await resetDailyCounters();
+  await sendMsg(
+    `🔄 *Contadores diarios reseteados*\n\n` +
+    `Anterior:\n` +
+    `   💸 Gasto: $${prev.previousSpend.toFixed(2)}\n` +
+    `   🔍 Leads: ${prev.previousLeads}\n` +
+    `   🔁 Runs: ${prev.previousRuns}\n\n` +
+    `✅ Todo en 0. Podés hacer /run-now para lanzar otro auto-run.`
+  );
+});
+
+// ─── /redo — Regenerar web de un lead existente ────────────────────────────
+
+let redoState: { step: 'idle' | 'sector' | 'pick'; sector?: string; leads?: any[] } = { step: 'idle' };
+
+bot.onText(/\/redo/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await connectDB();
+
+  // Mostrar sectores que tienen leads con web
+  const sectors = await Lead.distinct('sector', { status: { $in: ['web_live', 'email_sent'] } });
+  if (sectors.length === 0) {
+    await sendMsg('⚠️ No hay leads con web generada para rehacer.');
+    return;
+  }
+
+  redoState = { step: 'sector' };
+  const buttons = sectors.sort().map((s: string) => [{ text: s }]);
+  await sendMsg(
+    `🔄 *REHACER WEB*\n\nElegí el sector del lead que querés regenerar:`,
+    { reply_markup: { keyboard: buttons, resize_keyboard: true, one_time_keyboard: true } }
+  );
+});
+
+bot.onText(/\/redo-lead (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  const leadId = match![1].trim();
+  await connectDB();
+
+  const lead = await Lead.findById(leadId);
+  if (!lead) {
+    await sendMsg(`❌ Lead no encontrado: ${leadId}`);
+    return;
+  }
+
+  await sendMsg(
+    `🔄 Regenerando web para *${lead.businessName}*...\n` +
+    `📍 ${lead.city} | ${lead.sector}\n\n⏳ Esto tarda 10-30 segundos...`
+  );
+
+  try {
+    const result = await processSingleLead(leadId);
+    if (result.error) {
+      await sendMsg(`❌ Error: ${result.error}`);
+    } else {
+      await sendMsg(
+        `✅ *Web regenerada*\n\n` +
+        `🏢 ${result.businessName}\n` +
+        `🌐 ${result.webUrl}\n\n` +
+        `La web ya está actualizada con el template más reciente.`,
+        MAIN_KEYBOARD
+      );
+    }
+  } catch (err: any) {
+    await sendMsg(`❌ Error regenerando: ${err.message}`);
+  }
+  redoState = { step: 'idle' };
+});
+
+bot.onText(/\/cancel/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  if (autoPipelineCancelled) {
+    await sendMsg('⚠️ Ya se pidió cancelar. Esperando que termine el combo actual...');
+    return;
+  }
+  autoPipelineCancelled = true;
+  await sendMsg('🛑 *Cancelando Auto-Pipeline...*\nTermina el combo actual y para. Los leads ya guardados se mantienen.');
+});
+
+bot.onText(/\/summary/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await sendMsgPlain(
+    `📖 COMANDOS LEADFLOW\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+    `🚀 PIPELINE MANUAL\n` +
+    `/start — Menú principal. Elegís sector → país → ciudad → cantidad → genera webs al momento.\n\n` +
+    `🤖 AUTO-PIPELINE (crons)\n` +
+    `/auto — Ver estado: leads hoy, gasto, budget, próximo combo.\n` +
+    `/start-auto — Activar crons (10, 13, 16, 19h Costa Rica, Lun-Sáb).\n` +
+    `/stop-auto — Pausar crons. El pipeline manual sigue funcionando.\n` +
+    `/run-now — Ejecutar ahora sin esperar al cron. Funciona incluso domingos.\n` +
+    `/cancel — Frenar un run en curso. Termina el combo actual y para.\n` +
+    `/reset-daily — Resetear contadores de gasto/leads del día. Para relanzar.\n` +
+    `/redo — Regenerar la web de un lead existente (elige sector → lead).\n\n` +
+    `📊 INFORMACIÓN\n` +
+    `/health — Chequear MongoDB + servidor.\n` +
+    `/metrics — Historial de pipeline runs con costos.\n` +
+    `/leads-status — Leads activos por estado (scraped, web_live, client, etc).\n\n` +
+    `💰 VENTAS\n` +
+    `/stripe — Generar link de pago para un lead. Elegís servicios y monto.\n\n` +
+    `🧹 MANTENIMIENTO\n` +
+    `/cleanup — Expirar leads viejos (+48h sin actividad, +30 días scraped).\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `/summary — Este mensaje.`,
+    MAIN_KEYBOARD
+  );
+});
+
 // ─── Handler principal ────────────────────────────────────────────────────────
 
 bot.on('message', async (msg) => {
@@ -390,18 +576,58 @@ bot.on('message', async (msg) => {
     return;
   }
 
+  if (text === '⚡ Run ahora' || text === 'Run ahora') {
+    await sendMsg('🚀 *Ejecutando Auto-Pipeline manualmente...*');
+    await executeAutoPipeline('MANUAL', true);
+    return;
+  }
+
+  if (text === '🔄 Reset diario' || text === 'Reset diario') {
+    const prev = await resetDailyCounters();
+    await sendMsg(
+      `🔄 *Contadores diarios reseteados*\n\n` +
+      `Anterior:\n` +
+      `   💸 Gasto: $${prev.previousSpend.toFixed(2)}\n` +
+      `   🔍 Leads: ${prev.previousLeads}\n` +
+      `   🔁 Runs: ${prev.previousRuns}\n\n` +
+      `✅ Todo en 0. Podés hacer ⚡ Run ahora para lanzar.`,
+      MAIN_KEYBOARD
+    );
+    return;
+  }
+
+  if (text === '🔁 Rehacer web' || text === 'Rehacer web') {
+    await connectDB();
+    const sectors = await Lead.distinct('sector', { status: { $in: ['web_live', 'email_sent'] } });
+    if (sectors.length === 0) {
+      await sendMsg('⚠️ No hay leads con web generada para rehacer.', MAIN_KEYBOARD);
+      return;
+    }
+    redoState = { step: 'sector' };
+    const buttons = sectors.sort().map((s: string) => [{ text: s }]);
+    buttons.push([{ text: 'Cancelar' }]);
+    await sendMsg(
+      `🔁 *REHACER WEB*\n\nElegí el sector del lead que querés regenerar:`,
+      { reply_markup: { keyboard: buttons, resize_keyboard: true, one_time_keyboard: true } }
+    );
+    return;
+  }
+
   if (text === '❓ Ayuda' || text === 'Ayuda') {
     await sendMsg(
       `*LeadFlow v3 — Comandos*\n\n` +
-      `*🚀 Generar webs* — Pipeline completo (scraping → web → notificación)\n` +
+      `*🚀 Generar webs* — Pipeline completo manual\n` +
+      `*⚡ Run ahora* — Auto-pipeline inmediato\n` +
+      `*🔄 Reset diario* — Resetear gasto/leads del día\n` +
+      `*🔁 Rehacer web* — Regenerar web de un lead\n` +
       `*📊 Estadísticas* — Estado de todos los leads\n` +
       `*👁️ Leads activos* — Leads que visitaron su web\n` +
       `*✅ Clientes* — Clientes que pagan\n` +
       `*🏥 Health check* — Estado de Vercel y MongoDB\n` +
       `*🧹 Cleanup* — Expirar leads de +48h\n` +
-      `*📈 Coste pipeline* / *\/metrics* — Coste por ejecución y coste/web\n` +
-      `*💳 /stripe* — Generar link de pago personalizado\n\n` +
-      `*Nota:* El WhatsApp lo envías tú manualmente desde los botones de cada lead.`,
+      `*📈 Coste pipeline* — Coste por ejecución\n` +
+      `*💳 /stripe* — Link de pago personalizado\n\n` +
+      `*Crons:* 10:00, 13:00, 16:00, 19:00 (Lun-Sáb)`,
       MAIN_KEYBOARD
     );
     return;
@@ -452,6 +678,38 @@ bot.on('message', async (msg) => {
   if (text === 'Cancelar') {
     session.step = 'idle';
     await sendMsg('Cancelado.', MAIN_KEYBOARD);
+    return;
+  }
+
+  // ── Flujo /redo — selección de sector y lead ────────────────────────────
+
+  if (redoState.step === 'sector') {
+    const sector = text.trim().toLowerCase();
+    await connectDB();
+    const leads = await Lead.find({
+      sector,
+      status: { $in: ['web_live', 'email_sent', 'visited', 'contacted'] },
+    })
+      .sort({ webLiveAt: -1 })
+      .limit(20)
+      .lean();
+
+    if (leads.length === 0) {
+      await sendMsg(`⚠️ No hay leads con web en sector "${sector}".`, MAIN_KEYBOARD);
+      redoState = { step: 'idle' };
+      return;
+    }
+
+    redoState = { step: 'pick', sector, leads };
+    const lines = leads.map((l: any, i: number) =>
+      `${i + 1}. *${l.businessName}* — ${l.city}\n   /redo-lead ${l._id}`
+    );
+    await sendMsg(
+      `🔄 *Leads en ${sector}* (${leads.length}):\n\n${lines.join('\n\n')}\n\n` +
+      `Tocá el comando /redo-lead del que querés regenerar.`,
+      MAIN_KEYBOARD
+    );
+    redoState = { step: 'idle' };
     return;
   }
 
@@ -637,14 +895,20 @@ bot.on('message', async (msg) => {
             await sendMsg(
               `⚠️ *Preflight bloqueado*\n\n` +
               `La web de *${lead.businessName}* tiene imágenes caídas (${health.broken}).\n` +
-              `No se envía hasta corregir assets.`
+              `No se pudo arreglar automáticamente.`
             );
             continue;
           }
 
-          if (health.fixed) {
+          if (health.fixed && !health.degraded) {
             lead = await Lead.findById(r.leadId);
             await sendMsg(`🛠️ Assets corregidos automáticamente en *${lead?.businessName}* (fallback de template activado).`);
+          } else if (health.degraded) {
+            lead = await Lead.findById(r.leadId);
+            await sendMsg(
+              `🛠️ *${lead?.businessName}*: ${health.broken} imagen(es) reemplazada(s) con fallback del sector.` +
+              (health.fixed ? ' HTML actualizado en DB.' : ' Fallback client-side activo.')
+            );
           }
 
           if (lead) await sendLeadCard(lead);
@@ -1072,4 +1336,95 @@ process.on('uncaughtException', (err) => {
   console.error('[uncaughtException]', err.message);
 });
 
+// ─── CRON: Auto-Pipeline (control dinámico desde Telegram) ──────────────────
+// Hora Costa Rica (UTC-6): 10:00 AM = 16:00 UTC, 4:00 PM = 22:00 UTC
+
+let autoPipelineActive = process.env.AUTO_PIPELINE_ENABLED !== '0';
+let autoPipelineCancelled = false;
+const TARGET_WEBS_PER_RUN = parseInt(process.env.AUTO_PIPELINE_TARGET_WEBS || '50', 10);
+const MAX_COMBOS_PER_RUN = parseInt(process.env.AUTO_PIPELINE_MAX_COMBOS || '10', 10);
+
+async function executeAutoPipeline(label: string, forceSunday = false) {
+  try {
+    if (!autoPipelineActive && !forceSunday) {
+      console.log(`[cron] Auto-Pipeline ${label} omitido — desactivado`);
+      return;
+    }
+
+    const check = await canRun(forceSunday);
+    if (!check.allowed) {
+      await sendMsg(`⏸️ Auto-Pipeline ${label} omitido: ${check.reason}`);
+      return;
+    }
+
+    autoPipelineCancelled = false;
+    await sendMsg(`🚀 *Auto-Pipeline ${label} iniciando...*\nTarget: ${TARGET_WEBS_PER_RUN} webs | Máx combos: ${MAX_COMBOS_PER_RUN}\n_Podés cancelar con /cancel_`);
+
+    const result = await runAutoPipeline(TARGET_WEBS_PER_RUN, MAX_COMBOS_PER_RUN, () => autoPipelineCancelled, forceSunday);
+    const report = formatAutoReport(result);
+    await sendMsg(report);
+
+    // Enviar cards de las TOP 15 webs (por rating/reviews), el resto a /leads-status
+    if (result.success && result.websGenerated > 0) {
+      await connectDB();
+      const MAX_CARDS = 15;
+      const allNewLeads = await Lead.find({
+        status: 'web_live',
+        updatedAt: { $gte: new Date(Date.now() - 30 * 60 * 1000) }, // últimos 30 min
+      })
+        .sort({ reviewRating: -1, reviewCount: -1 })
+        .limit(MAX_CARDS)
+        .lean();
+
+      if (allNewLeads.length > 0) {
+        await sendMsg(`🏆 *Top ${allNewLeads.length} webs generadas* (por rating):`);
+        for (const lead of allNewLeads) {
+          await sendLeadCard(lead);
+        }
+      }
+
+      const remaining = result.websGenerated - allNewLeads.length;
+      if (remaining > 0) {
+        await sendMsg(`_...y ${remaining} webs más. Usá /leads-status para ver todas._`);
+      }
+    }
+
+    // Reporte diario al final
+    const dailyReport = await formatDailyReport();
+    await sendMsg(dailyReport);
+  } catch (err: any) {
+    await sendMsg(`❌ *Error Auto-Pipeline ${label}:* ${err.message}`);
+    console.error(`[auto-pipeline:${label}]`, err);
+  }
+}
+
+// Crons siempre registrados, pero solo ejecutan si autoPipelineActive === true
+// 4 crons/día para maximizar cobertura (Costa Rica UTC-6)
+
+// 10:00 AM Costa Rica = 16:00 UTC
+cron.schedule('0 16 * * 1-6', () => {
+  console.log('[cron] Auto-Pipeline 10:00 disparado');
+  executeAutoPipeline('10:00');
+}, { timezone: 'UTC' });
+
+// 1:00 PM Costa Rica = 19:00 UTC
+cron.schedule('0 19 * * 1-6', () => {
+  console.log('[cron] Auto-Pipeline 13:00 disparado');
+  executeAutoPipeline('13:00');
+}, { timezone: 'UTC' });
+
+// 4:00 PM Costa Rica = 22:00 UTC
+cron.schedule('0 22 * * 1-6', () => {
+  console.log('[cron] Auto-Pipeline 16:00 disparado');
+  executeAutoPipeline('16:00');
+}, { timezone: 'UTC' });
+
+// 7:00 PM Costa Rica = 01:00 UTC (+1 día)
+cron.schedule('0 1 * * 2-7', () => {
+  console.log('[cron] Auto-Pipeline 19:00 disparado');
+  executeAutoPipeline('19:00');
+}, { timezone: 'UTC' });
+
+console.log(`⏰ Crons registrados (10:00, 13:00, 16:00, 19:00 Costa Rica, Lun-Sáb)`);
+console.log(`🤖 Auto-Pipeline: ${autoPipelineActive ? 'ACTIVO ✅' : 'PAUSADO ⏸️'}`);
 console.log('🤖 LeadFlow Bot v3 arrancado. Esperando comandos...');

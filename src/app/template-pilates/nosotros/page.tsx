@@ -42,23 +42,23 @@ export default function NosotrosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#faf9f6' }}>
         <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <div className="md:col-span-5">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Our Mission</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestra misión</span>
             <h2 className="text-3xl md:text-5xl mb-6" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.15 }}>
-              Intelligence in every <span style={{ fontStyle: 'italic' }}>movement.</span>
+              Inteligencia en cada <span style={{ fontStyle: 'italic' }}>movimiento.</span>
             </h2>
             <p style={{ fontSize: '16px', color: '#5c605c', lineHeight: 1.8 }}>{about.mission}</p>
             <div className="flex gap-12 mt-12">
               <div>
                 <div className="text-3xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#536257' }}>2</div>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Instructors</div>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Instructores</div>
               </div>
               <div>
                 <div className="text-3xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#536257' }}>6</div>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Class Formats</div>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Formatos de clase</div>
               </div>
               <div>
                 <div className="text-3xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#536257' }}>5</div>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Days/Week</div>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5c605c', marginTop: '4px' }}>Días/semana</div>
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function NosotrosPage(props: any = {}) {
               <img src={images.studioMain} alt="Estudio interior" className="w-full h-full object-cover" />
             </div>
             <div className="mt-12" style={{ aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px' }}>
-              <img src={images.instructorHands} alt="Instructor detail" className="w-full h-full object-cover" />
+              <img src={images.instructorHands} alt="Detalle instructor" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -77,9 +77,9 @@ export default function NosotrosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#f4f4f0' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="text-center mb-16">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>The Kinetic Philosophy</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestra filosofía</span>
             <h2 className="text-3xl md:text-5xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430', lineHeight: 1.15 }}>
-              Three principles. <span style={{ fontStyle: 'italic' }}>One practice.</span>
+              Tres principios. <span style={{ fontStyle: 'italic' }}>Una práctica.</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -109,9 +109,9 @@ export default function NosotrosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#faf9f6' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="mb-16">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>The Instructors</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Nuestros instructores</span>
             <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-              Meet the people who <span style={{ fontStyle: 'italic' }}>guide your practice.</span>
+              Conoce a quienes <span style={{ fontStyle: 'italic' }}>guían tu práctica.</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -157,15 +157,15 @@ export default function NosotrosPage(props: any = {}) {
         <div className="max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
             <div className="md:col-span-5">
-              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>The Space</span>
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>El espacio</span>
               <h2 className="text-3xl md:text-4xl mb-6" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-                Designed to support your <span style={{ fontStyle: 'italic' }}>practice.</span>
+                Diseñado para acompañar tu <span style={{ fontStyle: 'italic' }}>práctica.</span>
               </h2>
               <p style={{ fontSize: '15px', color: '#5c605c', lineHeight: 1.8, marginBottom: '12px' }}>
-                Our 1,200 sq ft studio at 124 Serenity Lane is outfitted with Balanced Body Reformers, a full Cadillac unit, Wunda Chairs, and a dedicated mat floor.
+                Nuestro estudio está equipado con Reformers Balanced Body, una unidad Cadillac completa, Wunda Chairs y una zona dedicada de suelo.
               </p>
               <p style={{ fontSize: '15px', color: '#5c605c', lineHeight: 1.8 }}>
-                Natural light, considered acoustics, and materials chosen for calm create an environment where focus comes naturally.
+                Luz natural, acústica cuidada y materiales elegidos para la calma crean un entorno donde la concentración surge de forma natural.
               </p>
             </div>
             <div className="md:col-span-7 grid grid-cols-2 gap-3">
@@ -183,9 +183,9 @@ export default function NosotrosPage(props: any = {}) {
       <section className="py-20 md:py-28 px-6 md:px-8" style={{ backgroundColor: '#faf9f6' }}>
         <div className="max-w-[1920px] mx-auto">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Credentials</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.25em', color: '#5c605c', display: 'block', marginBottom: '12px' }}>Certificaciones</span>
             <h2 className="text-3xl md:text-4xl" style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, color: '#2f3430' }}>
-              Held to the highest <span style={{ fontStyle: 'italic' }}>standard.</span>
+              Mantenemos el más alto <span style={{ fontStyle: 'italic' }}>estándar.</span>
             </h2>
           </div>
           <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
@@ -209,23 +209,23 @@ export default function NosotrosPage(props: any = {}) {
       >
         <div className="max-w-2xl mx-auto">
           <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(235,252,237,0.65)', display: 'block', marginBottom: '20px' }}>
-            Join Us
+            Únete
           </span>
           <h2
             className="text-4xl md:text-6xl mb-8"
             style={{ fontFamily: "'Noto Serif', serif", fontWeight: 300, fontStyle: 'italic', color: '#ebfced', lineHeight: 1.15 }}
           >
-            Your practice begins with one session.
+            Tu práctica empieza con una sesión.
           </h2>
           <p style={{ fontSize: '16px', color: 'rgba(235,252,237,0.75)', lineHeight: 1.7, marginBottom: '32px' }}>
-            Meet {instructors[0].name} or {instructors[1].name}. Try your first class for $25. See what intentional movement can do.
+            Conoce a {instructors[0].name} o {instructors[1].name}. Prueba tu primera clase por 15€. Descubre lo que el movimiento consciente puede hacer.
           </p>
           <Link
             href={`${baseHref}/contacto`}
             className="inline-block transition-all active:scale-[0.98]"
             style={{ backgroundColor: '#ebfced', color: '#536257', padding: '18px 48px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', borderRadius: '9999px' }}
           >
-            Book Your First Session
+            Reservar primera sesión
           </Link>
           <p className="mt-6" style={{ fontSize: '12px', color: 'rgba(235,252,237,0.55)' }}>
             {business.address} · {business.city}, {business.state}

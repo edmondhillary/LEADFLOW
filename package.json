@@ -12,12 +12,14 @@
     "generate": "tsx skills/generate.ts",
     "cleanup": "tsx skills/cleanup/index.ts",
     "pipeline": "tsx skills/generate.ts",
-    "bot": "tsx src/bot/telegram.ts",
+    "bot": "tsx src/bot/telegram-runner.ts",
     "list-leads": "tsx scripts/list-leads.ts",
     "send-test-wa": "tsx scripts/send-test-whatsapp.ts",
     "preview": "tsx scripts/preview-leads.ts",
     "lint-ui": "tsx scripts/lint-ui.ts",
-    "pipeline-metrics": "tsx scripts/pipeline-metrics.ts"
+    "pipeline-metrics": "tsx scripts/pipeline-metrics.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -26,6 +28,7 @@
     "lucide-react": "^0.468.0",
     "mongoose": "^8.10.0",
     "next": "^15.2.0",
+    "node-cron": "^4.2.1",
     "node-telegram-bot-api": "^0.67.0",
     "playwright": "^1.50.0",
     "react": "^19.0.0",
@@ -35,6 +38,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.11",
     "@types/node-telegram-bot-api": "^0.64.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
@@ -43,6 +47,7 @@
     "postcss": "^8.5.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.4"
   }
 }

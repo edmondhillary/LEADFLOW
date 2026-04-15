@@ -297,12 +297,10 @@ export async function runScraper(options: {
   const { sector, city, country, limit, apiKey } = options;
 
   const ecoMode = process.env.SCRAPE_ECO_MODE !== '0';
-  const strictCityFilter = process.env.SCRAPE_STRICT_CITY
-    ? process.env.SCRAPE_STRICT_CITY === '1'
-    : ecoMode;
+  const strictCityFilter = process.env.SCRAPE_STRICT_CITY === '1';
   const maxPerQuery = Math.max(
     1,
-    parseInt(process.env.SCRAPE_MAX_RESULTS_PER_QUERY || (ecoMode ? '80' : '200'), 10),
+    parseInt(process.env.SCRAPE_MAX_RESULTS_PER_QUERY || '200', 10),
   );
   const effectiveLimit = Math.min(limit, maxPerQuery);
 
