@@ -1,3 +1,25 @@
+const fs = require('fs');
+const path = require('path');
+
+// Cargar .env.local manualmente
+const envLocal = {};
+const envPath = path.join(__dirname, '.env.local');
+if (fs.existsSync(envPath)) {
+  const content = fs.readFileSync(envPath, 'utf-8');
+  content.split('\n').forEach(line => {
+    line = line.trim();
+    if (!line || line.startsWith('#')) return;
+    const eq = line.indexOf('=');
+    if (eq === -1) return;
+    const key = line.slice(0, eq).trim();
+    let val = line.slice(eq + 1).trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    envLocal[key] = val;
+  });
+}
+
 module.exports = {
   apps: [
     {
@@ -13,12 +35,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         AUTO_PIPELINE_ENABLED: '1',
-        SCRAPE_ECO_MODE: '1',
-        SCRAPE_QUERY_CACHE_HOURS: '24',
+        SCRAPE_ECO_MODE: '0',
         DAILY_LEAD_CAP: '500',
-        DAILY_APIFY_BUDGET_USD: '5.00',
-        AUTO_PIPELINE_TARGET_WEBS: '15',
-        AUTO_PIPELINE_MAX_COMBOS: '6',
+        DAILY_APIFY_BUDGET_USD: '2.00',
+        AUTO_PIPELINE_TARGET_WEBS: '30',
+        AUTO_PIPELINE_MAX_COMBOS: '3',
+        ...envLocal,
       },
       error_file: 'logs/bot-error.log',
       out_file: 'logs/bot-out.log',
@@ -36,6 +58,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: '3000',
+        ...envLocal,
       },
       error_file: 'logs/web-error.log',
       out_file: 'logs/web-out.log',

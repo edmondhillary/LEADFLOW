@@ -17,6 +17,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { connectDB, Lead, Competitor, WebsiteContent } from '../../src/lib/mongodb';
 import { BrandGuidelines } from '../brand-builder/index';
 import { getSectorConfig } from '../../src/lib/sectors';
+import { notifyLeadViaWhatsApp } from '../../src/lib/whatsapp';
 
 function getAnthropic() {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('Falta ANTHROPIC_API_KEY en .env.local');
@@ -359,6 +360,11 @@ Responde SOLO con JSON válido:
       webLiveAt: new Date(),
     });
     console.log('✅ Contenido guardado en MongoDB');
+
+    // WhatsApp fire-and-forget: no bloquea el pipeline
+    notifyLeadViaWhatsApp(lead).catch(err =>
+      console.error(`[whatsapp] fire-and-forget error: ${err.message}`)
+    );
   }
 
   console.log(`\n🎉 Contenido v2 generado: ${lead.businessName}`);

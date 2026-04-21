@@ -121,6 +121,10 @@ const LeadSchema = new mongoose.Schema({
   hasWhatsApp: { type: Boolean, default: false },
   whatsAppValidatedAt: Date,
 
+  // WhatsApp notificación automática (Meta Cloud API)
+  whatsappMessageId: String,
+  whatsappSentAt: Date,
+
   // Template sectorial usado
   templateUsed: String,           // e.g. 'template-fontaneria'
 

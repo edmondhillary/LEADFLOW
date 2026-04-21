@@ -23,6 +23,7 @@ import { notifyPipelineRun } from '../src/bot/telegram';
 import { runScraper } from './scraper/index';
 import { SECTORS, getSector, getTemplateName, getDesign } from '../src/config/sectors';
 import { getSectorImages } from '../src/lib/images';
+import { notifyLeadViaWhatsApp } from '../src/lib/whatsapp';
 
 // ─── Interfaces ────────────────────────────────────────────────────────────
 
@@ -433,6 +434,12 @@ export async function processSingleLead(leadId: string): Promise<PipelineResult>
     });
 
     console.log(`✅ [${lead.businessName}] Web publicada: ${result.webUrl}`);
+
+    // WhatsApp fire-and-forget: no bloquea el pipeline
+    notifyLeadViaWhatsApp(lead).catch(err =>
+      console.error(`[whatsapp] fire-and-forget error: ${err.message}`)
+    );
+
     return result;
 
   } catch (err: any) {
