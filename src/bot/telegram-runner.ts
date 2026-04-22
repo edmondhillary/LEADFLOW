@@ -18,6 +18,7 @@ import { connectDB, Lead, PipelineRun, WebsiteContent } from '../lib/mongodb';
 import { runPipeline, processSingleLead } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
+import { sendFreeTextToLead } from '../lib/whatsapp';
 import { getSectorKeyboard, slugFromLabel } from '../config/sectors';
 import cron from 'node-cron';
 import { runAutoPipeline, formatAutoReport, formatDailyReport } from './auto-pipeline';
@@ -494,6 +495,50 @@ bot.onText(/\/redo-lead (.+)/, async (msg, match) => {
     await sendMsg(`❌ Error regenerando: ${err.message}`);
   }
   redoState = { step: 'idle' };
+});
+
+// ─── /reply <leadId> <texto> — responder por WhatsApp al lead ────────────────
+// Uso: /reply 69e8f7944e48a4a006b5e317 Hola, gracias por escribir. Te cuento...
+// Requiere que el lead haya escrito en las últimas 24h (ventana de Meta).
+
+bot.onText(/^\/reply\s+(\S+)\s+([\s\S]+)$/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  if (!match) return;
+
+  const leadId = match[1].trim();
+  const text = match[2].trim();
+
+  if (text.length === 0) {
+    await sendMsg('❌ Uso: `/reply <leadId> <mensaje>`');
+    return;
+  }
+  if (text.length > 4000) {
+    await sendMsg('❌ El mensaje es demasiado largo (máx 4000 caracteres).');
+    return;
+  }
+
+  await connectDB();
+  const result = await sendFreeTextToLead(leadId, text);
+
+  if (result.sent) {
+    const lead = await Lead.findById(leadId).select('businessName phone');
+    await sendMsg(
+      `✅ *Respuesta enviada*\n\n` +
+      `Para: *${lead?.businessName || leadId}* (${lead?.phone || '—'})\n` +
+      `msgId: \`${result.messageId}\`\n\n` +
+      `_"${text.slice(0, 300)}${text.length > 300 ? '…' : ''}"_`
+    );
+  } else {
+    const reasonLabels: Record<string, string> = {
+      'no-lead': '❌ Lead no encontrado',
+      'no-phone': '❌ El lead no tiene teléfono',
+      'no-inbound': '❌ El lead nunca escribió — no se puede mandar texto libre. Usá un template.',
+      'out-of-window': '⏰ Ventana de 24h cerrada. Usá un template aprobado.',
+      'api-error': '❌ Error de Meta API',
+    };
+    const title = reasonLabels[result.reason || 'api-error'] || '❌ Error';
+    await sendMsg(`${title}\n\n_${result.error || 'sin detalles'}_`);
+  }
 });
 
 bot.onText(/\/cancel/, async (msg) => {

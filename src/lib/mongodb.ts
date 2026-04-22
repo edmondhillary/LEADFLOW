@@ -125,6 +125,10 @@ const LeadSchema = new mongoose.Schema({
   whatsappMessageId: String,
   whatsappSentAt: Date,
 
+  // WhatsApp inbound (mensajes recibidos del lead)
+  lastInboundAt: Date,
+  inboundCount: { type: Number, default: 0 },
+
   // Template sectorial usado
   templateUsed: String,           // e.g. 'template-fontaneria'
 
@@ -291,8 +295,40 @@ const PipelineRunSchema = new mongoose.Schema({
 PipelineRunSchema.index({ createdAt: -1 });
 PipelineRunSchema.index({ sector: 1, city: 1, country: 1, createdAt: -1 });
 
+// --- WhatsApp Message (log de mensajes entrantes y salientes) ---
+const WhatsAppMessageSchema = new mongoose.Schema({
+  leadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lead', index: true },
+  wamid: { type: String, index: true, unique: true, sparse: true },
+  phone: { type: String, required: true, index: true },
+  direction: { type: String, enum: ['inbound', 'outbound'], required: true },
+  type: {
+    type: String,
+    enum: ['text', 'image', 'audio', 'video', 'document', 'button', 'interactive', 'reaction', 'sticker', 'location', 'contacts', 'unknown'],
+    default: 'text',
+  },
+  text: String,
+  // Para outbound: template usado + params (si aplica)
+  template: String,
+  params: [String],
+  // Para statuses (delivered/read) los guardamos en el mensaje original
+  status: { type: String, enum: ['sent', 'delivered', 'read', 'failed'] },
+  statusTimestamps: {
+    sentAt: Date,
+    deliveredAt: Date,
+    readAt: Date,
+    failedAt: Date,
+  },
+  errorMessage: String,
+  // Payload crudo de Meta para debug
+  raw: mongoose.Schema.Types.Mixed,
+}, { timestamps: true });
+
+WhatsAppMessageSchema.index({ leadId: 1, createdAt: -1 });
+WhatsAppMessageSchema.index({ phone: 1, createdAt: -1 });
+
 // ==================== MODELOS ====================
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
 export const Competitor = mongoose.models.Competitor || mongoose.model('Competitor', CompetitorSchema);
 export const WebsiteContent = mongoose.models.WebsiteContent || mongoose.model('WebsiteContent', WebsiteContentSchema);
 export const PipelineRun = mongoose.models.PipelineRun || mongoose.model('PipelineRun', PipelineRunSchema);
+export const WhatsAppMessage = mongoose.models.WhatsAppMessage || mongoose.model('WhatsAppMessage', WhatsAppMessageSchema);

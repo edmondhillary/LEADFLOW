@@ -8,7 +8,7 @@
  * Nunca tira excepciones — loguea y devuelve resultado.
  */
 
-import { Lead } from './mongodb';
+import { Lead, WhatsAppMessage } from './mongodb';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -268,4 +268,81 @@ export async function notifyLeadViaWhatsApp(lead: any): Promise<NotifyResult> {
   }
 
   return { sent: result.success, messageId: result.messageId };
+}
+
+// ─── Helper: enviar texto libre a un lead (ventana 24h) ──────────────────────
+
+export interface ReplyResult {
+  sent: boolean;
+  messageId?: string;
+  error?: string;
+  reason?: 'no-lead' | 'no-phone' | 'no-inbound' | 'out-of-window' | 'api-error';
+}
+
+const WINDOW_24H_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Envía un mensaje de texto libre a un lead por WhatsApp.
+ * Requiere que el lead haya escrito al número de negocio en las últimas 24h
+ * (regla de Meta para mensajes no-template).
+ *
+ * Respeta WHATSAPP_DRY_RUN (si está activo, redirige al número de test).
+ * Guarda el outbound en WhatsAppMessage.
+ */
+export async function sendFreeTextToLead(leadId: string, text: string): Promise<ReplyResult> {
+  const lead = await Lead.findById(leadId);
+  if (!lead) {
+    return { sent: false, reason: 'no-lead', error: `Lead ${leadId} no encontrado` };
+  }
+  if (!lead.phone) {
+    return { sent: false, reason: 'no-phone', error: `Lead ${leadId} sin teléfono` };
+  }
+
+  // Ventana de 24h: Meta solo permite texto libre si el lead escribió en ese rango
+  if (!lead.lastInboundAt) {
+    return {
+      sent: false,
+      reason: 'no-inbound',
+      error: 'El lead aún no escribió al número. Usá un template aprobado en su lugar.',
+    };
+  }
+  const msSinceInbound = Date.now() - new Date(lead.lastInboundAt).getTime();
+  if (msSinceInbound > WINDOW_24H_MS) {
+    const hours = Math.round(msSinceInbound / 3_600_000);
+    return {
+      sent: false,
+      reason: 'out-of-window',
+      error: `Ventana de 24h cerrada (último inbound hace ~${hours}h). Usá un template.`,
+    };
+  }
+
+  const config = getConfig();
+  let targetPhone = lead.phone;
+  if (config.isDryRun) {
+    targetPhone = config.dryRunNumber;
+    console.log(`[whatsapp] [DRY-RUN reply para ${lead.businessName}] Redirigiendo a ${config.dryRunNumber} (real: ${lead.phone})`);
+  }
+
+  const result = await sendText({ to: targetPhone, message: text });
+
+  if (result.success && result.messageId) {
+    try {
+      await WhatsAppMessage.create({
+        leadId: lead._id,
+        wamid: result.messageId,
+        phone: cleanPhone(targetPhone),
+        direction: 'outbound',
+        type: 'text',
+        text,
+        status: 'sent',
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[whatsapp] Error guardando outbound en WhatsAppMessage: ${msg}`);
+      // No bloqueamos el resultado al caller si el guardado falla
+    }
+    return { sent: true, messageId: result.messageId };
+  }
+
+  return { sent: false, reason: 'api-error', error: result.error };
 }
