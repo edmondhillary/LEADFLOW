@@ -1355,16 +1355,25 @@ bot.on('callback_query', async (query) => {
   }
 
   if (data === 'broadcast_confirm') {
-    if (session.step !== 'broadcast_confirm' || !session.broadcastFilter) {
-      await sendMsg('⚠️ Se perdió el contexto del broadcast. Probá de nuevo con /broadcast_web_lista.');
-      return;
-    }
+    console.log(`[broadcast] confirm click — session.step=${session.step} hasFilter=${!!session.broadcastFilter} currentRun=${currentBroadcastRunId}`);
+
     if (currentBroadcastRunId) {
-      await sendMsg('⏳ Ya hay otro broadcast en curso. Frenalo con /broadcast_cancel antes de lanzar uno nuevo.');
+      await sendMsgPlain('⏳ Ya hay otro broadcast en curso. Frenalo con /broadcast_cancel antes de lanzar uno nuevo.');
       return;
     }
 
-    const filter = session.broadcastFilter;
+    // Fallback: si por cualquier motivo (restart del bot, race, etc.) perdimos el filter,
+    // aplicamos el default web_lista como si el usuario hubiera tipeado /broadcast_web_lista sin args.
+    const filter = session.broadcastFilter || {
+      status: 'web_live' as const,
+      requirePhone: true,
+      requireSlug: true,
+      onlyUnsent: true,
+    };
+    if (!session.broadcastFilter) {
+      console.warn('[broadcast] confirm sin filter en session — usando default');
+    }
+
     session.step = 'broadcast_running';
     broadcastCancelFlag = false;
 
