@@ -71,10 +71,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true }, { status: 200 });
   }
 
-  // Procesar en background para devolver 200 rápido (Meta reintenta si tardamos >15s)
-  processPayload(payload).catch((err) => {
-    console.error('[wa-webhook] processPayload error:', err?.message || err);
-  });
+  // Await sync: Vercel serverless mata la función al devolver 200 → no fire-and-forget.
+  // Nuestro procesamiento es sub-segundo (1 Mongo read + 1 write + 1 Telegram call),
+  // muy por debajo del timeout de 15s de Meta.
+  try {
+    await processPayload(payload);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[wa-webhook] processPayload error:', msg);
+  }
 
   return NextResponse.json({ received: true }, { status: 200 });
 }
@@ -144,29 +149,52 @@ interface MetaWebhookPayload {
   entry?: Array<{ id: string; changes: MetaChange[] }>;
 }
 
-async function processPayload(payload: MetaWebhookPayload) {
-  if (payload.object !== 'whatsapp_business_account') return;
+async function processPayload(payload: MetaWebhookPayload & { field?: string; value?: MetaChange['value'] }) {
+  console.log('[wa-webhook] payload keys:', Object.keys(payload).join(','));
 
-  for (const entry of payload.entry || []) {
-    for (const change of entry.changes || []) {
-      if (change.field !== 'messages') continue;
-      const { messages, statuses } = change.value;
-
-      if (messages?.length) {
-        for (const msg of messages) {
-          await handleInboundMessage(msg).catch((err) =>
-            console.error('[wa-webhook] handleInboundMessage error:', err?.message || err)
-          );
-        }
-      }
-      if (statuses?.length) {
-        for (const st of statuses) {
-          await handleStatus(st).catch((err) =>
-            console.error('[wa-webhook] handleStatus error:', err?.message || err)
-          );
-        }
+  // Caso 1 — envelope de producción: { object, entry: [{ id, changes: [{ field, value }] }] }
+  if (payload.object === 'whatsapp_business_account' && Array.isArray(payload.entry)) {
+    for (const entry of payload.entry) {
+      for (const change of entry.changes || []) {
+        await handleChange(change);
       }
     }
+    return;
+  }
+
+  // Caso 2 — Test button del Dashboard de Meta: { field, value } sin envelope.
+  // Lo tratamos como un solo "change" para reusar el mismo handler.
+  if (payload.field && payload.value) {
+    await handleChange({ field: payload.field, value: payload.value });
+    return;
+  }
+
+  console.warn('[wa-webhook] formato de payload no reconocido — ignorando');
+}
+
+async function handleChange(change: MetaChange) {
+  if (change.field !== 'messages') {
+    console.log(`[wa-webhook] change.field=${change.field} — ignorando (solo procesamos 'messages')`);
+    return;
+  }
+  const { messages, statuses } = change.value;
+
+  if (messages?.length) {
+    for (const msg of messages) {
+      await handleInboundMessage(msg).catch((err) =>
+        console.error('[wa-webhook] handleInboundMessage error:', err?.message || err)
+      );
+    }
+  }
+  if (statuses?.length) {
+    for (const st of statuses) {
+      await handleStatus(st).catch((err) =>
+        console.error('[wa-webhook] handleStatus error:', err?.message || err)
+      );
+    }
+  }
+  if (!messages?.length && !statuses?.length) {
+    console.log('[wa-webhook] change sin messages ni statuses — payload shape:', JSON.stringify(change.value).slice(0, 300));
   }
 }
 
