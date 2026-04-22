@@ -1377,7 +1377,11 @@ bot.on('callback_query', async (query) => {
     session.step = 'broadcast_running';
     broadcastCancelFlag = false;
 
-    await sendMsg(`🚀 *Broadcast lanzado*\n\nProgreso cada 5 envíos. Frenar: /broadcast_cancel`);
+    try {
+      await sendMsgHtml(`🚀 <b>Broadcast lanzado</b>\n\nProgreso cada 5 envíos. Frenar con /broadcast_cancel`);
+    } catch (e) {
+      console.warn('[broadcast] no pude enviar mensaje de arranque (sigo igual):', e instanceof Error ? e.message : e);
+    }
 
     runBroadcast({
       filter,
