@@ -18,9 +18,58 @@ WHATSAPP_DRY_RUN=true                # "true" o cualquier valor → manda al nú
 WHATSAPP_DRY_RUN_NUMBER=+34617680026 # Tu móvil personal para pruebas
 
 # Template
-WHATSAPP_TEMPLATE_NAME=hello_world   # Cambiar a "web_lista" cuando Meta la apruebe
-WHATSAPP_TEMPLATE_LANG=en_US         # Cambiar a "es" para web_lista
+WHATSAPP_TEMPLATE_NAME=web_lista     # Template activa (antes: hello_world)
+WHATSAPP_TEMPLATE_LANG=es            # Idioma del template (antes: en_US)
 ```
+
+## Templates disponibles
+
+### `hello_world` (legacy)
+- Idioma: `en_US`
+- Params: ninguno
+- Uso: pruebas iniciales, verificar que la API funciona
+
+### `web_lista` (producción)
+- Idioma: `es`
+- Categoría: MARKETING
+- Params:
+  - `{{1}}` → nombre del negocio (`lead.businessName`)
+  - `{{2}}` → nombre del negocio (`lead.businessName`)
+  - `{{3}}` → URL de la web generada (computada desde `lead.slug`)
+
+Mensaje resultante:
+> Hola **Fontanería López**, soy Edu de Nexify.
+> Vi tu negocio **Fontanería López** en Google y te he preparado una web profesional de prueba sin ningún costo.
+> Mírala aquí: **https://leadflow.es/fontaneria-lopez-madrid**
+> Si te gusta, por 25 EUR al mes la dejamos activa con tu dominio.
+> Cualquier duda, aquí estoy.
+
+### Cambiar entre templates
+
+Solo cambiar las env vars y reiniciar:
+
+```env
+# Para hello_world (legacy):
+WHATSAPP_TEMPLATE_NAME=hello_world
+WHATSAPP_TEMPLATE_LANG=en_US
+
+# Para web_lista (producción):
+WHATSAPP_TEMPLATE_NAME=web_lista
+WHATSAPP_TEMPLATE_LANG=es
+```
+
+## Validación de datos (web_lista)
+
+Antes de enviar, `notifyLeadViaWhatsApp` valida:
+
+| Campo | Obligatorio para web_lista | Fallback |
+|-------|---------------------------|----------|
+| `phone` | Sí (cualquier template) | Skip |
+| `businessName` | Sí | Skip |
+| `slug` | Sí (se usa para construir URL) | Skip |
+
+Si falta alguno, el lead se skipea con log: `"skipped: lead incompleto (sin X)"`.
+El pipeline NO se interrumpe — simplemente ese lead no recibe WhatsApp.
 
 ## Cambiar de DRY-RUN a producción
 
@@ -34,19 +83,22 @@ WHATSAPP_TEMPLATE_LANG=en_US         # Cambiar a "es" para web_lista
 
 **IMPORTANTE**: Cualquier valor de `WHATSAPP_DRY_RUN` que NO sea exactamente `"false"` se comporta como dry-run. Esto incluye: `undefined`, `"true"`, `"TRUE"`, `"0"`, vacío, etc. Seguro por defecto.
 
-## Cambiar la template
+## Testear con un lead real (dry-run)
 
-Cuando Meta apruebe `web_lista`:
+```bash
+# 1. Asegurarse de que DRY_RUN=true (default)
+# 2. Buscar un lead con web generada:
+#    En Mongo: db.leads.findOne({ status: "web_live", slug: { $exists: true } })
 
-```env
-WHATSAPP_TEMPLATE_NAME=web_lista
-WHATSAPP_TEMPLATE_LANG=es
+# 3. Ejecutar el script de test:
+npx ts-node scripts/test-whatsapp-meta.ts --lead-id <MONGO_ID>
+
+# El script muestra:
+# - Config actual (token, phone ID, dry-run, template)
+# - Datos del lead (nombre, sector, teléfono, slug)
+# - Params que se van a enviar ({{1}}, {{2}}, {{3}})
+# - Resultado del envío y actualización en Mongo
 ```
-
-La template `web_lista` usa 3 variables que se envían automáticamente:
-- `{{1}}` → nombre del lead (businessName)
-- `{{2}}` → nombre del negocio (businessName)
-- `{{3}}` → URL de la web generada
 
 ## Rotar el token de Meta
 
@@ -64,18 +116,6 @@ El token de Meta Cloud API expira cada 60 días.
    npx ts-node scripts/test-whatsapp-meta.ts --lead-id <cualquier_lead_id>
    ```
 
-## Script de test
-
-```bash
-# Enviar WhatsApp a un lead específico (respeta DRY-RUN)
-npx ts-node scripts/test-whatsapp-meta.ts --lead-id 6540abc123def456
-
-# También acepta el ID como primer argumento
-npx ts-node scripts/test-whatsapp-meta.ts 6540abc123def456
-```
-
-El script muestra: config, datos del lead, resultado del envío, y verifica la actualización en Mongo.
-
 ## Flujo en el pipeline
 
 ```
@@ -87,6 +127,7 @@ Lead scrapeado → Web generada → status: web_live ──→ WhatsApp enviado 
 - Si WhatsApp falla, el pipeline sigue normalmente
 - El botón manual en Telegram sigue funcionando como respaldo
 - Si tiene éxito, se guarda `whatsappMessageId` y `whatsappSentAt` en el lead
+- Si el lead está incompleto, se skipea silenciosamente (log + `{ skipped: true }`)
 
 ## Campos en MongoDB (Lead)
 
@@ -100,7 +141,13 @@ whatsappSentAt     — Timestamp del envío exitoso
 | Problema | Solución |
 |----------|----------|
 | Token expirado | Rotar token (ver arriba) |
-| Lead sin teléfono | Se omite con log warning |
-| Número inválido | Se omite con log warning |
+| Lead sin teléfono | Se skipea con log |
+| Lead sin businessName o slug | Se skipea con log (solo web_lista) |
+| Número inválido | Se skipea con log |
 | API Meta caída | El pipeline sigue, solo falla el WhatsApp |
 | Template no aprobada | Usar `hello_world` hasta que Meta apruebe |
+| Params vacíos en template | Meta rechaza — siempre pasar valores reales |
+
+## Pendiente (futuro)
+
+- Template `follow_up`: recordatorio 48h después del primer envío (aún no creada en Meta)

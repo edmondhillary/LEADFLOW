@@ -14,7 +14,7 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { connectDB, Lead } from '../src/lib/mongodb';
-import { notifyLeadViaWhatsApp, sendTemplate, cleanPhone } from '../src/lib/whatsapp';
+import { notifyLeadViaWhatsApp, cleanPhone } from '../src/lib/whatsapp';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -78,16 +78,38 @@ async function main() {
 
   const targetPhone = isDryRun ? dryRunNumber : l.phone;
   console.log(`\nEnviando a: ${cleanPhone(targetPhone)} ${isDryRun ? '(DRY-RUN)' : '(REAL)'}`);
-  console.log('Disparando...\n');
+
+  // Mostrar params que se van a enviar (según template)
+  if (templateName !== 'hello_world') {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.es';
+    const webUrl = `${baseUrl}/${l.slug}`;
+    console.log(`\n--- Params para "${templateName}" ---`);
+    console.log(`  {{1}} nombre_contacto: "${l.businessName}"`);
+    console.log(`  {{2}} nombre_negocio:  "${l.businessName}"`);
+    console.log(`  {{3}} url_web:         "${webUrl}"`);
+    if (!l.businessName || !l.slug) {
+      console.error(`\nLead incompleto — falta ${!l.businessName ? 'businessName' : 'slug'}. Se va a skipear.`);
+    }
+  } else {
+    console.log(`\nTemplate "hello_world" — sin params.`);
+  }
+
+  console.log('\nDisparando...\n');
 
   // Usar el flujo completo (notifyLeadViaWhatsApp) para que también actualice Mongo
-  await notifyLeadViaWhatsApp(l);
+  const notifyResult = await notifyLeadViaWhatsApp(l);
+
+  if (notifyResult.skipped) {
+    console.log(`\nSKIPPED: ${notifyResult.reason}`);
+    process.exit(0);
+  }
 
   // Verificar actualización en Mongo
   const updated = await Lead.findById(leadId).lean() as any;
   console.log(`\n--- Post-envío (Mongo) ---`);
   console.log(`whatsappMessageId: ${updated?.whatsappMessageId || 'no actualizado'}`);
   console.log(`whatsappSentAt:    ${updated?.whatsappSentAt || 'no actualizado'}`);
+  console.log(`Resultado:         ${notifyResult.sent ? 'ENVIADO' : 'FALLO'}${notifyResult.messageId ? ` (msgId: ${notifyResult.messageId})` : ''}`);
 
   console.log('\nListo. Revisá tu WhatsApp.');
   process.exit(0);

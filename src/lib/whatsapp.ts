@@ -33,6 +33,13 @@ export interface WhatsAppResult {
   error?: string;
 }
 
+export interface NotifyResult {
+  sent: boolean;
+  skipped?: boolean;
+  reason?: string;
+  messageId?: string;
+}
+
 interface SendTemplateOpts {
   to: string;
   templateName?: string;
@@ -181,18 +188,34 @@ export async function sendText(opts: SendTextOpts): Promise<WhatsAppResult> {
  * Envía WhatsApp template al lead (o al número dry-run).
  * NON-BLOCKING: se llama con fire-and-forget desde el pipeline.
  * Actualiza whatsappMessageId y whatsappSentAt en el lead si tiene éxito.
+ *
+ * Para templates con variables (web_lista), valida que el lead tenga
+ * los datos obligatorios. Si faltan → skip (no se envía basura).
  */
-export async function notifyLeadViaWhatsApp(lead: any): Promise<void> {
+export async function notifyLeadViaWhatsApp(lead: any): Promise<NotifyResult> {
   const config = getConfig();
   const now = new Date().toISOString();
   const leadId = lead._id?.toString() || 'unknown';
-  const leadName = lead.businessName || 'Sin nombre';
+  const leadName = lead.businessName || '';
   const leadPhone = lead.phone;
 
-  // Sin teléfono → no se puede notificar
+  // Sin teléfono → skip
   if (!leadPhone) {
-    console.log(`[whatsapp] ${now} | leadId=${leadId} | ${leadName} | SIN TELÉFONO — omitido`);
-    return;
+    console.log(`[whatsapp] ${now} | leadId=${leadId} | skipped: sin teléfono`);
+    return { sent: false, skipped: true, reason: 'sin teléfono' };
+  }
+
+  // Para templates con variables, validar datos obligatorios
+  const isParameterized = config.templateName !== 'hello_world';
+  if (isParameterized) {
+    if (!lead.businessName) {
+      console.log(`[whatsapp] ${now} | leadId=${leadId} | skipped: lead incompleto (sin businessName)`);
+      return { sent: false, skipped: true, reason: 'sin businessName' };
+    }
+    if (!lead.slug) {
+      console.log(`[whatsapp] ${now} | leadId=${leadId} | ${leadName} | skipped: lead incompleto (sin slug/webUrl)`);
+      return { sent: false, skipped: true, reason: 'sin slug (no hay web generada)' };
+    }
   }
 
   // DRY-RUN: redirigir al número de test
@@ -202,12 +225,21 @@ export async function notifyLeadViaWhatsApp(lead: any): Promise<void> {
     console.log(`[whatsapp] [DRY-RUN para ${leadName}] Redirigiendo a ${config.dryRunNumber} (real: ${leadPhone})`);
   }
 
-  // Preparar params para cuando la template "web_lista" esté aprobada
-  // Por ahora con hello_world no se usan, pero queda listo
+  // Preparar params según template
   const webUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.es'}/${lead.slug}`;
-  const params = config.templateName === 'hello_world'
-    ? undefined
-    : [leadName, lead.businessName, webUrl];
+  let params: string[] | undefined;
+
+  if (!isParameterized) {
+    params = undefined;
+  } else {
+    // web_lista: {{1}} nombre_contacto, {{2}} nombre_negocio, {{3}} url_web
+    // No tenemos nombre del dueño en el schema → usamos businessName para ambos
+    params = [lead.businessName, lead.businessName, webUrl];
+  }
+
+  if (params) {
+    console.log(`[whatsapp] Params para "${config.templateName}": ${JSON.stringify(params)}`);
+  }
 
   const result = await sendTemplate({
     to: targetPhone,
@@ -234,4 +266,6 @@ export async function notifyLeadViaWhatsApp(lead: any): Promise<void> {
       console.error(`[whatsapp] Error actualizando lead ${leadId} en Mongo: ${err.message}`);
     }
   }
+
+  return { sent: result.success, messageId: result.messageId };
 }
