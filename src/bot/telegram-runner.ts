@@ -612,10 +612,10 @@ async function startBroadcastWebLista(inlineArgs: string) {
 
   const count = await countTargets(filter);
   if (count === 0) {
-    await sendMsg(
-      `⚠️ *Broadcast web_lista* — 0 leads coinciden.\n\n` +
-      `Filtro: \`${describeFilter(filter)}\`\n\n` +
-      `Probá: \`/broadcast_web_lista\` sin filtros, o \`/broadcast_web_lista sector=yoga\`.`,
+    await sendMsgHtml(
+      `⚠️ <b>Broadcast</b> <code>web_lista</code> — 0 leads coinciden.\n\n` +
+      `Filtro: <code>${escapeHtml(describeFilter(filter))}</code>\n\n` +
+      `Probá: <code>/broadcast_web_lista</code> sin filtros, o <code>/broadcast_web_lista sector=yoga</code>.`,
       MAIN_KEYBOARD
     );
     return;
@@ -623,22 +623,23 @@ async function startBroadcastWebLista(inlineArgs: string) {
 
   const preview = await previewTargets(filter, 5);
   const previewLines = preview
-    .map((p, i) => `${i + 1}. ${p.businessName} — ${p.city} (${p.sector})`)
+    .map((p, i) => `${i + 1}. ${escapeHtml(p.businessName || '')} — ${escapeHtml(p.city || '')} (${escapeHtml(p.sector || '')})`)
     .join('\n');
 
   const isDryRun = process.env.WHATSAPP_DRY_RUN !== 'false';
+  const dryRunNumber = process.env.WHATSAPP_DRY_RUN_NUMBER || '+34617680026';
   const dryRunTag = isDryRun
-    ? `🧪 *DRY_RUN activo* — todos los envíos se redirigen a ${process.env.WHATSAPP_DRY_RUN_NUMBER || '+34617680026'}.\nEn dry-run NO se marca \`whatsappSentAt\` — los mismos leads podrán ir en el broadcast real después.`
-    : `🚨 *PRODUCCIÓN* — los mensajes van al teléfono real de cada lead.`;
+    ? `🧪 <b>DRY-RUN activo</b> — todos los envíos se redirigen a <code>${escapeHtml(dryRunNumber)}</code>.\nEn dry-run NO se marca <code>whatsappSentAt</code> — los mismos leads podrán ir en el broadcast real después.`
+    : `🚨 <b>PRODUCCIÓN</b> — los mensajes van al teléfono real de cada lead.`;
 
   session.step = 'broadcast_confirm';
   session.broadcastFilter = filter;
   session.broadcastTemplate = 'web_lista';
 
-  await sendMsg(
-    `📣 *Broadcast web_lista*\n\n` +
-    `Filtro: \`${describeFilter(filter)}\`\n` +
-    `Leads que coinciden: *${count}*\n` +
+  await sendMsgHtml(
+    `📣 <b>Broadcast</b> <code>web_lista</code>\n\n` +
+    `Filtro: <code>${escapeHtml(describeFilter(filter))}</code>\n` +
+    `Leads que coinciden: <b>${count}</b>\n` +
     `Rate: 80 msg/min · ETA ~${Math.ceil((count * 60) / 80)}s\n\n` +
     `Ejemplos (primeros ${preview.length}):\n${previewLines}\n\n` +
     `${dryRunTag}`,
@@ -673,14 +674,14 @@ bot.onText(/^\/broadcast_status$/, async (msg) => {
       template?: string; status?: string; totalTargets?: number; sent?: number; skipped?: number; failed?: number; dryRun?: boolean;
     } | null;
     if (run) {
-      await sendMsg(
-        `📊 *Broadcast en curso*\n\n` +
-        `ID: \`${currentBroadcastRunId}\`\n` +
-        `Template: \`${run.template}\`\n` +
-        `Status: *${run.status}*\n` +
-        `Progreso: *${(run.sent || 0) + (run.skipped || 0) + (run.failed || 0)}/${run.totalTargets || 0}*\n` +
+      await sendMsgHtml(
+        `📊 <b>Broadcast en curso</b>\n\n` +
+        `ID: <code>${escapeHtml(currentBroadcastRunId)}</code>\n` +
+        `Template: <code>${escapeHtml(run.template || '')}</code>\n` +
+        `Status: <b>${escapeHtml(run.status || '')}</b>\n` +
+        `Progreso: <b>${(run.sent || 0) + (run.skipped || 0) + (run.failed || 0)}/${run.totalTargets || 0}</b>\n` +
         `✓ sent: ${run.sent || 0} · ⏭️ skip: ${run.skipped || 0} · ❌ fail: ${run.failed || 0}\n` +
-        `DRY_RUN: ${run.dryRun ? 'sí' : 'no'}\n\n` +
+        `Dry-run: ${run.dryRun ? 'sí' : 'no'}\n\n` +
         `Frenarlo: /broadcast_cancel`
       );
       return;
@@ -696,10 +697,10 @@ bot.onText(/^\/broadcast_status$/, async (msg) => {
   }
 
   const lines = last.map((r) =>
-    `• \`${String(r._id)}\` · ${r.template} · ${r.status} · ` +
+    `• <code>${String(r._id)}</code> · ${escapeHtml(r.template || '')} · ${escapeHtml(r.status || '')} · ` +
     `${r.sent || 0}/${r.totalTargets || 0} (fail ${r.failed || 0})`
   ).join('\n');
-  await sendMsg(`📋 *Últimos broadcasts:*\n\n${lines}\n\n_Ninguno en curso._`);
+  await sendMsgHtml(`📋 <b>Últimos broadcasts:</b>\n\n${lines}\n\n<i>Ninguno en curso.</i>`);
 });
 
 bot.onText(/^\/broadcast_cancel$/, async (msg) => {
@@ -910,18 +911,18 @@ bot.on('message', async (msg) => {
   if (text === '📋 Estado broadcast' || text === 'Estado broadcast') {
     await connectDB();
     if (currentBroadcastRunId) {
-      await sendMsg(`📊 Broadcast en curso: \`${currentBroadcastRunId}\`\n\nDetalle completo: /broadcast_status`);
+      await sendMsgHtml(`📊 Broadcast en curso: <code>${escapeHtml(currentBroadcastRunId)}</code>\n\nDetalle completo: /broadcast_status`);
     } else {
       const last = await BroadcastRun.find({}).sort({ createdAt: -1 }).limit(3).lean() as Array<{
         _id: unknown; template?: string; status?: string; sent?: number; totalTargets?: number; failed?: number;
       }>;
       if (!last.length) {
-        await sendMsg(`📭 No hay broadcasts aún. Probá con 📣 Broadcast web_lista.`, MAIN_KEYBOARD);
+        await sendMsgPlain('📭 No hay broadcasts aún. Probá con 📣 Broadcast web_lista.', MAIN_KEYBOARD);
       } else {
         const lines = last.map((r) =>
-          `• \`${String(r._id).slice(-8)}\` · ${r.template} · ${r.status} · ${r.sent || 0}/${r.totalTargets || 0}`
+          `• <code>${String(r._id).slice(-8)}</code> · ${escapeHtml(r.template || '')} · ${escapeHtml(r.status || '')} · ${r.sent || 0}/${r.totalTargets || 0}`
         ).join('\n');
-        await sendMsg(`📋 *Últimos broadcasts:*\n\n${lines}\n\n_Detalle: /broadcast_status_`, MAIN_KEYBOARD);
+        await sendMsgHtml(`📋 <b>Últimos broadcasts:</b>\n\n${lines}\n\n<i>Detalle: /broadcast_status</i>`, MAIN_KEYBOARD);
       }
     }
     return;
@@ -1389,15 +1390,15 @@ bot.on('callback_query', async (query) => {
         broadcastCancelFlag = false;
         session.step = 'idle';
 
-        const tag = result.dryRun ? '[DRY_RUN] ' : '';
+        const tag = result.dryRun ? '[DRY-RUN] ' : '';
         const statusEmoji = result.status === 'done' ? '✅' : result.status === 'cancelled' ? '🛑' : '❌';
         const errorsPreview = result.errors.length > 0
-          ? '\n\n*Errores (primeros 5):*\n' + result.errors.slice(0, 5).map((e) => `• ${e.businessName}: ${e.reason}`).join('\n')
+          ? '\n\n<b>Errores (primeros 5):</b>\n' + result.errors.slice(0, 5).map((e) => `• ${escapeHtml(e.businessName)}: ${escapeHtml(e.reason)}`).join('\n')
           : '';
-        await sendMsg(
-          `${statusEmoji} ${tag}*Broadcast ${result.status}*\n\n` +
-          `Run: \`${result.runId}\`\n` +
-          `Enviados: *${result.sent}/${result.totalTargets}*\n` +
+        await sendMsgHtml(
+          `${statusEmoji} ${tag}<b>Broadcast ${result.status}</b>\n\n` +
+          `Run: <code>${escapeHtml(result.runId)}</code>\n` +
+          `Enviados: <b>${result.sent}/${result.totalTargets}</b>\n` +
           `Skipped: ${result.skipped} · Failed: ${result.failed}\n` +
           `Duración: ${(result.durationMs / 1000).toFixed(1)}s` +
           errorsPreview,
@@ -1427,7 +1428,7 @@ bot.on('callback_query', async (query) => {
   // ── stripe_wasend_<leadId> — enviar payment link por WhatsApp ─────────────
   if (data.startsWith('stripe_wasend_')) {
     const leadId = data.replace('stripe_wasend_', '');
-    await sendMsg('_Enviando link por WhatsApp…_');
+    await sendMsgPlain('Enviando link por WhatsApp…');
     try {
       const result = await sendStripeLinkToLead({
         leadId,
@@ -1435,11 +1436,11 @@ bot.on('callback_query', async (query) => {
       });
       if (result.ok) {
         const channelLabel = result.channel === 'free-text' ? 'texto libre (ventana 24h)' : 'template pago_link';
-        await sendMsg(
-          `✅ *Link enviado por WhatsApp*\n\n` +
-          `Canal: ${channelLabel}\n` +
-          `msgId: \`${result.messageId}\`\n` +
-          `Payment URL: ${result.paymentLinkUrl}`,
+        await sendMsgHtml(
+          `✅ <b>Link enviado por WhatsApp</b>\n\n` +
+          `Canal: ${escapeHtml(channelLabel)}\n` +
+          `msgId: <code>${escapeHtml(result.messageId || '')}</code>\n` +
+          `Payment URL: ${escapeHtml(result.paymentLinkUrl || '')}`,
           MAIN_KEYBOARD
         );
       } else {
@@ -1447,15 +1448,15 @@ bot.on('callback_query', async (query) => {
           'no-lead': '❌ Lead no encontrado',
           'no-phone': '❌ Lead sin teléfono',
           'stripe-failed': '❌ Falló al crear payment link en Stripe',
-          'template-failed': '❌ Meta rechazó el template `pago_link`. ¿Lo aprobaron ya en Business Manager?',
+          'template-failed': '❌ Meta rechazó el template pago_link. ¿Lo aprobaron ya en Business Manager?',
           'freetext-failed': '❌ Meta rechazó el texto libre (posiblemente ventana 24h cerrada del lado de Meta)',
         };
         const title = reasonLabels[result.reason || ''] || '❌ Error';
-        await sendMsg(`${title}\n\n_${result.error || 'sin detalles'}_`, MAIN_KEYBOARD);
+        await sendMsgPlain(`${title}\n\n${result.error || 'sin detalles'}`, MAIN_KEYBOARD);
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      await sendMsg(`❌ Error inesperado: ${msg}`, MAIN_KEYBOARD);
+      await sendMsgPlain(`❌ Error inesperado: ${msg}`, MAIN_KEYBOARD);
     }
     return;
   }
