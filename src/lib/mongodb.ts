@@ -321,10 +321,41 @@ const WhatsAppMessageSchema = new mongoose.Schema({
   errorMessage: String,
   // Payload crudo de Meta para debug
   raw: mongoose.Schema.Types.Mixed,
+  // Referencias cruzadas a flujos que generaron este mensaje
+  broadcastRunId: { type: mongoose.Schema.Types.ObjectId, ref: 'BroadcastRun', index: true },
+  relatedStripePaymentLinkId: String,
 }, { timestamps: true });
 
 WhatsAppMessageSchema.index({ leadId: 1, createdAt: -1 });
 WhatsAppMessageSchema.index({ phone: 1, createdAt: -1 });
+
+// --- Broadcast Run (tracking de envíos masivos desde el bot) ---
+const BroadcastRunSchema = new mongoose.Schema({
+  template: { type: String, required: true },
+  templateLang: { type: String, default: 'es' },
+  filter: mongoose.Schema.Types.Mixed,
+  totalTargets: { type: Number, default: 0 },
+  sent: { type: Number, default: 0 },
+  skipped: { type: Number, default: 0 },
+  failed: { type: Number, default: 0 },
+  status: {
+    type: String,
+    enum: ['queued', 'running', 'done', 'cancelled', 'error'],
+    default: 'queued',
+  },
+  dryRun: { type: Boolean, default: true },
+  startedAt: Date,
+  finishedAt: Date,
+  cancelRequestedAt: Date,
+  errorLog: [{
+    leadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lead' },
+    businessName: String,
+    reason: String,
+  }],
+  initiator: { type: String, default: 'telegram' },
+}, { timestamps: true });
+
+BroadcastRunSchema.index({ status: 1, createdAt: -1 });
 
 // ==================== MODELOS ====================
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -332,3 +363,4 @@ export const Competitor = mongoose.models.Competitor || mongoose.model('Competit
 export const WebsiteContent = mongoose.models.WebsiteContent || mongoose.model('WebsiteContent', WebsiteContentSchema);
 export const PipelineRun = mongoose.models.PipelineRun || mongoose.model('PipelineRun', PipelineRunSchema);
 export const WhatsAppMessage = mongoose.models.WhatsAppMessage || mongoose.model('WhatsAppMessage', WhatsAppMessageSchema);
+export const BroadcastRun = mongoose.models.BroadcastRun || mongoose.model('BroadcastRun', BroadcastRunSchema);

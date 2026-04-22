@@ -14,11 +14,20 @@ import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 import TelegramBot from 'node-telegram-bot-api';
-import { connectDB, Lead, PipelineRun, WebsiteContent } from '../lib/mongodb';
+import { connectDB, Lead, PipelineRun, WebsiteContent, BroadcastRun } from '../lib/mongodb';
 import { runPipeline, processSingleLead } from '../../skills/generate';
 import { createPaymentLink } from '../../skills/payments/index';
 import { runCleanup } from '../../skills/cleanup/index';
 import { sendFreeTextToLead } from '../lib/whatsapp';
+import {
+  runBroadcast,
+  countTargets,
+  previewTargets,
+  webListaParams,
+  type BroadcastProgress,
+} from '../lib/whatsapp-broadcast';
+import { describeFilter, type BroadcastFilterSpec } from '../lib/broadcast-filters';
+import { sendStripeLinkToLead } from '../lib/whatsapp-stripe';
 import { getSectorKeyboard, slugFromLabel } from '../config/sectors';
 import cron from 'node-cron';
 import { runAutoPipeline, formatAutoReport, formatDailyReport } from './auto-pipeline';
@@ -67,7 +76,8 @@ const SERVICE_LABELS: Record<string, string> = {
 
 interface Session {
   step: 'idle' | 'sector' | 'country' | 'city' | 'limit' | 'confirm' | 'running'
-      | 'stripe_lead' | 'stripe_services';
+      | 'stripe_lead' | 'stripe_services'
+      | 'broadcast_confirm' | 'broadcast_running';
   sector?: string;
   city?: string;
   country?: string;
@@ -75,9 +85,17 @@ interface Session {
   // stripe flow
   stripeLead?: any;
   stripeServices?: string[];
+  // broadcast flow
+  broadcastFilter?: BroadcastFilterSpec;
+  broadcastTemplate?: string;
 }
 
 const session: Session = { step: 'idle' };
+
+// ─── Estado global de broadcast (1 a la vez) ─────────────────────────────────
+
+let currentBroadcastRunId: string | null = null;
+let broadcastCancelFlag = false;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -338,6 +356,7 @@ const MAIN_KEYBOARD: TelegramBot.SendMessageOptions = {
       [{ text: '⚡ Run ahora' }, { text: '🔄 Reset diario' }],
       [{ text: '🔁 Rehacer web' }, { text: '👁️ Leads activos' }],
       [{ text: '✅ Clientes' }, { text: '💳 /stripe' }],
+      [{ text: '📣 Broadcast web_lista' }, { text: '📋 Estado broadcast' }],
       [{ text: '🏥 Health check' }, { text: '🧹 Cleanup' }],
       [{ text: '📈 Coste pipeline' }, { text: '❓ Ayuda' }],
     ],
@@ -541,6 +560,165 @@ bot.onText(/^\/reply\s+(\S+)\s+([\s\S]+)$/, async (msg, match) => {
   }
 });
 
+// ─── /broadcast_web_lista — envío masivo del template web_lista ──────────────
+
+function parseInlineFilterArgs(rest: string): BroadcastFilterSpec {
+  const spec: BroadcastFilterSpec = {};
+  const tokens = rest.trim().split(/\s+/).filter(Boolean);
+  for (const tok of tokens) {
+    const eq = tok.indexOf('=');
+    if (eq <= 0) continue;
+    const key = tok.slice(0, eq).toLowerCase();
+    const val = tok.slice(eq + 1);
+    if (!val) continue;
+    switch (key) {
+      case 'sector': spec.sector = val.toLowerCase(); break;
+      case 'city': spec.city = val; break;
+      case 'country':
+        if (['ES', 'AR', 'UY', 'US'].includes(val.toUpperCase())) {
+          spec.country = val.toUpperCase() as BroadcastFilterSpec['country'];
+        }
+        break;
+      case 'status': spec.status = val; break;
+      case 'limit': {
+        const n = parseInt(val, 10);
+        if (!isNaN(n) && n > 0) spec.limit = n;
+        break;
+      }
+      case 'onlyunsent':
+      case 'only_unsent':
+        spec.onlyUnsent = val !== 'false' && val !== '0';
+        break;
+    }
+  }
+  return spec;
+}
+
+async function startBroadcastWebLista(inlineArgs: string) {
+  if (currentBroadcastRunId) {
+    await sendMsg(`⏳ Ya hay un broadcast en curso (\`${currentBroadcastRunId}\`). Usá /broadcast_status o /broadcast_cancel.`);
+    return;
+  }
+
+  await connectDB();
+
+  const filter: BroadcastFilterSpec = {
+    status: 'web_live',
+    requirePhone: true,
+    requireSlug: true,
+    onlyUnsent: true,
+    ...parseInlineFilterArgs(inlineArgs),
+  };
+
+  const count = await countTargets(filter);
+  if (count === 0) {
+    await sendMsg(
+      `⚠️ *Broadcast web_lista* — 0 leads coinciden.\n\n` +
+      `Filtro: \`${describeFilter(filter)}\`\n\n` +
+      `Probá: \`/broadcast_web_lista\` sin filtros, o \`/broadcast_web_lista sector=yoga\`.`,
+      MAIN_KEYBOARD
+    );
+    return;
+  }
+
+  const preview = await previewTargets(filter, 5);
+  const previewLines = preview
+    .map((p, i) => `${i + 1}. ${p.businessName} — ${p.city} (${p.sector})`)
+    .join('\n');
+
+  const isDryRun = process.env.WHATSAPP_DRY_RUN !== 'false';
+  const dryRunTag = isDryRun
+    ? `🧪 *DRY_RUN activo* — todos los envíos se redirigen a ${process.env.WHATSAPP_DRY_RUN_NUMBER || '+34617680026'}.\nEn dry-run NO se marca \`whatsappSentAt\` — los mismos leads podrán ir en el broadcast real después.`
+    : `🚨 *PRODUCCIÓN* — los mensajes van al teléfono real de cada lead.`;
+
+  session.step = 'broadcast_confirm';
+  session.broadcastFilter = filter;
+  session.broadcastTemplate = 'web_lista';
+
+  await sendMsg(
+    `📣 *Broadcast web_lista*\n\n` +
+    `Filtro: \`${describeFilter(filter)}\`\n` +
+    `Leads que coinciden: *${count}*\n` +
+    `Rate: 80 msg/min · ETA ~${Math.ceil((count * 60) / 80)}s\n\n` +
+    `Ejemplos (primeros ${preview.length}):\n${previewLines}\n\n` +
+    `${dryRunTag}`,
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '✅ Lanzar broadcast', callback_data: 'broadcast_confirm' }],
+          [{ text: '❌ Cancelar', callback_data: 'broadcast_abort' }],
+        ],
+      },
+    }
+  );
+}
+
+bot.onText(/^\/broadcast_web_lista(?:\s+(.+))?$/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await startBroadcastWebLista(match?.[1] || '');
+});
+
+bot.onText(/^\/broadcast$/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  // Por ahora /broadcast es alias de /broadcast_web_lista. Futuro: builder interactivo de filtros.
+  await startBroadcastWebLista('');
+});
+
+bot.onText(/^\/broadcast_status$/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+  await connectDB();
+
+  if (currentBroadcastRunId) {
+    const run = await BroadcastRun.findById(currentBroadcastRunId).lean() as {
+      template?: string; status?: string; totalTargets?: number; sent?: number; skipped?: number; failed?: number; dryRun?: boolean;
+    } | null;
+    if (run) {
+      await sendMsg(
+        `📊 *Broadcast en curso*\n\n` +
+        `ID: \`${currentBroadcastRunId}\`\n` +
+        `Template: \`${run.template}\`\n` +
+        `Status: *${run.status}*\n` +
+        `Progreso: *${(run.sent || 0) + (run.skipped || 0) + (run.failed || 0)}/${run.totalTargets || 0}*\n` +
+        `✓ sent: ${run.sent || 0} · ⏭️ skip: ${run.skipped || 0} · ❌ fail: ${run.failed || 0}\n` +
+        `DRY_RUN: ${run.dryRun ? 'sí' : 'no'}\n\n` +
+        `Frenarlo: /broadcast_cancel`
+      );
+      return;
+    }
+  }
+
+  const last = await BroadcastRun.find({}).sort({ createdAt: -1 }).limit(3).lean() as Array<{
+    _id: unknown; template?: string; status?: string; totalTargets?: number; sent?: number; skipped?: number; failed?: number; createdAt?: Date;
+  }>;
+  if (!last.length) {
+    await sendMsg(`📭 No hay broadcasts previos ni en curso.`);
+    return;
+  }
+
+  const lines = last.map((r) =>
+    `• \`${String(r._id)}\` · ${r.template} · ${r.status} · ` +
+    `${r.sent || 0}/${r.totalTargets || 0} (fail ${r.failed || 0})`
+  ).join('\n');
+  await sendMsg(`📋 *Últimos broadcasts:*\n\n${lines}\n\n_Ninguno en curso._`);
+});
+
+bot.onText(/^\/broadcast_cancel$/, async (msg) => {
+  if (!isAuthorized(msg.chat.id)) return;
+
+  if (!currentBroadcastRunId) {
+    await sendMsg(`No hay ningún broadcast en curso que cancelar.`);
+    return;
+  }
+
+  broadcastCancelFlag = true;
+  await connectDB();
+  await BroadcastRun.findByIdAndUpdate(currentBroadcastRunId, {
+    cancelRequestedAt: new Date(),
+  }).catch(() => { /* non-fatal */ });
+
+  await sendMsg(`🛑 Cancel solicitado — el broadcast va a parar entre un envío y el siguiente.`);
+});
+
 bot.onText(/\/cancel/, async (msg) => {
   if (!isAuthorized(msg.chat.id)) return;
   if (autoPipelineCancelled) {
@@ -571,7 +749,11 @@ bot.onText(/\/summary/, async (msg) => {
     `/metrics — Historial de pipeline runs con costos.\n` +
     `/leads-status — Leads activos por estado (scraped, web_live, client, etc).\n\n` +
     `💰 VENTAS\n` +
-    `/stripe — Generar link de pago para un lead. Elegís servicios y monto.\n\n` +
+    `/stripe — Generar link de pago para un lead. Al final tenés botón para enviar por WhatsApp.\n\n` +
+    `📣 BROADCAST WHATSAPP\n` +
+    `/broadcast_web_lista [sector=X city=Y limit=N] — Enviar template web_lista masivo. Respeta DRY_RUN.\n` +
+    `/broadcast_status — Ver broadcast en curso o últimos 3.\n` +
+    `/broadcast_cancel — Frenar el broadcast en curso.\n\n` +
     `🧹 MANTENIMIENTO\n` +
     `/cleanup — Expirar leads viejos (+48h sin actividad, +30 días scraped).\n\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
@@ -717,6 +899,31 @@ bot.on('message', async (msg) => {
 
   if (text === '💳 /stripe' || text === '/stripe') {
     await startStripeFlow();
+    return;
+  }
+
+  if (text === '📣 Broadcast web_lista' || text === 'Broadcast web_lista') {
+    await startBroadcastWebLista('');
+    return;
+  }
+
+  if (text === '📋 Estado broadcast' || text === 'Estado broadcast') {
+    await connectDB();
+    if (currentBroadcastRunId) {
+      await sendMsg(`📊 Broadcast en curso: \`${currentBroadcastRunId}\`\n\nDetalle completo: /broadcast_status`);
+    } else {
+      const last = await BroadcastRun.find({}).sort({ createdAt: -1 }).limit(3).lean() as Array<{
+        _id: unknown; template?: string; status?: string; sent?: number; totalTargets?: number; failed?: number;
+      }>;
+      if (!last.length) {
+        await sendMsg(`📭 No hay broadcasts aún. Probá con 📣 Broadcast web_lista.`, MAIN_KEYBOARD);
+      } else {
+        const lines = last.map((r) =>
+          `• \`${String(r._id).slice(-8)}\` · ${r.template} · ${r.status} · ${r.sent || 0}/${r.totalTargets || 0}`
+        ).join('\n');
+        await sendMsg(`📋 *Últimos broadcasts:*\n\n${lines}\n\n_Detalle: /broadcast_status_`, MAIN_KEYBOARD);
+      }
+    }
     return;
   }
 
@@ -1137,6 +1344,122 @@ bot.on('callback_query', async (query) => {
     return;
   }
 
+  // ── broadcast_confirm / broadcast_abort ───────────────────────────────────
+  if (data === 'broadcast_abort') {
+    session.step = 'idle';
+    session.broadcastFilter = undefined;
+    session.broadcastTemplate = undefined;
+    await sendMsg('❌ Broadcast cancelado antes de lanzar.', MAIN_KEYBOARD);
+    return;
+  }
+
+  if (data === 'broadcast_confirm') {
+    if (session.step !== 'broadcast_confirm' || !session.broadcastFilter) {
+      await sendMsg('⚠️ Se perdió el contexto del broadcast. Probá de nuevo con /broadcast_web_lista.');
+      return;
+    }
+    if (currentBroadcastRunId) {
+      await sendMsg('⏳ Ya hay otro broadcast en curso. Frenalo con /broadcast_cancel antes de lanzar uno nuevo.');
+      return;
+    }
+
+    const filter = session.broadcastFilter;
+    session.step = 'broadcast_running';
+    broadcastCancelFlag = false;
+
+    await sendMsg(`🚀 *Broadcast lanzado*\n\nProgreso cada 5 envíos. Frenar: /broadcast_cancel`);
+
+    runBroadcast({
+      filter,
+      template: session.broadcastTemplate || 'web_lista',
+      templateLang: 'es',
+      buildParams: webListaParams,
+      onProgress: async (p: BroadcastProgress) => {
+        if (!currentBroadcastRunId) return;
+        await sendMsg(
+          `⏳ ${p.processed}/${p.totalTargets} · ✓${p.sent} · ⏭️${p.skipped} · ❌${p.failed}` +
+          (p.etaSeconds !== undefined ? ` · ETA ~${p.etaSeconds}s` : '')
+        ).catch(() => { /* rate-limited o red */ });
+      },
+      progressEvery: 5,
+      isCancelled: () => broadcastCancelFlag,
+    })
+      .then(async (result) => {
+        currentBroadcastRunId = null;
+        broadcastCancelFlag = false;
+        session.step = 'idle';
+
+        const tag = result.dryRun ? '[DRY_RUN] ' : '';
+        const statusEmoji = result.status === 'done' ? '✅' : result.status === 'cancelled' ? '🛑' : '❌';
+        const errorsPreview = result.errors.length > 0
+          ? '\n\n*Errores (primeros 5):*\n' + result.errors.slice(0, 5).map((e) => `• ${e.businessName}: ${e.reason}`).join('\n')
+          : '';
+        await sendMsg(
+          `${statusEmoji} ${tag}*Broadcast ${result.status}*\n\n` +
+          `Run: \`${result.runId}\`\n` +
+          `Enviados: *${result.sent}/${result.totalTargets}*\n` +
+          `Skipped: ${result.skipped} · Failed: ${result.failed}\n` +
+          `Duración: ${(result.durationMs / 1000).toFixed(1)}s` +
+          errorsPreview,
+          MAIN_KEYBOARD
+        );
+      })
+      .catch(async (err: unknown) => {
+        currentBroadcastRunId = null;
+        broadcastCancelFlag = false;
+        session.step = 'idle';
+        const msg = err instanceof Error ? err.message : String(err);
+        await sendMsg(`❌ *Broadcast falló:* ${msg}`, MAIN_KEYBOARD);
+      });
+
+    // Capturamos el runId apenas se crea el registro (el engine lo crea al inicio)
+    // Sondeamos Mongo un instante después para obtenerlo — o el engine podría emitirlo.
+    setTimeout(async () => {
+      try {
+        const running = await BroadcastRun.findOne({ status: 'running' }).sort({ createdAt: -1 }).lean() as { _id: unknown } | null;
+        if (running) currentBroadcastRunId = String(running._id);
+      } catch { /* non-fatal */ }
+    }, 800);
+
+    return;
+  }
+
+  // ── stripe_wasend_<leadId> — enviar payment link por WhatsApp ─────────────
+  if (data.startsWith('stripe_wasend_')) {
+    const leadId = data.replace('stripe_wasend_', '');
+    await sendMsg('_Enviando link por WhatsApp…_');
+    try {
+      const result = await sendStripeLinkToLead({
+        leadId,
+        services: session.stripeServices,
+      });
+      if (result.ok) {
+        const channelLabel = result.channel === 'free-text' ? 'texto libre (ventana 24h)' : 'template pago_link';
+        await sendMsg(
+          `✅ *Link enviado por WhatsApp*\n\n` +
+          `Canal: ${channelLabel}\n` +
+          `msgId: \`${result.messageId}\`\n` +
+          `Payment URL: ${result.paymentLinkUrl}`,
+          MAIN_KEYBOARD
+        );
+      } else {
+        const reasonLabels: Record<string, string> = {
+          'no-lead': '❌ Lead no encontrado',
+          'no-phone': '❌ Lead sin teléfono',
+          'stripe-failed': '❌ Falló al crear payment link en Stripe',
+          'template-failed': '❌ Meta rechazó el template `pago_link`. ¿Lo aprobaron ya en Business Manager?',
+          'freetext-failed': '❌ Meta rechazó el texto libre (posiblemente ventana 24h cerrada del lado de Meta)',
+        };
+        const title = reasonLabels[result.reason || ''] || '❌ Error';
+        await sendMsg(`${title}\n\n_${result.error || 'sin detalles'}_`, MAIN_KEYBOARD);
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      await sendMsg(`❌ Error inesperado: ${msg}`, MAIN_KEYBOARD);
+    }
+    return;
+  }
+
   // ── pay_<leadId> ──────────────────────────────────────────────────────────
   if (data.startsWith('pay_')) {
     const leadId = data.replace('pay_', '');
@@ -1212,8 +1535,14 @@ bot.on('callback_query', async (query) => {
           `💰 Total: <b>${totalEur}€/mes</b>\n` +
           `🔗 Hosting: ~3,50€/mes adicional · Dominio: ~15€/año\n\n` +
           `<a href="${safeUrl}">Abrir payment link</a>\n\n` +
-          `Envíalo por WhatsApp al cliente.`,
-          MAIN_KEYBOARD
+          `Envíalo manualmente por WhatsApp, o tocá el botón de abajo para que el bot lo envíe automáticamente.`,
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '📲 Enviar link por WhatsApp', callback_data: `stripe_wasend_${lead._id}` }],
+              ],
+            },
+          }
         );
       }
     } catch (e: any) {
