@@ -233,8 +233,8 @@ export async function notifyLeadViaWhatsApp(lead: any): Promise<NotifyResult> {
     params = undefined;
   } else {
     // web_lista: {{1}} nombre_contacto, {{2}} nombre_negocio, {{3}} url_web
-    // No tenemos nombre del dueño en el schema → usamos businessName para ambos
-    params = [lead.businessName, lead.businessName, webUrl];
+    // {{1}} = "👋" (genérico, evita "Hola Cerrajería 24h Rosario" que queda mal)
+    params = ['👋', lead.businessName, webUrl];
   }
 
   if (params) {

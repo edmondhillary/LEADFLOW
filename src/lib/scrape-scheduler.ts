@@ -18,7 +18,7 @@ import mongoose from 'mongoose';
 export const DAILY_LEAD_CAP = parseInt(process.env.DAILY_LEAD_CAP || '500', 10);
 
 /** Presupuesto diario de Apify en USD (Bronze plan: $29 prepaid ÷ ~14 días) */
-export const DAILY_APIFY_BUDGET_USD = parseFloat(process.env.DAILY_APIFY_BUDGET_USD || '2.00');
+export const DAILY_APIFY_BUDGET_USD = parseFloat(process.env.DAILY_APIFY_BUDGET_USD || '5.00');
 
 /** Costo estimado por run de Apify en USD (Bronze plan: $0.300/CU, ~1-2 CU/run) */
 export const APIFY_COST_PER_RUN_USD = parseFloat(process.env.APIFY_COST_PER_RUN_USD || '0.40');

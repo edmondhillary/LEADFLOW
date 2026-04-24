@@ -303,5 +303,5 @@ export function webListaParams(lead: LeadDoc): string[] | null {
   if (!lead.businessName || !lead.slug) return null;
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://leadflow.es';
   const url = `${base}/${lead.slug}`;
-  return [lead.businessName, lead.businessName, url];
+  return ['👋', lead.businessName, url];
 }
